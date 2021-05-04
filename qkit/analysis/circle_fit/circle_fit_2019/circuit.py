@@ -9,6 +9,7 @@ https://github.com/sebastianprobst/resonator_tools
 """
 
 import numpy as np
+import cmath
 import logging
 import scipy.optimize as spopt
 from scipy import stats
@@ -35,12 +36,17 @@ class circuit:
     - f_data: Frequencies for which scattering data z_data_raw is taken
     - z_data_raw: Measured values for scattering parameter S11 or S21 taken at
                   frequencies f_data
+    - z_data_baseline: Measured values for scattering parameter S21 taken at 
+                       frequencies f_data without the resonator under test. 
+                       Used to remove environental offset for in-line type 
+                       resonators.
     """
     
-    def __init__(self, f_data, z_data_raw=None):
+    def __init__(self, f_data, z_data_raw=None, z_data_baseline=None):
         self.f_data = np.array(f_data)
         self.z_data_raw = np.array(z_data_raw)
         self.z_data_norm = None
+        self.z_data_baseline = np.array(z_data_baseline)
         
         self.fitresults = {}
         
@@ -65,8 +71,14 @@ class circuit:
         - delay (opt.): Time delay between output and input signal leading to
                         linearly frequency dependent phase shift
         """
+        # NN: diameter correction method (Khalil et al.)
         complexQc = Qc*np.cos(phi)*np.exp(-1j*phi)
-        return a*np.exp(1j*(alpha-2*np.pi*f*delay)) * (
+        
+        if cls.in_line_type:
+            return (Ql / (complexQc * (1. + 2j*Ql*(f/fr-1.)))) 
+        
+        else:
+            return a*np.exp(1j*(alpha-2*np.pi*f*delay)) * (
             1. - 2.*Ql / (complexQc * cls.n_ports * (1. + 2j*Ql*(f/fr-1.)))
         )
     
@@ -79,11 +91,28 @@ class circuit:
         # TODO: implement refine results?
         
         if fixed_delay is None:
-            self._fit_delay()
+
+            if self.in_line_type: 
+                # NN: Value of delay isn't used in the rest of the 
+                # fitting for in-line type resonators, but we still store it 
+                # in the fit results.
+                self.delay = 0
+                self.fitresults["delay"] = self._fit_baseline()[2]
+            else:
+                self._fit_delay()
+                
         else:
-            self.delay = fixed_delay
-            # Store result in dictionary (also for backwards-compatibility)
-            self.fitresults["delay"] = self.delay
+            if self.in_line_type:
+                # NN: Value of delay isn't used in the rest of the 
+                # fitting for in-line type resonators, but we still store it 
+                # in the fit results.
+                self.delay = 0
+                self.fitresults["delay"] = self._fit_baseline()[2]
+            else:           
+                self.delay = fixed_delay
+                # Store result in dictionary (also for backwards-compatibility)
+                self.fitresults["delay"] = self.delay
+        
         self._calibrate()
         self._normalize()
         self._extract_Qs(calc_errors=calc_errors)
@@ -93,10 +122,15 @@ class circuit:
             self.f_data, self.fr, self.Ql, self.Qc, self.phi,
             self.a, self.alpha, self.delay
         )
+        if self.in_line_type:
+            self.z_data_sim *= self.z_data_baseline
+            
         self.z_data_sim_norm = self.Sij(
             self.f_data, self.fr, self.Ql, self.Qc, self.phi
         )
     
+
+        
     def _fit_delay(self):
         """
         Finds the cable delay by repeatedly centering the "circle" and fitting
@@ -151,52 +185,179 @@ class circuit:
             )
         
         # Store result in dictionary (also for backwards-compatibility)
+      
         self.fitresults["delay"] = self.delay
     
+    def _fit_baseline(self):
+        """
+        Finds a, alpha and delay for in-line type resonators.
+        """
+        
+        phase = np.unwrap(np.angle(self.z_data_raw))
+
+        # NN: The in-line model of S21 differs from the notch model by a factor 
+        # of -1 = exp(i*pi), which is equivalent to a pi phase shift.
+        phase += np.pi
+        # For centered circle roll-off should be close to 2pi. If not warn user.
+        if np.max(phase) - np.min(phase) <= 0.8*2*np.pi:
+            logging.warning(
+                "Data does not cover a full circle (only {:.1f}".format(
+                    np.max(phase) - np.min(phase)
+                )
+               +" rad). Increase the frequency span around the resonance?"
+            )
+            roll_off = np.max(phase) - np.min(phase)
+        else:
+            roll_off = 2*np.pi
+        
+        # Estimate delay from background slope of phase (substract roll-off)
+        slope = phase[-1] - phase[0] + roll_off
+        delay_guess = -slope / (2*np.pi*(self.f_data[-1]-self.f_data[0]))
+        
+        #delay_guess = 1#self.delay
+
+        a_guess = np.mean(np.abs(self.z_data_baseline))
+        alpha_guess = np.mean(-1j*np.log(self.z_data_baseline / (
+                    a_guess*np.exp(1j*(-2*np.pi*self.f_data*delay_guess)))
+            ))       
+        alpha_guess = float(alpha_guess)
+
+
+        def residuals_a(params):
+            a, = params
+            return residuals_baseline_mag((a, alpha_guess, delay_guess))
+        def residuals_alpha(params):
+            alpha, = params
+            return residuals_baseline_arg((a_guess, alpha, delay_guess))
+        def residuals_delay(params):
+            delay, = params
+            return residuals_baseline_arg((a_guess, alpha_guess, delay))
+
+
+        def residuals_baseline_mag(params):
+            res_base_mag = np.abs(self.z_data_baseline)
+            - np.abs(circuit.baseline_model(self.f_data, *params))
+            return res_base_mag
+        def residuals_baseline_arg(params):
+            res_base_arg = np.angle(self.z_data_baseline)
+            - np.angle(circuit.baseline_model(self.f_data, *params))
+            return res_base_arg
+        
+
+        results = spopt.leastsq(residuals_a, [a_guess])
+        a_guess, = results[0]
+        results = spopt.leastsq(residuals_alpha, [alpha_guess])
+        alpha_guess = results[0]
+        results = spopt.leastsq(residuals_delay, [delay_guess])
+        delay_guess = results[0]
+
+        # results = spopt.leastsq(residuals_baseline_arg, [
+        #     a_guess, alpha_guess, delay_guess])
+  
+        return a_guess, alpha_guess, delay_guess
+    
+    @classmethod
+    def baseline_model(cls, f, a, alpha, delay):
+        """
+        Model of S21 without the resonator under test.
+        """
+        return a*np.exp(1j*(alpha-2*np.pi*f*delay))
+            
     def _calibrate(self):
         """
         Finds the parameters for normalization of the scattering data. See
         Sij of port classes for explanation of parameters.
         """
         
-        # Correct for delay and translate circle to origin
-        z_data = self.z_data_raw * np.exp(2j*np.pi*self.delay*self.f_data)
-        xc, yc, self.r0 = self._fit_circle(z_data)
-        zc = np.complex(xc, yc)
-        z_data -= zc
+        if self.in_line_type:
+            
+            # Correct for delay and translate circle to origin
+           
+            # NN: factor out the environmental components
+            z_data = self.z_data_raw / self.z_data_baseline 
         
-        # Find off-resonant point by fitting offset phase
-        # (centered circle corresponds to lossless resonator in reflection)
-        self.fr, self.Ql, theta, self.delay_remaining = self._fit_phase(z_data)
-        self.theta = self._periodic_boundary(theta)
-        beta = self._periodic_boundary(theta - np.pi)
-        offrespoint = zc + self.r0*np.cos(beta) + 1j*self.r0*np.sin(beta)
-        self.offrespoint = offrespoint
-        self.a = np.absolute(offrespoint)
-        self.alpha = np.angle(offrespoint)
-        self.phi = self._periodic_boundary(beta - self.alpha)
-        
-        # Store radius for later calculation
-        self.r0 /= self.a
-        
-        # Store results in dictionary (also for backwards-compatibility)
-        self.fitresults.update({
-            "delay_remaining": self.delay_remaining,
-            "a": self.a,
-            "alpha": self.alpha,
-            "theta": self.theta,
-            "phi": self.phi,
-            "fr": self.fr,
-            "Ql": self.Ql
-        })
+            xc, yc, self.r0 = self._fit_circle(z_data)
+            zc = np.complex(xc, yc)
+            z_data -= zc
+            
+            # Find off-resonant point by fitting offset phase
+            # (centered circle corresponds to lossless resonator in reflection)
+            # self.fr, self.Ql, theta, self.delay_remaining = self._fit_phase(z_data)
+            self.fr, self.Ql, theta = self._fit_phase(z_data)
+            
+            # NN: Values of a and alpha aren't used in the rest of the 
+            # fitting for in-line type resonators, but we still store them 
+            # in the fit results.
+            self.a = 1 
+            self.fitresults["a"] = self._fit_baseline()[0]
+            self.alpha = 0 
+            self.fitresults["alpha"] = self._fit_baseline()[1]
+            
+            self.theta = self._periodic_boundary(theta)
+            beta = self._periodic_boundary(theta - np.pi)
+            offrespoint = zc + self.r0*np.cos(beta) + 1j*self.r0*np.sin(beta)
+            self.offrespoint = offrespoint
+            self.phi = self._periodic_boundary(beta - self.alpha)
+
+            # Store radius for later calculation
+            self.r0 /= self.a
+            
+            # Store results in dictionary (also for backwards-compatibility)
+            self.fitresults.update({
+                "delay_remaining": 0,#self.delay_remaining,
+                "theta": self.theta,
+                "phi": self.phi,
+                "fr": self.fr,
+                "Ql": self.Ql
+            })
     
+    
+        else:
+            
+            # Correct for delay and translate circle to origin
+            z_data = self.z_data_raw * np.exp(2j*np.pi*self.delay*self.f_data)
+            xc, yc, self.r0 = self._fit_circle(z_data)
+            zc = np.complex(xc, yc)
+            z_data -= zc
+            
+            # Find off-resonant point by fitting offset phase
+            # (centered circle corresponds to lossless resonator in reflection)
+            self.fr, self.Ql, theta, self.delay_remaining = self._fit_phase(z_data)
+            self.theta = self._periodic_boundary(theta)
+            beta = self._periodic_boundary(theta - np.pi)
+            offrespoint = zc + self.r0*np.cos(beta) + 1j*self.r0*np.sin(beta)
+            self.offrespoint = offrespoint
+            self.a = np.absolute(offrespoint)
+            self.alpha = np.angle(offrespoint)
+            self.phi = self._periodic_boundary(beta - self.alpha)
+            
+            # Store radius for later calculation
+            self.r0 /= self.a
+            
+            # Store results in dictionary (also for backwards-compatibility)
+            self.fitresults.update({
+                "delay_remaining": self.delay_remaining,
+                "a": self.a,
+                "alpha": self.alpha,
+                "theta": self.theta,
+                "phi": self.phi,
+                "fr": self.fr,
+                "Ql": self.Ql
+            })    
+            
+            
     def _normalize(self):
         """
         Transforms scattering data into canonical position with off-resonant
         point at (1, 0) (does not correct for rotation phi of circle around
         off-resonant point).
         """
-        self.z_data_norm = self.z_data_raw / self.a*np.exp(
+        
+        if self.in_line_type:
+            self.z_data_norm = self.z_data_raw / self.z_data_baseline 
+            
+        else:
+            self.z_data_norm = self.z_data_raw / self.a*np.exp(
             1j*(-self.alpha + 2.*np.pi*self.delay*self.f_data)
         )
         
@@ -360,7 +521,11 @@ class circuit:
                  frequency dependent phase shift
         """
         phase = np.unwrap(np.angle(z_data))
-        
+
+        # NN: The in-line model of S21 differs from the notch model by a factor 
+        # of -1 = exp(i*pi), which is equivalent to a pi phase shift.
+        if self.in_line_type: 
+            phase += np.pi
         # For centered circle roll-off should be close to 2pi. If not warn user.
         if np.max(phase) - np.min(phase) <= 0.8*2*np.pi:
             logging.warning(
@@ -415,24 +580,46 @@ class circuit:
                 phase - circuit.phase_centered(self.f_data, *params)
             )
 
-        p_final = spopt.leastsq(residuals_Ql, [Ql_guess])
-        Ql_guess, = p_final[0]
-        p_final = spopt.leastsq(residuals_fr_theta, [fr_guess, theta_guess])
-        fr_guess, theta_guess = p_final[0]
-        p_final = spopt.leastsq(residuals_delay, [delay_guess])
-        delay_guess, = p_final[0]
-        p_final = spopt.leastsq(residuals_fr_Ql, [fr_guess, Ql_guess])
-        fr_guess, Ql_guess = p_final[0]
-        # p_final = spopt.leastsq(residuals_fr, [fr_guess])
-        # fr_guess, = p_final[0]
-        # p_final = spopt.leastsq(residuals_Ql, [Ql_guess])
-        # Ql_guess, = p_final[0]
-        p_final = spopt.leastsq(residuals_full, [
-            fr_guess, Ql_guess, theta_guess, delay_guess
-        ])
+        if self.in_line_type:
+            
+            p_final = spopt.leastsq(residuals_Ql, [Ql_guess])
+            Ql_guess, = p_final[0]
+            p_final = spopt.leastsq(residuals_fr_theta, [fr_guess, theta_guess])
+            fr_guess, theta_guess = p_final[0]
+            #p_final = spopt.leastsq(residuals_delay, [delay_guess])
+            #delay_guess, = p_final[0]
+            p_final = spopt.leastsq(residuals_fr_Ql, [fr_guess, Ql_guess])
+            fr_guess, Ql_guess = p_final[0]
+           
+            # p_final = spopt.leastsq(residuals_fr, [fr_guess])
+            # fr_guess, = p_final[0]
+            # p_final = spopt.leastsq(residuals_Ql, [Ql_guess])
+            # Ql_guess, = p_final[0]
+            
+            p_final = spopt.leastsq(residuals_full, [
+                fr_guess, Ql_guess, theta_guess])#, delay_guess
+            #])
         
+        else:
+
+            p_final = spopt.leastsq(residuals_Ql, [Ql_guess])
+            Ql_guess, = p_final[0]
+            p_final = spopt.leastsq(residuals_fr_theta, [fr_guess, theta_guess])
+            fr_guess, theta_guess = p_final[0]
+            p_final = spopt.leastsq(residuals_delay, [delay_guess])
+            delay_guess, = p_final[0]
+            p_final = spopt.leastsq(residuals_fr_Ql, [fr_guess, Ql_guess])
+            fr_guess, Ql_guess = p_final[0]
+            # p_final = spopt.leastsq(residuals_fr, [fr_guess])
+            # fr_guess, = p_final[0]
+            # p_final = spopt.leastsq(residuals_Ql, [Ql_guess])
+            # Ql_guess, = p_final[0]
+            p_final = spopt.leastsq(residuals_full, [
+                fr_guess, Ql_guess, theta_guess, delay_guess
+            ])
+            
         return p_final[0]
-        
+    
     @classmethod
     def phase_centered(cls, f, fr, Ql, theta, delay=0.):
         """
@@ -446,7 +633,7 @@ class circuit:
         - theta: Offset phase
         - delay (opt.): Time delay between output and input signal leading to
                         linearly frequency dependent phase shift
-        """
+        """ 
         return theta - 2*np.pi*delay*(f-fr) + 2.*np.arctan(2.*Ql*(1. - f/fr))
     
     def _phase_dist(self, angle):
@@ -541,14 +728,14 @@ class circuit:
         plt.subplot(221, aspect="equal")
         plt.axvline(0, c="k", ls="--", lw=1)
         plt.axhline(0, c="k", ls="--", lw=1)
-        plt.plot(real,imag,label='rawdata')
-        plt.plot(real2,imag2,label='fit')
+        plt.plot(real,imag, label='rawdata')
+        plt.plot(real2,imag2, label='fit')
         plt.xlabel('Re(S21)')
         plt.ylabel('Im(S21)')
         plt.legend()
         plt.subplot(222)
-        plt.plot(self.f_data*1e-9,np.absolute(self.z_data_raw),label='rawdata')
-        plt.plot(self.f_data*1e-9,np.absolute(self.z_data_sim),label='fit')
+        plt.plot(self.f_data*1e-9,np.absolute(self.z_data_raw), label='rawdata')
+        plt.plot(self.f_data*1e-9,np.absolute(self.z_data_sim), label='fit')
         plt.xlabel('f (GHz)')
         plt.ylabel('|S21|')
         plt.legend()
@@ -611,11 +798,25 @@ class reflection_port(circuit):
     
     # See Sij of circuit class for explanation
     n_ports = 1.
+    in_line_type = False
+    notch_type = False    
     
 class notch_port(circuit):
     """
-    Circlefit class for two-port resonator probed in transmission.
+    Circlefit class for two-port resonator in a notch-type configuration probed in transmission.
     """
     
     # See Sij of circuit class for explanation
     n_ports = 2.
+    in_line_type = False
+    notch_type = True
+    
+class in_line_port(circuit):
+    """
+    Circlefit class for two-port resonator in an in-line configuration probed in transmission.
+    """
+    
+    # See Sij of circuit class for explanation
+    n_ports = 2.
+    in_line_type = True
+    notch_type = False
