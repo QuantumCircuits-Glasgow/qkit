@@ -226,7 +226,7 @@ def gauss(pulse, sample, length = None,position = None, low = 0, high = 1, clock
     if(np.ceil(sample_end) != np.floor(sample_end)): wfm[int(sample_end)] = low + (high-low)*(sample_end-int(sample_end))
     return wfm
 
-def arb_function(function, pulse, length = None,position = None, clock = None):
+def arb_function(function, sample, pulse, length = None,position = None, clock = None):
     '''
         generate arbitrary waveform pulse
 
@@ -248,12 +248,12 @@ def arb_function(function, pulse, length = None,position = None, clock = None):
         else:
             logging.warning('overlap attribute not found in sample object')
     if(pulse>position): logging.error(__name__ + ' : pulse does not fit into waveform')
-    sample_start = clock*(position-pulse)
-    sample_end = clock*position
+    sample_start = int(clock*(position-pulse))
+    sample_end = int(clock*position)
     sample_length = int(np.ceil(length*clock))
 
     wfm = np.zeros(sample_length,dtype=dtype)
-    times = 1./clock*np.arange(0, sample_end-sample_start+1)
+    times = 1./clock*np.arange(0, sample_end-sample_start)
     wfm[sample_start:sample_end] = function(times)
     return wfm
 
