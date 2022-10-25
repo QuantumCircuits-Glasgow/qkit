@@ -54,8 +54,9 @@ class Keithley_2450(Instrument):
         self._address = address
         #self._numchs = 1
         self.ramp_wait_time = 0.5
-        self._visainstrument = visa.instrument(self._address)
         
+        rm= visa.ResourceManager()
+        self._visainstrument = rm.open_resource((self._address))
         #self._visainstrument.write(':SYST:REM')
         
 
@@ -263,7 +264,7 @@ class Keithley_2450(Instrument):
         '''
         logging.debug('Get status of output')
         #ans=self._get_func_par('outp','stat')
-        ans = self._visainstrument.ask(':outp?')
+        ans = self._visainstrument.query(':outp?')
         
         if ans=='zero':
             return "off"
@@ -300,9 +301,9 @@ class Keithley_2450(Instrument):
         logging.debug('Get measuring level')
         mode = self.get('source_mode')
         if mode == 'CURR':
-            return float(self._visainstrument.ask(':SOUR:CURR?'))
+            return float(self._visainstrument.query(':SOUR:CURR?'))
         elif mode == 'VOLT':
-            return float(self._visainstrument.ask(':SOUR:VOLT?'))
+            return float(self._visainstrument.query(':SOUR:VOLT?'))
         else:
             return 'error'
         
@@ -319,7 +320,7 @@ class Keithley_2450(Instrument):
         # Gets voltage protection value
         # '''                
         # logging.debug('Get voltage protection value')
-        # return float(self._visainstrument.ask(':SENS:VOLT:PROT?'))
+        # return float(self._visainstrument.query(':SENS:VOLT:PROT?'))
         
     # def do_set_current_protection(self, val):
         # '''
@@ -333,7 +334,7 @@ class Keithley_2450(Instrument):
         # Gets current protection value
         # '''                
         # logging.debug('Get current protection value')
-        # return float(self._visainstrument.ask(':SENS:CURR:PROT?'))
+        # return float(self._visainstrument.query(':SENS:CURR:PROT?'))
         
         
     # def do_set_4W(self, val):
@@ -354,7 +355,7 @@ class Keithley_2450(Instrument):
         # Gets measurement mode
         # '''
         # logging.debug('Get 4-wire measurement mode')
-        # ans = self._visainstrument.ask(":SENS:REM?")
+        # ans = self._visainstrument.query(":SENS:REM?")
         
         # if int(ans):
             # return 'on'
@@ -375,7 +376,7 @@ class Keithley_2450(Instrument):
         between two subsequent steps.
         '''
         logging.debug('Set ramp time to %s s' % val)
-        self.ramp_wait_time = va
+        self.ramp_wait_time = val
         
         
     def ramp_current(self, target, step,  wait_time, showvalue=True, outp=True):
@@ -425,7 +426,7 @@ class Keithley_2450(Instrument):
 #        Gets measured value
 #        '''
 #        logging.debug('Get measured value')
-#        return float(self._visainstrument.ask(':chan%d:fetc?' % channel))
+#        return float(self._visainstrument.query(':chan%d:fetc?' % channel))
 #
 #
 #
