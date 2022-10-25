@@ -3,7 +3,7 @@
 </p>
 
 
-### Qkit - a quantum measurement suite in python Chisha's Fork
+### Qkit - a quantum measurement suite in python: Chisha's Fork, updating Drivers
 
 ### Features:
   * a collection of ipython notebooks for measurement and data analysis tasks.
