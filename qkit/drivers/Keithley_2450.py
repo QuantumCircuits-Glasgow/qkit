@@ -418,7 +418,7 @@ class Keithley_2450(Instrument):
                 print('{} mA'.format(self.get('level')*1e3)),
             time.sleep(wait_time)
         if showvalue==True:
-            print()
+            print()#??
 #
 #
 #    def do_get_value(self, channel):
@@ -431,3 +431,85 @@ class Keithley_2450(Instrument):
 #
 #
 #
+# Measuring (:SENSe) functions
+
+    bufferElementTable = {#lists down the possible options for bufferElements when used
+        "DATE": "The date when the data point was measured",
+        "FORMatted":"The measured value as it appears on the front panel",
+        "FRACtional":"The fractional seconds for the data point when the data point was measured",
+        "READing":"The measurement reading based on the SENS:FUNC setting; if no buffer elements are defined, this option is used",
+        "RELative":"The relative time when the data point was measured",
+        "SEConds":"The seconds in UTC (Coordinated Universal Time) format when the data point was measured",
+        "SOURce":"The source value; if readback is ON, then it is the readback value, otherwise it is the programmed source value",
+        "SOURFORMatted":"The source value as it appears on the display",
+        "SOURSTATus":"The status information associated with sourcing",
+        "SOURUNIT":"The unit of value associated with the source value",
+        "STATus":"The status information associated with the measurement The time for the data point",
+        "TIME":"The timestamp for the data point",
+        "UNIT":"The unit of measure associated with the measurement"}
+    def get_latest_reading(self,bufferName:str="debuffer1",*readingElements:str):
+        '''
+        Returns the latest reading from a given/default reading buffer
+
+        - 'bufferName': (optional) name of buffer where 'debuffer1' is the default buffer
+
+        - 'readingElements': (optional) variadic paramters (up to of 14) determining what aspects of the reading get returned
+            E.g: 'DATE', 'UNIT'
+        
+        Note: if you want to add readingElements, you need to specify bufferName first
+        '''
+        if len(readingElements)>0:#for correct formatting of query, need to handle differently if no elements passed 
+            return self._visainstrument.query(':FETCh "{bName}", {elements}'.format(bName = bufferName,elements = ", ".join(readingElements)))
+        else:
+            return self._visainstrument.query(':FETCh "{bName}"'.format(bName = bufferName))#just get the plain reading as it is
+    
+
+    def get_measurement(self,mode:str,bufferName:str="debuffer1",*readingElements:str):
+        '''
+        Makes a measurement using the specified function mode, stores and returns the measurement in a reading buffer
+
+        - 'mode': specify either 'CURR', 'RES', 'VOLT' to get a current, resistance or voltage measurement respectively
+
+        - 'bufferName': (optional) name of buffer where 'debuffer1' is the default buffer
+
+        - 'readingElements': (optional) variadic paramters (up to 14) determining what aspects of the reading get returned (look up bufferElementTable)
+        
+        Note: 
+
+            - if you want to add readingElements, you need to specify bufferName first
+
+            - the 'mode' parameter will change the measurement function to the specified one, and this change will persist
+        '''
+        if len(readingElements)>0:
+            return self._visainstrument.query(':MEAS:{mode}? "{bName}", {elements}'.format(mode=mode, bName = bufferName,elements = ", ".join(readingElements)))
+        else:
+            return self._visainstrument.query(':MEAS:{mode}? "{bName}"'.format(mode=mode,bName=bufferName))
+
+    #Display (:DISPlay) function
+    def set_display_digits(self,numDigits,mode:str=None):
+        '''
+        Set the number of digits displayed on the front panel for a given measurement function (changes will persist)
+         - 'mode': specify either 'CURR', 'RES', 'VOLT' to get current, resistance or voltage measurement functions respectively
+                - if mode is set to None, then all 3 measurement functions will be changed 
+         - 'numDigits': the number of digits to set the display to. Use an integer value
+        
+        Note: this does NOT affect the accuracy or speed of measurements.
+        '''
+        numDigits=str(numDigits)
+        if mode == None:#then all 3 measurement functions get changed
+            self._visainstrument.write(':DISP:DIG {digits}'.format(digits=numDigits))
+        else:
+            self._visainstrument.write(':DISP:{mode}:DIG: {digits}'.format(mode = mode,digits=numDigits))
+    def get_display_digits(self,mode,boundary=None):
+        '''
+        Get the number of digits dispayed for a given measurement function
+        - 'mode': specify either 'CURR', 'RES', 'VOLT' to get current, resistance or voltage measurement functions respectively
+        - 'boundary': (optional) specify the following string values to get the relevant data:
+                - DEF to get to the default number of digits
+                - MIN to get to the minimum number of digits allowed
+                - MAX to get to the maximum number of digits allowed 
+        '''
+        if boundary==None:
+            return float(self._visainstrument.query(':DISP:{mode}:DIG?'.format(mode=mode)))
+        else:
+            return float(self._visainstrument.query(':DISP:{mode}:DIG? {boundaty}'.format(mode=mode,boundary=boundary)))
