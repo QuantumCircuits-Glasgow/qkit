@@ -372,8 +372,154 @@ class Keithley_2450_gla(Instrument):
             return float(self._visainstrument.query(':DISP:{mode}:DIG?'.format(mode=mode)))
         else:
             return float(self._visainstrument.query(':DISP:{mode}:DIG? {boundary}'.format(mode=mode,boundary=boundary)))
+        
+    def get_bias_mode(self):
+        """
+        Gets bias mode <mode>.
+        
+        Returns
+        -------
+        mode: String
+            Bias mode. "VOLT" for voltage, "CURR" for current
+        """
+        return self._visainstrument.query(':SOUR:FUNC?')
+    def get_sense_mode(self):
+        """
+        Gets sense mode <mode>.
+        
+        Returns
+        -------
+        mode: String
+            Bias mode. "VOLT" for voltage, "CURR" for current
+        """
+        return self._visainstrument.query(':SENS:FUNC?')
+    def get_sweep_mode(self):#find manual for setting the sweep "mode"
+        """
+        Either:
+         * voltage is both applied and measured (VV-mode),
+         * current is applied and voltage is measured (IV-mode),
+         * voltage is applied and current is measured (VI-mode),
+         * current is both applied and measured (II-mode).
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        mode: int
+            Sweep mode denoting bias and sense modes. Meanings are 0 (VV-mode), 1 (IV-mode), 2 (VI-mode), or 3 (II-mode).
+        """
+        sourceMode = self.get_bias_mode() #the independent variable that will be swept over
+        senseMode = self.get_sweep_mode() #the dependant variable that will be measured
+        if sourceMode == "VOLT" and senseMode == "VOLT":
+            return 0 #VV mode
+        elif sourceMode == "CURR" and senseMode == "VOLT":
+            return 1 #IV mode
+        elif sourceMode == "VOLT" and senseMode == "CURR":
+            return 2 #VI mode
+        elif sourceMode == "CURR" and senseMode == "CURR":
+            return 3 # II mode
+            
+
+    def get_sweep_bias(self):
+        """
+        Calls get_bias_mode. This method is needed for qkit.measure.transport.transport.py in case of no virtual tunnel electronic.
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        mode: int
+            Bias mode. Meanings are 0 (current) and 1 (voltage).
+        """
+        biasMode:str = self.get_bias_mode()
+        if biasMode == "CURR":
+            return 0
+        elif biasMode == "VOLT":
+            return 1 
+
+    def get_sweep_channels(self):#always return 1
+        """
+        Due to the functionality of the Keithlet 2450, there is only 1 channel. 
+        
+        So this function will only return 1 (though is still needed to be compatible with transport class)
+        """
+        return 1
+
+    def set_status(self,status:int):#should be able to do
+        """
+        This command enables or disables the source output
+        
+        Parameters
+        ----------
+        status: int
+            Output status. Possible values are 0 (off) and 1 (on)
+        """
+        if status in [0,1]:
+            self._visainstrument.write(':OUTP {s}'.format(s = status))
+    
+    def get_status(self):
+        """
+        This command simply checks if the source output is on or off
+        """
+        return self._visainstrument.query(':OUTP ?')
+    def take_IV(self,sweep):#this one should do all 4 (IV, VV, VI, II)
+        """
+        Takes IV curve with sweep parameters <sweep> in the sweep mode predefined.
+        
+        Parameters
+        ----------
+        sweep: 5 element float list where : 
+            - sweep[0] is the start value
+            - sweep[1] is the stop value
+            - sweep[2] is the step width (MUST BE GREATER THAN 0)
+            - sweep[3] is the delay between measuring points
+            - sweep[4] is the number of times to perform the sweep (0 for infinite loop)
+        
+        Returns
+        -------
+        bias_values: numpy.array(float)
+            Measured bias values.
+        sense_values: numpy.array(float)
+            Measured sense values.
+        """
+        try:
+            start = sweep[0]
+            stop = sweep[1]
+            step = sweep[2]
+            delay = sweep[3]
+            count = sweep[4]
+        except:
+            print("Invalid sweep parameter. Provide a 5 element array")
+            return
+        #setting up sweep parameters
+        sweepMode = self.get_sweep_mode()
+        bias = self.get_bias_mode()#so that we correctly write the sweep command
+        if sweepMode == 0:# VV mode
+            self._visainstrument.write(':SENS:FUNC VOLT')
+            print("Sweeping voltage, measuring voltage")
+        elif sweepMode == 1:# IV mode
+            self._visainstrument.write(':SENS:FUNC VOLT')
+            print("Sweeping current, measuring voltage")
+        elif sweepMode == 2:# VI mode
+            self._visainstrument.write(':SENS:FUNC CURR')
+            print("Sweeping voltage, measuring current")
+        elif sweepMode == 3:# II mode
+            self._visainstrument.write(':SENS:FUNC CURR')
+            print("Sweeping current, measuring current")
+        else:
+            print("Invalid sweep mode passed in")
+            return
+        result = self._visainstrument.query(':SOUR:SWE:{bias}:LIN:STEP {start}, {stop}, {step}, {delay}, {count}'
+                                            .format(bias = bias,start = start,stop = stop, step = step, delay = delay,count = count))
+        return result
+        
+
               
 
 if __name__ == "__main__":
-    KEITH = Keithley_2450(name = "Keithley_2450", address="10.22.197.8")
+    KEITH = Keithley_2450_gla(name = "Keithley_2450", address="10.22.197.8")
     print("DC current: {:.4g}A".format(KEITH.get_current_dc()))
