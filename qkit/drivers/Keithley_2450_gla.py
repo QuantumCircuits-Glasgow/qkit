@@ -411,16 +411,44 @@ class Keithley_2450_gla(Instrument):
             Sweep mode denoting bias and sense modes. Meanings are 0 (VV-mode), 1 (IV-mode), 2 (VI-mode), or 3 (II-mode).
         """
         sourceMode = self.get_bias_mode() #the independent variable that will be swept over
-        senseMode = self.get_sweep_mode() #the dependant variable that will be measured
-        if sourceMode == "VOLT" and senseMode == "VOLT":
+        senseMode = self.get_sense_mode() #the dependant variable that will be measured
+        if sourceMode == "VOLT" and "VOLT" in senseMode:
             return 0 #VV mode
-        elif sourceMode == "CURR" and senseMode == "VOLT":
+        elif sourceMode == "CURR" and "VOLT" in senseMode:
             return 1 #IV mode
-        elif sourceMode == "VOLT" and senseMode == "CURR":
+        elif sourceMode == "VOLT" and "CURR" in senseMode:
             return 2 #VI mode
-        elif sourceMode == "CURR" and senseMode == "CURR":
+        elif sourceMode == "CURR" and "CURR" in senseMode:
             return 3 # II mode
+        else:
+            raise ValueError("Unkown sweep mode") 
             
+    def set_sweep_mode(self,sourceMode,measureMode):
+        """
+         Parameters
+        ----------
+        - sourceMode: mode to sweep. Either 'VOLT' or 'CURR'
+        - measureMode: mode to measure sweep of. Either 'VOLT' or 'CURR'
+        
+        Either:
+         * voltage is both applied and measured (VV-mode),
+         * current is applied and voltage is measured (IV-mode),
+         * voltage is applied and current is measured (VI-mode),
+         * current is both applied and measured (II-mode).
+        
+        Returns
+        -------
+         None
+        """
+        #first validate the modes
+        if sourceMode not in ["CURR","VOLT"]:
+            print("Sorry, invalid source mode passed. Please use 'CURR' or 'VOLT")
+            raise ValueError("Invalid sourceMode passed")
+        elif measureMode not in ["CURR","VOLT"]:
+            print("Sorry, invalid measure mode passed. Please use 'CURR' or 'VOLT")
+            raise ValueError("Invalid measureMode passed")
+        self._visainstrument.write(':SOUR:FUNC {sourceMode}'.format(sourceMode=sourceMode))
+        self._visainstrument.write(':SENS:FUNC "{measureMode}"'.format(measureMode=measureMode))
 
     def get_sweep_bias(self):
         """
@@ -439,7 +467,9 @@ class Keithley_2450_gla(Instrument):
         if biasMode == "CURR":
             return 0
         elif biasMode == "VOLT":
-            return 1 
+            return 1
+        else:
+            raise ValueError("Unkown bias mode") 
 
     def get_sweep_channels(self):#always return 1
         """
@@ -465,7 +495,7 @@ class Keithley_2450_gla(Instrument):
         """
         This command simply checks if the source output is on or off
         """
-        return self._visainstrument.query(':OUTP ?')
+        return self._visainstrument.query(':OUTP?')
     def take_IV(self,sweep):#this one should do all 4 (IV, VV, VI, II)
         """
         Takes IV curve with sweep parameters <sweep> in the sweep mode predefined.
@@ -476,7 +506,7 @@ class Keithley_2450_gla(Instrument):
             - sweep[0] is the start value
             - sweep[1] is the stop value
             - sweep[2] is the step width (MUST BE GREATER THAN 0)
-            - sweep[3] is the delay between measuring points
+            - sweep[3] is the delay between measuring points (in seconds)
             - sweep[4] is the number of times to perform the sweep (0 for infinite loop)
         
         Returns
@@ -486,6 +516,7 @@ class Keithley_2450_gla(Instrument):
         sense_values: numpy.array(float)
             Measured sense values.
         """
+        self._visainstrument.write("TRAC:CLE'defbuffer1'")#first clear the buffer
         try:
             start = sweep[0]
             stop = sweep[1]
@@ -496,6 +527,7 @@ class Keithley_2450_gla(Instrument):
             print("Invalid sweep parameter. Provide a 5 element array")
             return
         #setting up sweep parameters
+        numSteps = int((stop - start)/delay)+1#needed for reading out data
         sweepMode = self.get_sweep_mode()
         bias = self.get_bias_mode()#so that we correctly write the sweep command
         if sweepMode == 0:# VV mode
@@ -512,12 +544,13 @@ class Keithley_2450_gla(Instrument):
             print("Sweeping current, measuring current")
         else:
             print("Invalid sweep mode passed in")
-            return
-        result = self._visainstrument.query(':SOUR:SWE:{bias}:LIN:STEP {start}, {stop}, {step}, {delay}, {count}'
+            return ValueError("Invalid sweep mode")
+        self._visainstrument.write(':SOUR:SWE:{bias}:LIN:STEP {start}, {stop}, {step}, {delay}, {count}'
                                             .format(bias = bias,start = start,stop = stop, step = step, delay = delay,count = count))
-        return result
-        
-
+        self._visainstrument.write(":INIT")
+        measuredArray:list[float] = self._visainstrument.query("TRAC: DATA? 1, {numSteps}".format(numSteps=numSteps))
+        sourceArray:list[float] = self._visainstrument.query("TRAC: DATA? 1, {numSteps}, 'defbuffer1', SOUR".format(numSteps=numSteps))
+        return sourceArray,measuredArray
               
 
 if __name__ == "__main__":
