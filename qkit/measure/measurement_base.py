@@ -59,6 +59,14 @@ class MeasureBase(object):
         self._measurement_object = Measurement()
         self._measurement_object.measurement_type = 'defaultMeasurement'
         self.web_visible = True
+
+    def __getattr__(self, item):
+        if item == "x_vec":
+            return self._x_parameter.values
+        elif item == "y_vec":
+            return self._y_parameter.values
+        else:
+            raise AttributeError("Measurement object has no attribute '{}'".format(item))
     
     def set_sample(self,sample):
         if sample is None:
@@ -183,15 +191,15 @@ class MeasureBase(object):
             return True
     
         def create_dataset(self, hdf_file):
-            if self.hdf_dataset is None:
+            if self.hdf_dataset is None or self.hdf_dataset.hf != hdf_file.hf: # If dataset not yet created or belongs to old hdf file
                 self.validate_parameters()
                 c = [co.create_dataset(hdf_file) for co in self.coordinates]
                 if self.dim == 1:
-                    self.hdf_dataset = hdf_file.add_value_vector(self.name, x=c[0], **self.kwargs)
+                    self.hdf_dataset = hdf_file.add_value_vector(self.name, x=c[0], unit = self.unit, **self.kwargs)
                 elif self.dim == 2:
-                    self.hdf_dataset = hdf_file.add_value_matrix(self.name, x=c[0], y=c[1], **self.kwargs)
+                    self.hdf_dataset = hdf_file.add_value_matrix(self.name, x=c[0], y=c[1], unit = self.unit, **self.kwargs)
                 elif self.dim == 3:
-                    self.hdf_dataset = hdf_file.add_value_box(self.name, x=c[0], y=c[1], z=c[2], **self.kwargs)
+                    self.hdf_dataset = hdf_file.add_value_box(self.name, x=c[0], y=c[1], z=c[2], unit = self.unit, **self.kwargs)
             else:
                 logging.info(__name__ + ": Dataset for coordinate '{}' was already created.".format(self.name))
             return self.hdf_dataset
@@ -268,7 +276,7 @@ class MeasureBase(object):
         self._dim = 0
         for d in data:
             for c in d.coordinates:
-                coordinates.add(c.name)
+                coordinates.add(c.name.rstrip("_0123456789")) # removes indices like frequency_0 from the file name
             self._dim = max(self._dim, len(d.coordinates))  # if you have several 2D scans, the dimension is still 2D
         if not self.measurement_name:
             self.measurement_name = ", ".join(coordinates)
