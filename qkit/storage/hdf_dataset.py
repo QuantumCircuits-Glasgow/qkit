@@ -69,13 +69,14 @@ class hdf_dataset(object):
         self.first = True
 
     def _read_ds_from_hdf(self,ds_url):
-        ds = self.hf[str(ds_url)]
+        self.ds = self.hf[str(ds_url)]
 
-        for attr in ds.attrs.keys():
-            val = ds.attrs.get(attr)
+        for attr in self.ds.attrs.keys():
+            val = self.ds.attrs.get(attr)
             setattr(self,attr,val)
         
         self.ds_url =  ds_url
+        self.first=False
         
     def _setup_metadata(self):
         ds = self.ds
