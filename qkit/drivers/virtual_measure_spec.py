@@ -295,6 +295,9 @@ class virtual_measure_spec(Instrument):
             result = self._acquire_multimode()
         else:
             result = self._acquire_singlemode()
+
+        self._gate_func(False) # reset gate_func ("stop" awg output)
+
         # apply offsets
         if (self._offsets != None):
             for idx in range(len(self._offsets)):
