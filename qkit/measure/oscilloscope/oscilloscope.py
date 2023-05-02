@@ -55,6 +55,7 @@ class scope_class(object):
 
         self.scope=scope_device
         self.has_flowcontrol_func = all(x in self.scope.get_function_names() for x in ["ready","_start_measurement"])
+        self.manual_trigger_control=0
 
         self._measurement_object=Measurement()
         self._measurement_object.measurement_type = 'oscilloscope'
@@ -68,11 +69,19 @@ class scope_class(object):
         self.progress_bar = True
         self.open_qviewkit = True
 
-        self._scan_dim = None # for now only time vs voltage sweeps
+        self._scan_dim = None 
+
         self.x_set_obj = None
         self.x_vec=None
         self.x_coordname = None
         self.x_unit = None
+        
+        self.y_set_obj = None #for 3D sweeps
+        self.y_vec=None
+        self.y_coordname = None
+        self.y_unit = None
+    
+        self.log_function=None
 
 
 
@@ -95,6 +104,49 @@ class scope_class(object):
     def get_comment(self):
         return self._comment
 
+    def set_log_function(self, func=None, name=None, unit=None, log_dtype=None):
+        '''
+        A function (object) can be passed to the measurement loop which is excecuted before every x iteration
+        but after executing the x_object setter in 2D measurements and before every line (but after setting
+        the x value) in 3D measurements.
+        The return value of the function of type float or similar is stored in a value vector in the h5 file.
+
+        Call without any arguments to delete all log functions. The timestamp is automatically saved.
+
+        func: function object in list form
+        name: name of logging parameter appearing in h5 file, default: 'log_param'
+        unit: unit of logging parameter, default: ''
+        log_dtype: h5 data type, default: 'f' (float32)
+        '''
+
+        if name == None:
+            try:
+                name = ['log_param'] * len(func)
+            except Exception:
+                name = None
+        if unit == None:
+            try:
+                unit = [''] * len(func)
+            except Exception:
+                unit = None
+        if log_dtype == None:
+            try:
+                log_dtype = ['f'] * len(func)
+            except Exception:
+                log_dtype = None
+
+        self.log_function = []
+        self.log_name = []
+        self.log_unit = []
+        self.log_dtype = []
+
+        if func != None:
+            for i, f in enumerate(func):
+                self.log_function.append(f)
+                self.log_name.append(name[i])
+                self.log_unit.append(unit[i])
+                self.log_dtype.append(log_dtype[i])
+
     def set_x_parameters(self, x_vec, x_coordname, x_set_obj, x_unit=""):
         '''
         Same functionality as seen on spectroscopy class
@@ -103,6 +155,18 @@ class scope_class(object):
         self.x_coordname = x_coordname
         self.x_unit = x_unit
         self.x_set_obj = x_set_obj
+        return
+    
+    def set_y_parameters(self, y_vec, y_coordname, y_set_obj, y_unit=""):
+        """
+        Sets parameters for sweep. In a 3D measurement, the x-parameters will be the "outer" sweep.
+        For every x value all y values are swept
+        Same functionality as seen on spectroscopy class
+        """
+        self.y_vec = y_vec
+        self.y_coordname = y_coordname
+        self.y_set_obj = y_set_obj
+        self.y_unit = y_unit
         return
 
 
@@ -145,8 +209,29 @@ class scope_class(object):
             self._data_t.add(self._timepoints)
             for ind,ch in enumerate(self.scope._meas_channel):
                 self._data_V.append(self._data_file.add_value_matrix("voltage_ch{}".format(ch),x=self._data_x, y=self._data_t, unit="V",save_timestamp=True))
+            
+            if self.log_function != None:  # use logging
+                self._log_value = []
+                for i in range(len(self.log_function)):
+                    self._log_value.append(
+                        self._data_file.add_value_vector(self.log_name[i], x=self._data_x, unit=self.log_unit[i],
+                                                         dtype=self.log_dtype[i]))
 
             #self._data_V = self._data_file.add_value_matrix("voltage", x=self._data_x, y=self.data_t, unit="V", save_timestamp=True)
+
+        if self._scan_dim == 3: #3D sweep (WIP)
+            self._data_x = self._data_file.add_coordinate(self.x_coordname, unit=self.x_unit)
+            self._data_x.add(self.x_vec)
+            self._data_y = self._data_file.add_coordinate(self.y_coordname, unit=self.y_unit)
+            self._data_y.add(self.y_vec)
+
+            self._data_t = self._data_file.add_coordinate("time", unit="s")
+            self._data_t.add(self._timepoints)
+            for ind,ch in enumerate(self.scope._meas_channel):
+                self._data_V.append(self._data_file.add_value_box('voltage_ch{}'.format(ch), x=self._data_y, y=self._data_x,
+                                                           z=self._data_t, unit='V',
+                                                           save_timestamp=False))
+
 
         #add view 
         #self._hdf_t_view = self._data_file.add_view("data", x=self._data_t, y=self._data_V, 
@@ -236,17 +321,87 @@ class scope_class(object):
             self._qvk_process = qviewkit.plot(self._data_file.get_filepath(), datasets=open_ds)
 
         qkit.flow.start()
-        
-        for i, x in enumerate(self.x_vec):
-            self.x_set_obj(x)
-            if self.scope.ready():
-                self.scope._start_measurement()
-                t,y = self.scope.get_data()
+        try:
+            for i, x in enumerate(self.x_vec):
+
+                if self.log_function != None:
+                    for i, f in enumerate(self.log_function):
+                        self._log_value[i].append(float(f()))
+
+                self.scope.clear()
+                self.x_set_obj(x)
+                if self.scope.ready():
+                    if(not self.manual_trigger_control):
+                        self.scope._start_measurement()
+                    else:
+                        self.scope._start_measurement_manual_trigger()
+                    time.sleep(0.01)
+                    t,y = self.scope.get_data()
+                    for ind,ch in enumerate(self.scope._meas_channel):
+                        self._data_V[ind].append(y[ind])
+                time.sleep(0.1)
+        except Exception as e:
+            print(e)
+        finally:
+            qkit.flow.end()
+            self._end_measurement()
+
+        return
+
+    def measure_3D(self):
+        '''
+        Measures the active channels on the oscilloscope for all parameters x_vec in x_obj and y_vec in y_obj. Sweep over y_vec is outer and x_vec inner, for every y_vec[i], all values of x_vec are considered
+        '''
+        if not self.x_set_obj:
+            logging.error('axes parameters not properly set...aborting')
+            return
+        if len(self.x_vec) * len(self.y_vec) == 0:
+            logging.error('No points to measure given. Check your x vector... aborting')
+            return
+        self._scan_dim = 3
+
+        self._measurement_object.measurement_func = 'measure_2D'
+        self._measurement_object.x_axis = self.x_coordname
+        self._measurement_object.y_axis = self.measurement_object_axis_name
+        self._measurement_object.z_axis = self.y_coordname
+
+        if not self._dirname:
+            self._dirname = "Scope_Tracedata_"+self.x_coordname+"-"+self.y_coordname
+        self._filename = '3D_' + self._dirname.replace(' ', '').replace(',', '_')
+
+        self._prepare_measurement_scope()
+        self._prepare_measurement_file()
+
+        if self.open_qviewkit:
+            open_ds=["voltage_ch{}".format(i) for i in self.scope._meas_channel]
+            self._qvk_process = qviewkit.plot(self._data_file.get_filepath(), datasets=open_ds)
+
+        qkit.flow.start()
+        try:
+            for j,y in enumerate(self.y_vec):
+                self.y_set_obj(y)
+
+                for i, x in enumerate(self.x_vec):
+                    self.scope.clear()
+                    self.x_set_obj(x)
+                    if self.scope.ready():
+                        if(not self.manual_trigger_control):
+                            self.scope._start_measurement()
+                        else:
+                            self.scope._start_measurement_manual_trigger()
+                        time.sleep(0.01)
+                        t,y = self.scope.get_data()
+                        for ind,ch in enumerate(self.scope._meas_channel):
+                            self._data_V[ind].append(y[ind])
+                    time.sleep(0.1)
+                
                 for ind,ch in enumerate(self.scope._meas_channel):
-                    self._data_V[ind].append(y[ind])
-        
-        
-        qkit.flow.end()
-        self._end_measurement()
+                    self._data_V[ind].next_matrix()
+                
+        # except Exception as e:
+        #     print(e)
+        finally:
+            qkit.flow.end()
+            self._end_measurement()
 
         return

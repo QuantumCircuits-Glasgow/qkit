@@ -1544,8 +1544,15 @@ class transport(object):
                                                      view_params={"labels": ('V', 'I'),
                                                                   'plot_style': 1,
                                                                   'markersize': 5})
+        self._hdf_view_VI = self._data_file.add_view('VI',
+                                                     x=self._hdf_I[0],
+                                                     y=self._hdf_V[0],
+                                                     view_params={"labels": ('I', 'V'),
+                                                                  'plot_style': 1,
+                                                                  'markersize': 5})
         for i in range(1, self.sweeps.get_nos()):
             self._hdf_view_IV.add(x=self._hdf_V[i], y=self._hdf_I[i])
+            self._hdf_view_VI.add(x=self._hdf_I[i], y=self._hdf_V[i])
         if self._dVdI:
             self._hdf_view_dVdI = self._data_file.add_view('dVdI',
                                                            x=self._hdf_I[0],

@@ -252,7 +252,7 @@ class Resonator(object):
         self._get_data_circle()
         trace = 0
         self.debug("circle fit:")
-        for z_data_raw in self._z_data_raw:
+        for i,z_data_raw in enumerate(self._z_data_raw):
             
             z_data_raw.real = self._pre_filter_data(z_data_raw.real)
             z_data_raw.imag = self._pre_filter_data(z_data_raw.imag)
@@ -263,19 +263,20 @@ class Resonator(object):
                 self._circle_port.autofit()
             except:
                 err=np.array([np.nan for f in self._fit_frequency])
-                self._circ_amp_gen.append(err)
-                self._circ_pha_gen.append(err)
-                self._circ_real_gen.append(err)
-                self._circ_imag_gen.append(err)
+                self._circ_amp_gen.append(err,reset=(i==0))
+                self._circ_pha_gen.append(err,reset=(i==0))
+                self._circ_real_gen.append(err,reset=(i==0))
+                self._circ_imag_gen.append(err,reset=(i==0))
 
                 for key in iter(self._results):
                     self._results[str(key)].append(np.nan)
 
             else:
-                self._circ_amp_gen.append(np.absolute(self._circle_port.z_data_sim))
-                self._circ_pha_gen.append(np.angle(self._circle_port.z_data_sim))
-                self._circ_real_gen.append(np.real(self._circle_port.z_data_sim))
-                self._circ_imag_gen.append(np.imag(self._circle_port.z_data_sim))
+                self._circ_amp_gen.append(np.absolute(self._circle_port.z_data_sim),reset=(i==0))
+                self._circ_pha_gen.append(np.angle(self._circle_port.z_data_sim),reset=(i==0))
+                self._circ_real_gen.append(np.real(self._circle_port.z_data_sim),reset=(i==0))
+                self._circ_imag_gen.append(np.imag(self._circle_port.z_data_sim),reset=(i==0))
+                print(i,i==0)
 
                 for key in iter(self._results):
                     self._results[str(key)].append(float(self._circle_port.fitresults[str(key)]))
@@ -299,7 +300,8 @@ class Resonator(object):
         elif circle_fit_version == 2:
             self._result_keys = ["delay", "delay_remaining", "a", "alpha", "theta", "phi", "fr", "Ql", "Qc",
                                  "Qc_no_dia_corr", "Qi", "Qi_no_dia_corr", "fr_err", "Ql_err", "absQc_err",
-                                 "phi_err", "Qi_err", "Qi_no_dia_corr_err", "chi_square"]
+                                 "phi_err", "Qi_err", "Qi_no_dia_corr_err", "chi_square", "Qi_min", "Qi_max",
+                                 "Qc_min", "Qc_max", "fano_b"]
         else:
             logging.warning("Circle fit version not properly set in configuration!")
 

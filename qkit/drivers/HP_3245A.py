@@ -210,7 +210,7 @@ class HP_3245A(Instrument):
     def write(self,msg):
         return self._visainstrument.write(msg)
     
-    if qkit.visa.qkit_visa_version == 1:
+    if visa.qkit_visa_version == 1:
         def ask(self, msg):
             return self._visainstrument.ask(msg)
     else:
