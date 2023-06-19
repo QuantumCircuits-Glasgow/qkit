@@ -95,13 +95,16 @@ class LDA_203(Instrument):
         self.add_parameter('attenuation', type=float,flags=Instrument.FLAG_GETSET,minval=self._MIN_ATT,maxval=self._MAX_ATT,units='dB',tags=['sweep'])
 
 
-
-
-        #self.add_function('get_all')
-
+        self.add_function('get_all') #must implement else will throw error  
 
 
 
+    def get_all(self):
+        self.get_channel()
+        self.get_frequency()
+        self.get_attenuation()
+
+        
 
         #Start defining the functons
     def do_get_channel(self):
