@@ -1,6 +1,8 @@
 pyqtgraph
 zerorpc
 jupyterlab
+ipython==7.22
+ipykernel
 ipywidgets
 h5py
 pywin32
