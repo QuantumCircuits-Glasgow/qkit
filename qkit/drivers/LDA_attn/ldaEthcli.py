@@ -32,6 +32,9 @@ class CLI_Vaunix_Attn:
     def check_deviceexists(self, devip):
         self.vnx.fnLDA_InitDevice(devip)
         return self.vnx.fnLDA_CheckDeviceReady(devip)
+    
+
+    
 
     def get_devices_number(self):
         return self.vnx.fnLDA_GetNumDevices()
@@ -188,12 +191,19 @@ class CLI_Vaunix_Attn:
         self.vnx.fnLDA_GetProfileIndex(devip,  ctypes.byref(self.data))
         return self.data.value
     
+    def close_device(self, devip):
+        try :
+            self.vnx.fnLDA_CloseDevice(devip)
+        except:
+            print("An exception occurred")
+        return "Device Connection Terminated"
+    
     # Set Attenuation
     def set_attenuation(self, devip, attenuation):
         try:
             self.vnx.fnLDA_InitDevice(devip)
             self.vnx.fnLDA_SetAttenuation(devip, int(attenuation)*20)
-            self.vnx.fnLDA_CloseDevice(devip)
+            # self.vnx.fnLDA_CloseDevice(devip)
         except:
             print("An exception occurred")
         return True
@@ -203,7 +213,7 @@ class CLI_Vaunix_Attn:
         try:
             self.vnx.fnLDA_InitDevice(devip)
             self.vnx.fnLDA_SetWorkingFrequency(devip, int(frequency)*10)
-            self.vnx.fnLDA_CloseDevice(devip)
+            # self.vnx.fnLDA_CloseDevice(devip)
         except:
             print("An exception occurred")
         return True
@@ -213,7 +223,7 @@ class CLI_Vaunix_Attn:
         try:
             self.vnx.fnLDA_InitDevice(devip)
             self.vnx.fnLDA_SetChannel(devip, int(channel))
-            self.vnx.fnLDA_CloseDevice(devip)
+            # self.vnx.fnLDA_CloseDevice(devip)
         except:
             print("An exception occurred")
         return True
@@ -223,7 +233,7 @@ class CLI_Vaunix_Attn:
         try:
             self.vnx.fnLDA_InitDevice(devip)
             self.vnx.fnLDA_SetRampStart(devip, int(attenuation)*20)
-            self.vnx.fnLDA_CloseDevice(devip)
+            # self.vnx.fnLDA_CloseDevice(devip)
         except:
             print("An exception occurred")
         return True
@@ -233,7 +243,7 @@ class CLI_Vaunix_Attn:
         try:
             self.vnx.fnLDA_InitDevice(devip)
             self.vnx.fnLDA_SetRampEnd(devip, int(attenuation)*20)
-            self.vnx.fnLDA_CloseDevice(devip)
+            # self.vnx.fnLDA_CloseDevice(devip)
         except:
             print("An exception occurred")
         return True
@@ -243,7 +253,7 @@ class CLI_Vaunix_Attn:
         try:
             self.vnx.fnLDA_InitDevice(devip)
             self.vnx.fnLDA_SetDwellTime(devip, int(dwelltime))
-            self.vnx.fnLDA_CloseDevice(devip)
+            # self.vnx.fnLDA_CloseDevice(devip)
         except:
             print("An exception occurred")
         return True
@@ -253,7 +263,7 @@ class CLI_Vaunix_Attn:
         try:
             self.vnx.fnLDA_InitDevice(devip)
             self.vnx.fnLDA_SetIdleTime(devip, int(idletime))
-            self.vnx.fnLDA_CloseDevice(devip)
+            # self.vnx.fnLDA_CloseDevice(devip)
         except:
             print("An exception occurred")
         return True
