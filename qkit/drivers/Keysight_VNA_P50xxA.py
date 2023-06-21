@@ -11,7 +11,8 @@ class Keysight_VNA_P50xxA(Instrument):
     '''
     Driver class for Keysight P50xxA/P5004A Streamline Series USB VNA
     Usage:
-        vna=qkit.instruments.create("vna", "Keysight_VNA_P50xxA", address=<TCPIP address>)
+        vna=
+        qkit.instruments.create("vna", "Keysight_VNA_P50xxA", address=<TCPIP address>)
         vna.gets_()
         vna.sets_()
         vna.some_function()
@@ -47,10 +48,11 @@ class Keysight_VNA_P50xxA(Instrument):
             units="s", minval=-10, maxval=10)
         self.add_parameter("nop", flag=Instrument.FLAG_GETSET, type=int,
             units="", minval=1, maxval=1e5, tags=["sweep"])
-        self.add_parameter("power", flag=Instrument.FLAG_GETSET, type=float,
+        self.add_parameter("power", flag=Instrument.FLAG_GETSET, type=float,minval=-60,maxval=+12,
             units="dBm")
         self.add_parameter("rf_output", flag=Instrument.FLAG_GETSET, type=bool,
             units="")
+        self.add_parameter("s_parameter", flag=Instrument.FLAG_GETSET, type=str)
         self.add_parameter("span", flag=Instrument.FLAG_GETSET, type=float,
             units="Hz", minval=70, maxval=20e9)
         self.add_parameter("startfreq", flag=Instrument.FLAG_GETSET, type=float,
@@ -59,9 +61,9 @@ class Keysight_VNA_P50xxA(Instrument):
             units="Hz", minval=9e3, maxval=20e9)
         self.add_parameter("sweepmode", flag=Instrument.FLAG_GETSET, type=str)
         self.add_parameter("sweeptime", flag=Instrument.FLAG_GET, type=float,
-            units="s")
+            units="s", minval=0, maxval=1e3)
         self.add_parameter("sweeptime_averages", flag=Instrument.FLAG_GET, type=float,
-            units="s")
+            units="s",minval=0, maxval=1e3)
 
 
         self.add_function("reset")
@@ -75,6 +77,7 @@ class Keysight_VNA_P50xxA(Instrument):
         self.add_function("start_measurement")
         self.add_function("pre_measurement")
         self.add_function("post_measurement")
+        self.add_function("get_span")
 
         self.get_all()
 
@@ -89,6 +92,7 @@ class Keysight_VNA_P50xxA(Instrument):
         self.get_sweeptime()
         self.get_sweepmode()
         self.get_rf_output()
+        
         
     ###
     ###
@@ -106,6 +110,12 @@ class Keysight_VNA_P50xxA(Instrument):
         ...
         Trace14 ->0b100 0000 0000 0000
         '''
+        if self.get_averages() == 1:
+            if self.get_sweepmode() == "HOLD\n":
+                return True
+            else:
+                return False
+
         return (int(self.ask("STAT:OPER:AVER1:COND?")) & 0b10) 
     
     def hold(self, value):
@@ -153,13 +163,13 @@ class Keysight_VNA_P50xxA(Instrument):
 
 
     def get_freqpoints(self):
-        self.write("FORM REAL,32")
+        self.write("FORM REAL,64")
         self.write('FORM:BORD SWAPPED')
 
         if self.cw_mode:
             return self.get_cwfreq()
         else:
-            return self.ask_for_values("CALC{}:MEAS:DATA:X?".format(self._ci))
+            return self.ask_for_values("CALC{}:MEAS:DATA:X?".format(self._ci), format = visa.double)
 
     ### GETs / SETs ###
     def do_get_Average(self):
@@ -171,6 +181,7 @@ class Keysight_VNA_P50xxA(Instrument):
 
     def do_get_averages(self):
         return self.ask("SENS{}:AVER:COUN?".format(self._ci))
+    
     def do_set_averages(self, value):
         self.write("SENS{}:AVER:COUN {}".format(self._ci, value))
 
@@ -236,9 +247,21 @@ class Keysight_VNA_P50xxA(Instrument):
         return self.ask("SOUR{}:POW{}?".format(self._ci,port))
     def do_set_power(self, value, port=1):
         return self.write("SOUR{}:POW{} {}".format(self._ci,port,value))
+    def do_get_s_parameter(self):
+        return self.ask("CALC:MEAS:PAR?")
+    def do_set_s_parameter(self, value):
+        self.write("CALC:MEAS:PAR "+value)
+        return
 
-    def do_get_span(self):
+
+
+
+    def do_get_span(self):  
         return self.ask("SENS{}:FREQ:SPAN?".format(self._ci))
+
+
+
+
     def do_set_span(self, value):
         self.write("SENS{}:FREQ:SPAN {}".format(self._ci, value))
         return
@@ -288,16 +311,22 @@ class Keysight_VNA_P50xxA(Instrument):
 
     def pre_measurement(self):
         self.write("TRIG:SOUR MAN")
+        self.set_sweepmode("CONT")
         self.write("SENS{}:AVER ON".format(self._ci))
 
     def start_measurement(self):
-        self.avg_clear()
-        for i in range(self.get_averages()):
-            while(True):
-                if(int(self.ask("TRIG:STAT:READ? MAN"))) : break
-                sleep(0.05)
+        if self.get_averages() == 1:
+            self.set_sweepmode("HOLD")
+            sleep(0.05)
             self.write("INIT:IMM")
-            sleep(0.1)
+        else:
+            self.avg_clear()
+            for i in range(self.get_averages()):
+                while(True):
+                    if(int(self.ask("TRIG:STAT:READ? MAN"))) : break
+                    sleep(0.05)
+                self.write("INIT:IMM")
+                sleep(0.1)
 
 
     def post_measurement(self):

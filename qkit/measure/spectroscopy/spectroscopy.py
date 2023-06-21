@@ -720,7 +720,7 @@ class spectrum(object):
     def edel_correction_data(self, data_pha):
         if hasattr(self.vna,"_edel"):
             #phase correction for electrical delay
-            slope_corr=self.vna._edel*2*np.pi
+            slope_corr=float(self.vna._edel)*2*np.pi
 
             data_pha=np.unwrap(data_pha)
             for i,f in enumerate(self._freqpoints):
@@ -788,7 +788,7 @@ class Landscape:
 
         try:
             if curve_f == 'lin_spline':
-                f = interp1d(x_fit, y_fit, fill_value="extrapolate")
+                f = interp1d(x_fit, y_fit)
                 center_points = f(self.spec.x_vec)
             elif curve_f == 'spline':
                 center_points =  UnivariateSpline(x_fit, y_fit)(self.spec.x_vec)
@@ -859,9 +859,9 @@ class Landscape:
                 popt, pcov = curve_fit(fit_fct, x_fit, z_fit/multiplier, p0=p0)
                 self.xzlandscape_func = lambda x: multiplier * fit_fct(x, *popt)
 
-            self.xz_freqpoints = np.arange(np.min(self.xzlandscape_func(self.spec.x_vec)) - self.z_span / 2,
-                                           np.max(self.xzlandscape_func(self.spec.x_vec)) + self.z_span / 2,
-                                           self.vna.get_span() / self.vna.get_nop())
+            self.xz_freqpoints = np.arange(self.xzlandscape_func(self.spec.x_vec[0])-self.z_span/2,
+                                           self.xzlandscape_func(self.spec.x_vec[-1])+self.z_span/2,
+                                           self.vna.get_span()/self.vna.get_nop())
         except Exception as message:
             print('fit not successful:', message)
 
