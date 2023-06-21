@@ -5,6 +5,7 @@ from qkit.core.instrument_base import Instrument
 from qkit import visa
 import logging
 import numpy as np
+from time import sleep
 
 class RS_RT2000(Instrument):
     '''
@@ -24,6 +25,7 @@ class RS_RT2000(Instrument):
         self._visainstrument = visa.instrument(self._address)
         self._visainstrument.read_termination="\n"
         self._nchannels = 4
+        self.manual_trigger_delay=0
 
         if meas_channel>4 or meas_channel<1: 
             raise ValueError("Channels between 1 and {}".format(self._nchannels))
@@ -82,6 +84,8 @@ class RS_RT2000(Instrument):
 
     def ready(self):
         return self.ask("*OPC?") #TODO
+        #sleep(0.5)
+        #return
 
     def set_resolution_dependence(self, value):
         '''
@@ -107,7 +111,7 @@ class RS_RT2000(Instrument):
                 self._meas_channel.append(i)
 
                 self.write("TRIG:SOUR CHAN{}".format(i))
-                self.write("TRIG:MODE:AUTO")
+                self.write("TRIG:MODE AUTO")
                 self.write("SING")
         return
 
@@ -192,15 +196,26 @@ class RS_RT2000(Instrument):
         return time_array
         
     def _pre_measurement(self):
-        self.write("TRIG:SOUR SBUS") #source of trigger (software)
+        self.write("TRIG:SOUR CHAN{}".format(self._meas_channel[0])) #source of trigger (software)
+        self.write("TRIG:MODE NORM") # waits for trigger to acquire waveform
+        
     
     def _start_measurement(self):
-        self.write("TRIG:MODE NORM") # waits for trigger to acquire waveform
+        #Get single trace (with average count)
+        self.acq_single() #check later
+        sleep(0.01)
         self.write("TRIG:FORC") #forces trigger and acquires waveform
-    
+        
+    def _start_measurement_manual_trigger(self):
+        # Trigger is done through a signal on one of the scope channels
+        self.acq_continuous() #
+        sleep(0.01)
+        sleep(self.manual_trigger_delay)
+
     def _post_measurement(self):
         #return back to analog channel triggering
-        self.write("TRIG:SOUR CHAN{}".format(self._meas_channel))
+        self.clear()
+        self.write("TRIG:SOUR CHAN{}".format(self._meas_channel[0]))
         #self.write("TRIG:FIND")
         self.write("TRIG:MODE AUTO")
         self.write("SING")
