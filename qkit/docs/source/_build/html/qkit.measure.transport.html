@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.transport package &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.services package" href="qkit.services.html" />
+    <link rel="prev" title="qkit.measure.timedomain.quantum_machine package" href="qkit.measure.timedomain.quantum_machine.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">qkit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.html#module-qkit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">qkit</a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.measure.html">qkit.measure package</a></li>
+      <li class="breadcrumb-item active">qkit.measure.transport package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.measure.transport.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-measure-transport-package">
+<h1>qkit.measure.transport package<a class="headerlink" href="#qkit-measure-transport-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-qkit.measure.transport.transport">
+<span id="qkit-measure-transport-transport-module"></span><h2>qkit.measure.transport.transport module<a class="headerlink" href="#module-qkit.measure.transport.transport" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.transport.transport.</span></span><span class="sig-name descname"><span class="pre">transport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">IV_Device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is a measurement class to perform transport measurements such as IV-characteristics by means of a current-voltage source meter.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.add_sweep_4quadrants">
+<span class="sig-name descname"><span class="pre">add_sweep_4quadrants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.add_sweep_4quadrants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.add_sweep_4quadrants" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Adds a four quadrants sweep series with the pattern </dt><dd><p>0th: (+&lt;start&gt; –&gt; +&lt;stop&gt;,  &lt;step&gt;) + &lt;offset&gt;
+1st: (+&lt;stop&gt;  –&gt; +&lt;start&gt;, &lt;step&gt;) + &lt;offset&gt;
+2nd: (+&lt;start&gt; –&gt; -&lt;stop&gt;,  &lt;step&gt;) + &lt;offset&gt;
+3rd: (-&lt;stop&gt;  –&gt; +&lt;start&gt;, &lt;step&gt;) + &lt;offset&gt;
+time.sleep(&lt;sleep&gt;)</p>
+</dd>
+</dl>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>start: float</dt><dd><p>Start value of sweep.</p>
+</dd>
+<dt>stop: float</dt><dd><p>Stop value of sweep.</p>
+</dd>
+<dt>step: float</dt><dd><p>Step value of sweep.</p>
+</dd>
+<dt>offset: float, optional</dt><dd><p>Offset value by which &lt;start&gt; and &lt;stop&gt; are shifted. Default is 0.</p>
+</dd>
+<dt>sleep: float</dt><dd><p>Sleep time after whole sweep. Default is 0.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.add_sweep_halfswing">
+<span class="sig-name descname"><span class="pre">add_sweep_halfswing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.add_sweep_halfswing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.add_sweep_halfswing" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Adds a halfswing sweep series with the pattern </dt><dd><p>0th: (+&lt;amplitude&gt; –&gt; -&lt;amplitude, &lt;step&gt;) + &lt;offset&gt;
+1st: (-&lt;amplitude&gt; –&gt; +&lt;amplitude, &lt;step&gt;) + &lt;offset&gt;
+time.sleep(&lt;sleep&gt;)</p>
+</dd>
+</dl>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>amplitude: float</dt><dd><p>Amplitude value of sweep.</p>
+</dd>
+<dt>step: float</dt><dd><p>Step value of sweep.</p>
+</dd>
+<dt>offset: float</dt><dd><p>Offset value by which &lt;start&gt; and &lt;stop&gt; are shifted. Default is 0.</p>
+</dd>
+<dt>sleep: float</dt><dd><p>Sleep time after whole sweep. Default is 0.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_average">
+<span class="sig-name descname"><span class="pre">get_average</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_average" title="Permalink to this definition"></a></dt>
+<dd><p>Sets trace average parameter.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>avg: int</dt><dd><p>Number of averages of whole traces. Is None (off) or a natural number.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_comment">
+<span class="sig-name descname"><span class="pre">get_comment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_comment" title="Permalink to this definition"></a></dt>
+<dd><p>Gets comment that is added to the .h5 file</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>comment: str</dt><dd><p>The comment added to data in .h5 file.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_dVdI">
+<span class="sig-name descname"><span class="pre">get_dVdI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_dVdI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_dVdI" title="Permalink to this definition"></a></dt>
+<dd><p>Gets the internal dVdI parameter, to decide weather the differential resistance (dV/dI) is calculated or not.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>status: bool</dt><dd><p>Status if numerical derivative is calculated.</p>
+</dd>
+<dt>func: function</dt><dd><p>Function to calculate numerical derivative, e.g. scipy.signal.savgol_filter (default), numpy.gradient, …</p>
+</dd>
+<dt><a href="#id9"><span class="problematic" id="id10">*</span></a>args: array_likes</dt><dd><p>Arguments for derivation function.</p>
+</dd>
+<dt><a href="#id11"><span class="problematic" id="id12">**</span></a>kwargs: dictionary_likes</dt><dd><p>Keyword arguments for derivation function.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_expname">
+<span class="sig-name descname"><span class="pre">get_expname</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_expname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_expname" title="Permalink to this definition"></a></dt>
+<dd><p>Gets experiment name of current measurement</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>expname: str</dt><dd><p>The experiment name used as suffix of uuid and &lt;filename&gt;.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_filename">
+<span class="sig-name descname"><span class="pre">get_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_filename" title="Permalink to this definition"></a></dt>
+<dd><p>Gets filename of current measurement.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>filename: str</dt><dd><p>The file name used as suffix of uuid.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_log_function">
+<span class="sig-name descname"><span class="pre">get_log_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_log_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_log_function" title="Permalink to this definition"></a></dt>
+<dd><p>Gets the current log_function settings.</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>func: array_likes of callable objects</dt><dd><p>A callable object that returns the value to be saved.</p>
+</dd>
+<dt>name: array_likes of strings</dt><dd><p>Names of logging parameter appearing in h5 file. Default is ‘log_param’.</p>
+</dd>
+<dt>unit: array_likes of strings</dt><dd><p>Units of logging parameter. Default is ‘’.</p>
+</dd>
+<dt>dtype: array_likes of dtypes</dt><dd><p>h5 data type to be used in the data file. Default is float (float64).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_tdy">
+<span class="sig-name descname"><span class="pre">get_tdy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_tdy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_tdy" title="Permalink to this definition"></a></dt>
+<dd><p>Gets sleep time between y-iterations in 3D scans.</p>
+<section id="id19">
+<h3>Parameters<a class="headerlink" href="#id19" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id20">
+<h3>Returns<a class="headerlink" href="#id20" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>x_dt: float</dt><dd><p>The sleep time between y-iterations.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_view_xy">
+<span class="sig-name descname"><span class="pre">get_view_xy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_view_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_view_xy" title="Permalink to this definition"></a></dt>
+<dd><p>Gets views that combine different data series of xy-measurement.</p>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>view: bool or array_likes of integers</dt><dd><p>Parameter that determines if additional views of different y-parameters are added. Is boolean or an array containing tuples of two natural numbers, where y1 is used x-axis and y2 as y-axis.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_x_dt">
+<span class="sig-name descname"><span class="pre">get_x_dt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_x_dt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_x_dt" title="Permalink to this definition"></a></dt>
+<dd><p>Gets sleep time between x-iterations in 2D and 3D scans.</p>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id24">
+<h3>Returns<a class="headerlink" href="#id24" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>x_dt: float</dt><dd><p>The sleep time between x-iterations</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.measure_1D">
+<span class="sig-name descname"><span class="pre">measure_1D</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.measure_1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.measure_1D" title="Permalink to this definition"></a></dt>
+<dd><p>Measures a 1 dimensional set of IV curves while sweeping the bias according to the set sweep parameters. 
+Every single data point is taken with the current IV Device settings.</p>
+<section id="id25">
+<h3>Parameters<a class="headerlink" href="#id25" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id26">
+<h3>Returns<a class="headerlink" href="#id26" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.measure_2D">
+<span class="sig-name descname"><span class="pre">measure_2D</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.measure_2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.measure_2D" title="Permalink to this definition"></a></dt>
+<dd><p>Measures a 2 dimensional set of IV curves while sweeping the bias according to the set sweep parameters and iterating all parameters x_vec in x_obj. 
+Every single data point is taken with the current IV Device settings.</p>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id28">
+<h3>Returns<a class="headerlink" href="#id28" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.measure_3D">
+<span class="sig-name descname"><span class="pre">measure_3D</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.measure_3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.measure_3D" title="Permalink to this definition"></a></dt>
+<dd><p>Measures a 3 dimensional set of IV curves while sweeping the bias according to the set sweep parameters and iterating all parameters x_vec in x_obj and all parameters y_vec in y_obj. The sweep over y_obj is the inner loop, for every value x_vec[i] all values y_vec are measured.
+Every single data point is taken with the current IV Device settings.</p>
+<section id="id29">
+<h3>Parameters<a class="headerlink" href="#id29" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id30">
+<h3>Returns<a class="headerlink" href="#id30" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.measure_xy">
+<span class="sig-name descname"><span class="pre">measure_xy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.measure_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.measure_xy" title="Permalink to this definition"></a></dt>
+<dd><p>Measures single data points, e.g. current or voltage and iterating all parameters x_vec, e.g. time.
+Every single data point is taken with the current IV Device settings.</p>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id32">
+<h3>Returns<a class="headerlink" href="#id32" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_comment">
+<span class="sig-name descname"><span class="pre">reset_comment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_comment" title="Permalink to this definition"></a></dt>
+<dd><p>Resets comment that is added to the .h5 file to None.</p>
+<section id="id33">
+<h3>Parameters<a class="headerlink" href="#id33" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id34">
+<h3>Returns<a class="headerlink" href="#id34" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_expname">
+<span class="sig-name descname"><span class="pre">reset_expname</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_expname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_expname" title="Permalink to this definition"></a></dt>
+<dd><p>Resets experiment name of current measurement to None.</p>
+<section id="id35">
+<h3>Parameters<a class="headerlink" href="#id35" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id36">
+<h3>Returns<a class="headerlink" href="#id36" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_filename">
+<span class="sig-name descname"><span class="pre">reset_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_filename" title="Permalink to this definition"></a></dt>
+<dd><p>Resets filename of current measurement to None.</p>
+<section id="id37">
+<h3>Parameters<a class="headerlink" href="#id37" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id38">
+<h3>Returns<a class="headerlink" href="#id38" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_fit_IV">
+<span class="sig-name descname"><span class="pre">reset_fit_IV</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_fit_IV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_fit_IV" title="Permalink to this definition"></a></dt>
+<dd><p>Resets all fit_function settings.</p>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id40">
+<h3>Returns<a class="headerlink" href="#id40" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_landscape">
+<span class="sig-name descname"><span class="pre">reset_landscape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_landscape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_landscape" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_log_function">
+<span class="sig-name descname"><span class="pre">reset_log_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_log_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_log_function" title="Permalink to this definition"></a></dt>
+<dd><p>Resets all log_function settings.</p>
+<section id="id41">
+<h3>Parameters<a class="headerlink" href="#id41" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id42">
+<h3>Returns<a class="headerlink" href="#id42" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_average">
+<span class="sig-name descname"><span class="pre">set_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">avg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_average" title="Permalink to this definition"></a></dt>
+<dd><p>Sets trace average parameter.</p>
+<section id="id43">
+<h3>Parameters<a class="headerlink" href="#id43" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>avg: int</dt><dd><p>Number of averages of whole traces. Must be None (off) or natural numbers.</p>
+</dd>
+</dl>
+</section>
+<section id="id44">
+<h3>Returns<a class="headerlink" href="#id44" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_comment">
+<span class="sig-name descname"><span class="pre">set_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_comment" title="Permalink to this definition"></a></dt>
+<dd><p>Sets comment that is added to the .h5 file to &lt;comment&gt;</p>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>comment: str</dt><dd><p>The comment added to data in .h5 file.</p>
+</dd>
+</dl>
+</section>
+<section id="id46">
+<h3>Returns<a class="headerlink" href="#id46" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_dVdI">
+<span class="sig-name descname"><span class="pre">set_dVdI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_dVdI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_dVdI" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the internal dVdI parameter, to decide weather the differential resistance (dV/dI) is calculated or not.</p>
+<section id="id47">
+<h3>Parameters<a class="headerlink" href="#id47" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>status: bool</dt><dd><p>Status if numerical derivative is calculated.</p>
+</dd>
+<dt>func: function</dt><dd><p>Function to calculate numerical derivative, e.g. scipy.signal.savgol_filter (default), numpy.gradient, …</p>
+</dd>
+<dt><a href="#id48"><span class="problematic" id="id49">*</span></a>args: array_likes, optional</dt><dd><p>Arguments for derivation function.</p>
+</dd>
+<dt><a href="#id50"><span class="problematic" id="id51">**</span></a>kwargs: dictionary_likes, optional</dt><dd><p>Keyword arguments for derivation function.</p>
+</dd>
+</dl>
+</section>
+<section id="id52">
+<h3>Returns<a class="headerlink" href="#id52" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h3>
+<p>Savitzky-Golay filter
+&gt;&gt;&gt; tr.set_dVdI(True, func=signal.savgol_filter, window_length=15, polyorder=3, deriv=1)</p>
+<p>Gradient as difference quotient
+&gt;&gt;&gt; tr.set_dVdI(True, func=np.gradient)</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_expname">
+<span class="sig-name descname"><span class="pre">set_expname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_expname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_expname" title="Permalink to this definition"></a></dt>
+<dd><p>Sets experiment name of current measurement to &lt;expname&gt;.</p>
+<section id="id53">
+<h3>Parameters<a class="headerlink" href="#id53" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>expname: str</dt><dd><p>The experiment name used as suffix of uuid and &lt;filename&gt;.</p>
+</dd>
+</dl>
+</section>
+<section id="id54">
+<h3>Returns<a class="headerlink" href="#id54" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_filename">
+<span class="sig-name descname"><span class="pre">set_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_filename" title="Permalink to this definition"></a></dt>
+<dd><p>Sets filename of current measurement to &lt;filename&gt;.</p>
+<section id="id55">
+<h3>Parameters<a class="headerlink" href="#id55" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>filename: str</dt><dd><p>The file name used as suffix of uuid.</p>
+</dd>
+</dl>
+</section>
+<section id="id56">
+<h3>Returns<a class="headerlink" href="#id56" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_fit_IV">
+<span class="sig-name descname"><span class="pre">set_fit_IV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_fit_IV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_fit_IV" title="Permalink to this definition"></a></dt>
+<dd><p>Sets fit-parameters for an in situ IV fit.
+This function is called for each trace with ints kexword arguments</p>
+<section id="id57">
+<h3>Parameters<a class="headerlink" href="#id57" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>func: obj</dt><dd><p>An callable object to execute for each trace.</p>
+</dd>
+<dt>name: string</dt><dd><p>The coordinate name to be created as data series in the .h5 file.</p>
+</dd>
+<dt>unit: string, optional</dt><dd><p>The unit name to be used in data series in the .h5 file.</p>
+</dd>
+<dt><a href="#id58"><span class="problematic" id="id59">**</span></a>kwargs: dictionary_likes, optional</dt><dd><p>Keyword arguments for fit function.</p>
+</dd>
+</dl>
+</section>
+<section id="id60">
+<h3>Returns<a class="headerlink" href="#id60" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id61">
+<h3>Examples<a class="headerlink" href="#id61" title="Permalink to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">qkit.analysis.IV_curve</span> <span class="kn">import</span> <span class="n">IV_curve</span> <span class="k">as</span> <span class="n">IVC</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ivc</span> <span class="o">=</span> <span class="n">IVC</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Ic fit via threshold voltage
+&gt;&gt;&gt; tr.set_fit_IV(func=ivc.get_Ic_threshold, name=’I_c’, unit=’A’, offset=0)</p>
+<p>Ic fit via peaks in the numerical derivative dV/dI
+&gt;&gt;&gt; tr.set_fit_IV(func=ivc.get_Ic_deriv, name=’I_c’, unit=’A’, prominence=10)</p>
+<p>Ic fit via peaks in the smoothed derivation in the frequency domain
+&gt;&gt;&gt; tr.set_fit_IV(func=ivc.get_Ic_dft, name=’I_c’, unit=’A’, prominence=1e-2)</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_landscape">
+<span class="sig-name descname"><span class="pre">set_landscape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_landscape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_landscape" title="Permalink to this definition"></a></dt>
+<dd><p>Sets parameters for landscapes scans in case of 2D and 3D scans to fasten up the measurement.
+The values of the given envelop function limit the sweep bounds for each x-value of 2D or 3D scans. The overall sweep bounds can merely be decreased, so that only envelop values &lt;= sweep bounds affect them.</p>
+<section id="id62">
+<h3>Parameters<a class="headerlink" href="#id62" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>func: function</dt><dd><p>An envelop function that limits bias values.</p>
+</dd>
+<dt>args: tuple</dt><dd><p>The arguments for the envelop function.</p>
+</dd>
+<dt>mirror: bool, optional</dt><dd><p>This determines if the envelop function is mirrored at the x-axis. Default is True</p>
+</dd>
+</dl>
+</section>
+<section id="id63">
+<h3>Returns<a class="headerlink" href="#id63" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id64">
+<h3>Examples<a class="headerlink" href="#id64" title="Permalink to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tr</span><span class="o">.</span><span class="n">add_sweep_halfswing</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">10e-9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">x_function</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+<span class="go">        set_x_value(i)</span>
+<span class="go">        return</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tr</span><span class="o">.</span><span class="n">set_x_parameters</span><span class="p">(</span><span class="n">x_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span>
+<span class="go">                        x_coordname = &#39;x_name&#39;,</span>
+<span class="go">                        x_set_obj = x_function,</span>
+<span class="go">                        x_unit = &#39;x_unit&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">lsc_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+<span class="go">        y = np.ones(shape = len(x)) * a1</span>
+<span class="go">        y[np.abs(x) &gt; x0] = a0</span>
+<span class="go">        return y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tr</span><span class="o">.</span><span class="n">set_landscape</span><span class="p">(</span><span class="n">lsc_func</span><span class="p">,</span> <span class="p">(</span><span class="mf">500e-9</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_log_function">
+<span class="sig-name descname"><span class="pre">set_log_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'f'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_log_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_log_function" title="Permalink to this definition"></a></dt>
+<dd><p>Saves desired values obtained by a function &lt;func&gt; in the .h5-file as a value vector with name &lt;name&gt;, unit &lt;unit&gt; and in data format &lt;f&gt;.
+The function (object) can be passed to the measurement loop which is executed before every x iteration
+but after executing the x_object setter in 2D measurements and before every line (but after setting 
+the x value) in 3D measurements.
+The return value of the function of type float or similar is stored in a value vector in the h5 file.</p>
+<section id="id65">
+<h3>Parameters<a class="headerlink" href="#id65" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>func: array_likes of callable objects</dt><dd><p>A callable object that returns the value to be saved.</p>
+</dd>
+<dt>name: array_likes of strings</dt><dd><p>Names of logging parameter appearing in h5 file. Default is ‘log_param’.</p>
+</dd>
+<dt>unit: array_likes of strings</dt><dd><p>Units of logging parameter. Default is ‘’.</p>
+</dd>
+<dt>dtype: array_likes of dtypes</dt><dd><p>h5 data type to be used in the data file. Default is ‘f’ (float64).</p>
+</dd>
+</dl>
+</section>
+<section id="id66">
+<h3>Returns<a class="headerlink" href="#id66" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_plot_comment">
+<span class="sig-name descname"><span class="pre">set_plot_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_plot_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_plot_comment" title="Permalink to this definition"></a></dt>
+<dd><p>Set small comment to add at the end of plot pics for more information i.e. good for wiki entries.</p>
+<section id="id67">
+<h3>Parameters<a class="headerlink" href="#id67" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>comment: str</dt><dd><p>A comment that is added in the plot images.</p>
+</dd>
+</dl>
+</section>
+<section id="id68">
+<h3>Returns<a class="headerlink" href="#id68" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_sample">
+<span class="sig-name descname"><span class="pre">set_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_sample" title="Permalink to this definition"></a></dt>
+<dd><p>Adds sample object (e.g. with sample properties, measurement comments) to measurement object.</p>
+<section id="id69">
+<h3>Parameters<a class="headerlink" href="#id69" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>sample: qkit.measure.sample_class.Sample()</dt><dd><p>Sample object to store information about the sample.</p>
+</dd>
+</dl>
+</section>
+<section id="id70">
+<h3>Returns<a class="headerlink" href="#id70" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id71">
+<h3>Examples<a class="headerlink" href="#id71" title="Permalink to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">qkit.measure.samples_class</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Sample</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;sample_name&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tr</span><span class="o">.</span><span class="n">set_sample</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_tdy">
+<span class="sig-name descname"><span class="pre">set_tdy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_tdy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_tdy" title="Permalink to this definition"></a></dt>
+<dd><p>Sets sleep time between y-iterations in 3D scans.</p>
+<section id="id72">
+<h3>Parameters<a class="headerlink" href="#id72" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>x_dt: float</dt><dd><p>The sleep time between y-iterations.</p>
+</dd>
+</dl>
+</section>
+<section id="id73">
+<h3>Returns<a class="headerlink" href="#id73" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_view_xy">
+<span class="sig-name descname"><span class="pre">set_view_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_view_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_view_xy" title="Permalink to this definition"></a></dt>
+<dd><p>Sets views that combine different data series of xy-measurement.</p>
+<section id="id74">
+<h3>Parameters<a class="headerlink" href="#id74" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>view: bool or array_likes of integers</dt><dd><p>Parameter that determines if additional views of different y-parameters are added. Must be boolean or an array containing tuples of two natural numbers, where y1 is used x-axis and y2 as y-axis.</p>
+</dd>
+</dl>
+</section>
+<section id="id75">
+<h3>Returns<a class="headerlink" href="#id75" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_x_dt">
+<span class="sig-name descname"><span class="pre">set_x_dt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_x_dt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_x_dt" title="Permalink to this definition"></a></dt>
+<dd><p>Sets sleep time between x-iterations in 2D and 3D scans.</p>
+<section id="id76">
+<h3>Parameters<a class="headerlink" href="#id76" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>x_dt: float</dt><dd><p>The sleep time between x-iterations.</p>
+</dd>
+</dl>
+</section>
+<section id="id77">
+<h3>Returns<a class="headerlink" href="#id77" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_x_parameters">
+<span class="sig-name descname"><span class="pre">set_x_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_set_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_x_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_x_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Sets x-parameters for 2D and 3D scan.
+In a 3D measurement, the x-parameters will be the “outer” sweep meaning for every x value all y values are swept and for each (x,y) value the bias is swept according to the set sweep parameters.</p>
+<section id="id78">
+<h3>Parameters<a class="headerlink" href="#id78" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>x_vec: array_likes</dt><dd><p>An N-dimensional array that contains the sweep values.</p>
+</dd>
+<dt>x_coordname: string</dt><dd><p>The coordinate name to be created as data series in the .h5 file.</p>
+</dd>
+<dt>x_set_obj: obj</dt><dd><p>An callable object to execute with x_vec-values.</p>
+</dd>
+<dt>x_unit: string, optional</dt><dd><p>The unit name to be used in data series in the .h5 file.</p>
+</dd>
+<dt>x_dt: float, optional</dt><dd><p>The sleep time between x-iterations.</p>
+</dd>
+</dl>
+</section>
+<section id="id79">
+<h3>Returns<a class="headerlink" href="#id79" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_xy_parameters">
+<span class="sig-name descname"><span class="pre">set_xy_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_xy_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_xy_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Set x- and y-parameters for measure_xy(), where y-parameters can be a list in order to record various quantities.</p>
+<section id="id80">
+<h3>Parameters<a class="headerlink" href="#id80" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>x_name: str</dt><dd><p>The name of the x-parameter to be created as data series in the .h5 file.</p>
+</dd>
+<dt>x_func: function</dt><dd><p>A function that returns x-values.</p>
+</dd>
+<dt>x_vec: array_likes of floats</dt><dd><p>An array of x-values at which data should be taken.</p>
+</dd>
+<dt>x_unit: str</dt><dd><p>The unit of the x-parameter to be used in data series in the .h5 file.</p>
+</dd>
+<dt>x_kwargs: dict</dt><dd><p>Keyword arguments forwarded to the x-function &lt;x_func&gt;.</p>
+</dd>
+<dt>y_name: array_likes of strings</dt><dd><p>Names of y-parameters to be created as data series in the .h5 file.</p>
+</dd>
+<dt>y_func: function</dt><dd><p>A function that returns y-values.</p>
+</dd>
+<dt>y_unit: array_likes of strings</dt><dd><p>Units of y-parameters to be used in data series in the .h5 file.</p>
+</dd>
+<dt>y_kwargs: dict</dt><dd><p>Keyword arguments forwarded to the y-function &lt;y_func&gt;.</p>
+</dd>
+<dt>x_dt: float, optional</dt><dd><p>The sleep time between queries of x-values. Default is 1e-3.</p>
+</dd>
+</dl>
+</section>
+<section id="id81">
+<h3>Returns<a class="headerlink" href="#id81" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_y_parameters">
+<span class="sig-name descname"><span class="pre">set_y_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_set_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_y_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_y_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Sets x-parameters for 3D scan, where y-parameters will be the “inner” sweep meaning for every x value all y values are swept and for each (x,y) value the bias is swept according to the set sweep parameters.</p>
+<section id="id82">
+<h3>Parameters<a class="headerlink" href="#id82" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>y_vec: array_likes</dt><dd><p>An N-dimensional array that contains the sweep values.</p>
+</dd>
+<dt>y_coordname: string</dt><dd><p>The coordinate name to be created as data series in the .h5 file.</p>
+</dd>
+<dt>y_set_obj: obj</dt><dd><p>An callable object to execute with y_vec-values.</p>
+</dd>
+<dt>y_unit: string, optional</dt><dd><p>The unit name to be used in data series in the .h5 file.</p>
+</dd>
+<dt>y_dt: float, optional</dt><dd><p>The sleep time between y-iterations.</p>
+</dd>
+</dl>
+</section>
+<section id="id83">
+<h3>Returns<a class="headerlink" href="#id83" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sweep</span></span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is a subclass of &lt;transport&gt; that provides the customized usage of many sweeps in one measurement.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.add_sweep">
+<span class="sig-name descname"><span class="pre">add_sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.add_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.add_sweep" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a sweep object with given parameters.</p>
+<section id="id84">
+<h3>Parameters<a class="headerlink" href="#id84" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>start: float</dt><dd><p>Start value of the sweep.</p>
+</dd>
+<dt>stop: float</dt><dd><p>Stop value of the sweep.</p>
+</dd>
+<dt>step: float</dt><dd><p>Step value of the sweep.</p>
+</dd>
+<dt>sleep: float</dt><dd><p>Sleep time after whole sweep. Default is 0.</p>
+</dd>
+</dl>
+</section>
+<section id="id85">
+<h3>Returns<a class="headerlink" href="#id85" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.create_iterator">
+<span class="sig-name descname"><span class="pre">create_iterator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.create_iterator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.create_iterator" title="Permalink to this definition"></a></dt>
+<dd><p>Creates iterator of start, stop, step and sleep arrays.</p>
+<section id="id86">
+<h3>Parameters<a class="headerlink" href="#id86" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id87">
+<h3>Returns<a class="headerlink" href="#id87" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.get_nos">
+<span class="sig-name descname"><span class="pre">get_nos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.get_nos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.get_nos" title="Permalink to this definition"></a></dt>
+<dd><p>Gets number of sweeps.</p>
+<section id="id88">
+<h3>Parameters<a class="headerlink" href="#id88" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id89">
+<h3>Returns<a class="headerlink" href="#id89" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>nos: int</dt><dd><p>Number of sweeps stored in this sweep-class.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.get_sweep">
+<span class="sig-name descname"><span class="pre">get_sweep</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.get_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.get_sweep" title="Permalink to this definition"></a></dt>
+<dd><p>Gets sweep parameter.</p>
+<section id="id90">
+<h3>Parameters<a class="headerlink" href="#id90" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id91">
+<h3>Returns<a class="headerlink" href="#id91" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>sweep: tuple of floats</dt><dd><p>Sweep object containing start, stop, step and sleep values.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.get_sweeps">
+<span class="sig-name descname"><span class="pre">get_sweeps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.get_sweeps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.get_sweeps" title="Permalink to this definition"></a></dt>
+<dd><p>Gets parameters of all sweep.</p>
+<section id="id92">
+<h3>Parameters<a class="headerlink" href="#id92" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id93">
+<h3>Returns<a class="headerlink" href="#id93" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>sweep: list of floats</dt><dd><p>Sweep object containing start, stop, step and sleep values.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.reset_sweeps">
+<span class="sig-name descname"><span class="pre">reset_sweeps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.reset_sweeps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.reset_sweeps" title="Permalink to this definition"></a></dt>
+<dd><p>Resets sweeps.</p>
+<section id="id94">
+<h3>Parameters<a class="headerlink" href="#id94" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id95">
+<h3>Returns<a class="headerlink" href="#id95" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.take_IV">
+<span class="sig-name descname"><span class="pre">take_IV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sweep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.take_IV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.take_IV" title="Permalink to this definition"></a></dt>
+<dd><p>Takes IV and considers if landscape is set.</p>
+<section id="id96">
+<h3>Parameters<a class="headerlink" href="#id96" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>sweep: array_likes of floats</dt><dd><p>Sweep object containing start, stop, step and sleep values.</p>
+</dd>
+</dl>
+</section>
+<section id="id97">
+<h3>Returns<a class="headerlink" href="#id97" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>I_values: numpy.array(float)</dt><dd><p>Measured current values.</p>
+</dd>
+<dt>V_values: numpy.array(float)</dt><dd><p>Measured voltage values.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.transport">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.measure.transport" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.measure.timedomain.quantum_machine.html" class="btn btn-neutral float-left" title="qkit.measure.timedomain.quantum_machine package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.services.html" class="btn btn-neutral float-right" title="qkit.services package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

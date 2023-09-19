@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.gui.qviewkit.plot_view &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.gui.qviewkit.plot_view</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.gui.qviewkit.plot_view</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: hannes.rotzinger@kit.edu / 2015,2016,2017 </span>
+<span class="sd">         marco.pfirrmann@kit.edu / 2016, 2017</span>
+<span class="sd">@license: GPL</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">in_pyqt5</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">QtCore</span>
+    <span class="kn">import</span> <span class="nn">PyQt5.QtWidgets</span> <span class="k">as</span> <span class="nn">QtGui</span>
+    <span class="n">in_pyqt5</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">in_pyqt5</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;import of PyQt5 and PyQt4 failed. Install one of those.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">qkit</span>
+<span class="kn">from</span> <span class="nn">qkit.storage.hdf_constants</span> <span class="kn">import</span> <span class="n">ds_types</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">_fromUtf8</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QString</span><span class="o">.</span><span class="n">fromUtf8</span>
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_fromUtf8</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">_encoding</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">UnicodeUTF8</span>
+    <span class="k">def</span> <span class="nf">_translate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">disambig</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">disambig</span><span class="p">,</span> <span class="n">_encoding</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_translate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">disambig</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">disambig</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Ui_Form"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.plot_view.Ui_Form">[docs]</a><span class="k">class</span> <span class="nc">Ui_Form</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ui_form class builds the general UI for the plot windows.</span>
+
+<span class="sd">    This class creates the overall plot window based on the QtGui class. </span>
+<span class="sd">    Depending on the ds_type we add some signal slots for the user to add more</span>
+<span class="sd">    possiblilities to view the data.</span>
+<span class="sd">    setupUi() creates the overall window and ds_type sensitive signal slots </span>
+<span class="sd">    are added by the respective functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Ui_Form.setupUi"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.plot_view.Ui_Form.setupUi">[docs]</a>    <span class="k">def</span> <span class="nf">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Form</span><span class="p">,</span><span class="n">ds_type</span><span class="p">,</span> <span class="n">selector_labels</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets up the general window</span>
+<span class="sd">        </span>
+<span class="sd">        This function coordinates the changing input from the signal slots and</span>
+<span class="sd">        updates the attributes that are parsed to the plotting lib functions.</span>
+<span class="sd">        update_plots() is either periodically called e.g. by the timer or once </span>
+<span class="sd">        on startup.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the Ui_Form class.</span>
+<span class="sd">            Form: PlotWindow object that inherits the used calls here from the</span>
+<span class="sd">                underlying QWidget class.</span>
+<span class="sd">            ds_type: Integer</span>
+<span class="sd">            selector_labels: String list with names of the datasets on all axis</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the given object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Form</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">))</span>
+        <span class="n">Form</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">750</span><span class="p">,</span> <span class="mi">450</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout_Top</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGridLayout</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout_Top</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout_Top</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;gridLayout_Top&quot;</span><span class="p">))</span>
+        <span class="c1"># we push for a tight layout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout_Top</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout_Top</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout_Top</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">setSizeConstraint</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLayout</span><span class="o">.</span><span class="n">SetMinimumSize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;horizontalLayout&quot;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout_Top</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGridLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;gridLayout&quot;</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout_Top</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gridLayout</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">Form</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">QtCore</span><span class="o">.</span><span class="n">QMetaObject</span><span class="o">.</span><span class="n">connectSlotsByName</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">selector_labels</span> <span class="o">=</span> <span class="n">selector_labels</span>
+        <span class="k">if</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;coordinate&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setupCoordinate</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;vector&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setupVector</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;matrix&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setupMatrix</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;box&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setupBox</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;txt&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setupTxt</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;view&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setupView</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Ui_Form.setupCoordinate"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.plot_view.Ui_Form.setupCoordinate">[docs]</a>    <span class="k">def</span> <span class="nf">setupCoordinate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Form</span><span class="p">):</span>
+        <span class="c1"># see setupVector()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setupVector</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ui_Form.setupVector"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.plot_view.Ui_Form.setupVector">[docs]</a>    <span class="k">def</span> <span class="nf">setupVector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Form</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up slots for value_vector.</span>
+<span class="sd">        </span>
+<span class="sd">        It is possible to plot the data over the x_axis and display the numeric</span>
+<span class="sd">        values in a table.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the Ui_Form class.</span>
+<span class="sd">            Form: PlotWindow object that inherits the used calls here from the</span>
+<span class="sd">                underlying QWidget class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the given object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="n">sizePolicy</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHorizontalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setVerticalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHeightForWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">sizePolicy</span><span class="p">()</span><span class="o">.</span><span class="n">hasHeightForWidth</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;PlotTypeSelector&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;Line Plot&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;Table&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        
+        <span class="n">spacerItem</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpacerItem</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">spacerItem</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addIndicatorLabels</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">indicators</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PointX&quot;</span><span class="p">,</span><span class="s2">&quot;PointY&quot;</span><span class="p">])</span></div>
+        
+
+<div class="viewcode-block" id="Ui_Form.setupView"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.plot_view.Ui_Form.setupView">[docs]</a>    <span class="k">def</span> <span class="nf">setupView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Form</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up slots for views.</span>
+<span class="sd">        </span>
+<span class="sd">        The x- and y-values of higher dimensional datasets can be selected to</span>
+<span class="sd">        be displayed in the 1d plot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the Ui_Form class.</span>
+<span class="sd">            Form: PlotWindow object that inherits the used calls here from the</span>
+<span class="sd">                underlying QWidget class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the given object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sizePolicy</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHorizontalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setVerticalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addTraceSelectorIndicator</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">TraceSelector</span> <span class="o">=</span> <span class="s2">&quot;VTraceXSelector&quot;</span><span class="p">,</span> 
+                                        <span class="n">TraceIndicator</span><span class="o">=</span><span class="s2">&quot;VTraceXValue&quot;</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector_labels</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;: &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addTraceSelectorIndicator</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">TraceSelector</span> <span class="o">=</span> <span class="s2">&quot;VTraceYSelector&quot;</span><span class="p">,</span> 
+                                        <span class="n">TraceIndicator</span><span class="o">=</span><span class="s2">&quot;VTraceYValue&quot;</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector_labels</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;: &#39;</span><span class="p">)</span>        
+
+        <span class="n">spacerItem</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpacerItem</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">spacerItem</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addIndicatorLabels</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">indicators</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PointX&quot;</span><span class="p">,</span><span class="s2">&quot;PointY&quot;</span><span class="p">])</span></div>
+        
+
+<div class="viewcode-block" id="Ui_Form.setupMatrix"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.plot_view.Ui_Form.setupMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">setupMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Form</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up slots for value_matrix.</span>
+<span class="sd">        </span>
+<span class="sd">        The data can be plotted color coded as a 2d plot, as a 1d plot at a</span>
+<span class="sd">        user selected value of the x_axis or the numerical values can be</span>
+<span class="sd">        displayed in a table.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the Ui_Form class.</span>
+<span class="sd">            Form: PlotWindow object that inherits the used calls here from the</span>
+<span class="sd">                underlying QWidget class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the given object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="n">sizePolicy</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Preferred</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHorizontalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setVerticalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHeightForWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">sizePolicy</span><span class="p">()</span><span class="o">.</span><span class="n">hasHeightForWidth</span><span class="p">())</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;PlotTypeSelector&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;Color Plot&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;Line Plot X&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;Line Plot Y&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;Table&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="p">)</span>
+        <span class="c1"># add a empty label to move the PlotTypeSelector to the top</span>
+        <span class="n">emptyL</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">emptyL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeLayout</span><span class="p">,</span><span class="n">stretch</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addTraceSelectorIndicator</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">TraceSelector</span> <span class="o">=</span> <span class="s2">&quot;TraceXSelector&quot;</span><span class="p">,</span>
+                                        <span class="n">TraceIndicator</span><span class="o">=</span><span class="s2">&quot;TraceXValue&quot;</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;: &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addTraceSelectorIndicator</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">TraceSelector</span> <span class="o">=</span> <span class="s2">&quot;TraceYSelector&quot;</span><span class="p">,</span> 
+                                        <span class="n">TraceIndicator</span><span class="o">=</span><span class="s2">&quot;TraceYValue&quot;</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;: &#39;</span><span class="p">)</span>
+        
+        <span class="c1">#The indicators should be located at the most right side of the bar</span>
+        <span class="n">spacerItem</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpacerItem</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">spacerItem</span><span class="p">)</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addIndicatorLabels</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span> <span class="n">indicators</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PointX&quot;</span><span class="p">,</span><span class="s2">&quot;PointY&quot;</span><span class="p">,</span><span class="s2">&quot;PointZ&quot;</span><span class="p">])</span></div>
+        
+        
+<div class="viewcode-block" id="Ui_Form.setupBox"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.plot_view.Ui_Form.setupBox">[docs]</a>    <span class="k">def</span> <span class="nf">setupBox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Form</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up slots for value_box.</span>
+<span class="sd">        </span>
+<span class="sd">        The data can be plotted color coded as a 2d plot at a user selected</span>
+<span class="sd">        value of either the x_, y_ or z_axis or as a 1d plot at a user selected </span>
+<span class="sd">        value of the x_ and y_axis.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the Ui_Form class.</span>
+<span class="sd">            Form: PlotWindow object that inherits the used calls here from the</span>
+<span class="sd">                underlying QWidget class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the given object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="n">sizePolicy</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHorizontalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setVerticalStretch</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sizePolicy</span><span class="o">.</span><span class="n">setHeightForWidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">sizePolicy</span><span class="p">()</span><span class="o">.</span><span class="n">hasHeightForWidth</span><span class="p">())</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;PlotTypeSelector&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="c1">#self.horizontalLayout.addWidget(self.PlotTypeSelector)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;2D Select X&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;2D Select Y&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;2D Select Z&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;Line Plot X&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;Line Plot Y&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="s2">&quot;Line Plot Z&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="p">)</span>
+        <span class="c1"># add a empty label to move the PlotTypeSelector to the top</span>
+        <span class="n">emptyL</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="n">Form</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">emptyL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeLayout</span><span class="p">,</span><span class="n">stretch</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span><span class="p">)</span>
+       
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addTraceSelectorIndicator</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">TraceSelector</span> <span class="o">=</span> <span class="s2">&quot;TraceXSelector&quot;</span><span class="p">,</span> 
+                                        <span class="n">TraceIndicator</span><span class="o">=</span><span class="s2">&quot;TraceXValue&quot;</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;: &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addTraceSelectorIndicator</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">TraceSelector</span> <span class="o">=</span> <span class="s2">&quot;TraceYSelector&quot;</span><span class="p">,</span> 
+                                        <span class="n">TraceIndicator</span><span class="o">=</span><span class="s2">&quot;TraceYValue&quot;</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;: &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addTraceSelectorIndicator</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">TraceSelector</span> <span class="o">=</span> <span class="s2">&quot;TraceZSelector&quot;</span><span class="p">,</span>  
+                                        <span class="n">TraceIndicator</span><span class="o">=</span><span class="s2">&quot;TraceZValue&quot;</span><span class="p">,</span>  <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector_labels</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;: &#39;</span><span class="p">)</span>        
+
+        <span class="n">spacerItem</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpacerItem</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">spacerItem</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addIndicatorLabels</span><span class="p">(</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">indicators</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PointX&quot;</span><span class="p">,</span><span class="s2">&quot;PointY&quot;</span><span class="p">,</span><span class="s2">&quot;PointZ&quot;</span><span class="p">])</span></div>
+        
+
+<div class="viewcode-block" id="Ui_Form.setupTxt"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.plot_view.Ui_Form.setupTxt">[docs]</a>    <span class="k">def</span> <span class="nf">setupTxt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Form</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">_addIndicatorLabels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">indicators</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">IndicatorLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">IndicatorLayout</span><span class="o">.</span><span class="n">setSizeConstraint</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLayout</span><span class="o">.</span><span class="n">SetMinimumSize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">IndicatorLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;horizontalLayout&quot;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">IndicatorLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">IndicatorLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">IndicatorLayout</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">indicators</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">indicator</span><span class="p">,</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="n">Form</span><span class="p">))</span>
+            <span class="n">temp_indicator</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">indicator</span><span class="p">)</span>
+            <span class="n">temp_indicator</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy</span><span class="p">)</span>
+            <span class="n">temp_indicator</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="n">indicator</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">IndicatorLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">temp_indicator</span><span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">IndicatorLayout</span><span class="p">,</span><span class="n">stretch</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_addTraceSelectorIndicator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Form</span><span class="p">,</span><span class="n">sizePolicy</span><span class="p">,</span><span class="n">TraceSelector</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">TraceIndicator</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Trace: &quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelIndLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelIndLayout</span><span class="o">.</span><span class="n">setSizeConstraint</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLayout</span><span class="o">.</span><span class="n">SetMinimumSize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelIndLayout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;TraceSelIndLayout&quot;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelIndLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelIndLayout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelIndLayout</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">TraceSelector</span><span class="p">,</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">(</span><span class="n">Form</span><span class="p">))</span>
+        <span class="n">temp_SelInd</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">TraceSelector</span><span class="p">)</span>
+        <span class="n">temp_SelInd</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy</span><span class="p">)</span>
+        <span class="n">temp_SelInd</span><span class="o">.</span><span class="n">setSuffix</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="n">temp_SelInd</span><span class="o">.</span><span class="n">setMinimum</span><span class="p">(</span><span class="o">-</span><span class="mi">99999</span><span class="p">)</span>
+        <span class="n">temp_SelInd</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="mi">99999</span><span class="p">)</span>
+        <span class="n">temp_SelInd</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">temp_SelInd</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="n">TraceSelector</span><span class="p">))</span>
+        <span class="n">temp_SelInd</span><span class="o">.</span><span class="n">setPrefix</span><span class="p">(</span><span class="n">_translate</span><span class="p">(</span><span class="s2">&quot;Form&quot;</span><span class="p">,</span> <span class="n">prefix</span> <span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelIndLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">temp_SelInd</span><span class="p">)</span>
+            
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">TraceIndicator</span><span class="p">,</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">(</span><span class="n">Form</span><span class="p">))</span>
+        <span class="n">temp_SelInd</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">TraceIndicator</span><span class="p">)</span>
+        <span class="n">temp_SelInd</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">sizePolicy</span><span class="p">)</span>
+        <span class="n">temp_SelInd</span><span class="o">.</span><span class="n">setReadOnly</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">temp_SelInd</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="n">_fromUtf8</span><span class="p">(</span><span class="s2">&quot;TraceValue&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelIndLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">temp_SelInd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontalLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TraceSelIndLayout</span><span class="p">,</span><span class="n">stretch</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span><span class="p">)</span>              </div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

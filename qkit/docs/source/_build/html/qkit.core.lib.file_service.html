@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.core.lib.file_service package &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.core.lib.network package" href="qkit.core.lib.network.html" />
+    <link rel="prev" title="qkit.core.lib.com package" href="qkit.core.lib.com.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">qkit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.html#module-qkit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">qkit</a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.core.html">qkit.core package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.core.lib.html">qkit.core.lib package</a></li>
+      <li class="breadcrumb-item active">qkit.core.lib.file_service package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.core.lib.file_service.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-core-lib-file-service-package">
+<h1>qkit.core.lib.file_service package<a class="headerlink" href="#qkit-core-lib-file-service-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="qkit-core-lib-file-service-file-info-database-module">
+<h2>qkit.core.lib.file_service.file_info_database module<a class="headerlink" href="#qkit-core-lib-file-service-file-info-database-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-qkit.core.lib.file_service.file_info_database_lib">
+<span id="qkit-core-lib-file-service-file-info-database-lib-module"></span><h2>qkit.core.lib.file_service.file_info_database_lib module<a class="headerlink" href="#module-qkit.core.lib.file_service.file_info_database_lib" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.UUID_base">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.lib.file_service.file_info_database_lib.</span></span><span class="sig-name descname"><span class="pre">UUID_base</span></span><a class="reference internal" href="_modules/qkit/core/lib/file_service/file_info_database_lib.html#UUID_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.UUID_base" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_date">
+<span class="sig-name descname"><span class="pre">get_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/file_service/file_info_database_lib.html#UUID_base.get_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_date" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a date string from a given UUID timestamp (reverse of get_uuid())</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_time">
+<span class="sig-name descname"><span class="pre">get_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/file_service/file_info_database_lib.html#UUID_base.get_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_time" title="Permalink to this definition"></a></dt>
+<dd><p>returns a integer time value from a given UUID timestamp (reverse of get_UUID())
+orginally located in hdf_DateTimeGenerator.py (AS/MP/HR)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_uuid">
+<span class="sig-name descname"><span class="pre">get_uuid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/file_service/file_info_database_lib.html#UUID_base.get_uuid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_uuid" title="Permalink to this definition"></a></dt>
+<dd><p>returns a UUID from a given time, e.g. returned by time.time()
+The UUID is returned with a precision of (integer) seconds 
+and has a fixed length of six characters.</p>
+<p>Derived from encode_uuid(), orginally located in hdf_DateTimeGenerator.py (AS/MP/HR)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.file_system_service">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.lib.file_service.file_info_database_lib.</span></span><span class="sig-name descname"><span class="pre">file_system_service</span></span><a class="reference internal" href="_modules/qkit/core/lib/file_service/file_info_database_lib.html#file_system_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.file_system_service" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.core.lib.file_service.file_info_database_lib.UUID_base" title="qkit.core.lib.file_service.file_info_database_lib.UUID_base"><code class="xref py py-class docutils literal notranslate"><span class="pre">UUID_base</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.file_system_service.add_h5_file">
+<span class="sig-name descname"><span class="pre">add_h5_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h5_filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/file_service/file_info_database_lib.html#file_system_service.add_h5_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.file_system_service.add_h5_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.file_system_service.h5_db">
+<span class="sig-name descname"><span class="pre">h5_db</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.file_system_service.h5_db" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.file_system_service.h5_info_db">
+<span class="sig-name descname"><span class="pre">h5_info_db</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.file_system_service.h5_info_db" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.file_system_service.lock">
+<span class="sig-name descname"><span class="pre">lock</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;unlocked</span> <span class="pre">_thread.lock</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.file_system_service.lock" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.file_system_service.measure_db">
+<span class="sig-name descname"><span class="pre">measure_db</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.file_system_service.measure_db" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.file_system_service.set_db">
+<span class="sig-name descname"><span class="pre">set_db</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.file_system_service.set_db" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.file_system_service.update_file_db">
+<span class="sig-name descname"><span class="pre">update_file_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/file_service/file_info_database_lib.html#file_system_service.update_file_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.file_system_service.update_file_db" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.file_service.file_info_database_lib.file_system_service.wait">
+<span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/file_service/file_info_database_lib.html#file_system_service.wait"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.file_service.file_info_database_lib.file_system_service.wait" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.core.lib.file_service">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.core.lib.file_service" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.core.lib.com.html" class="btn btn-neutral float-left" title="qkit.core.lib.com package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.core.lib.network.html" class="btn btn-neutral float-right" title="qkit.core.lib.network package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

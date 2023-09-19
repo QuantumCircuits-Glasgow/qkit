@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.core.flow &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.core.flow</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.core.flow</h1><div class="highlight"><pre>
+<span></span><span class="c1"># qtflow.py, handle &#39;flow control&#39; in the QT lab environment</span>
+<span class="c1"># Pieter de Groot, &lt;pieterdegroot@gmail.com&gt;, 2008</span>
+<span class="c1"># Reinier Heeres, &lt;reinier@heeres.eu&gt;, 2008</span>
+<span class="c1"># HR@KIT/2017 (python3 conversion &amp; cleanup for QKIT)</span>
+<span class="c1"># YS@KIT/2018: Further emancipated from qtlab</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">qkit</span>
+<span class="kn">from</span> <span class="nn">qkit.core.lib.misc</span> <span class="kn">import</span> <span class="n">get_traceback</span>
+
+<span class="n">AutoFormattedTB</span> <span class="o">=</span> <span class="n">get_traceback</span><span class="p">()</span>
+
+<div class="viewcode-block" id="FlowControl"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl">[docs]</a><span class="k">class</span> <span class="nc">FlowControl</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Class for flow control of the QT measurement environment.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">STATUS_STOPPED</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">STATUS_RUNNING</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s1">&#39;starting&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurements_running</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_abort</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pause</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exit_handlers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1">#########</span>
+    <span class="c1">### signals</span>
+    <span class="c1">#########</span>
+
+<div class="viewcode-block" id="FlowControl.measurement_start"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.measurement_start">[docs]</a>    <span class="k">def</span> <span class="nf">measurement_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Indicate the start of a measurement.</span>
+
+<span class="sd">        FIXME: The following is disabled due to lack of exception catching.</span>
+<span class="sd">        This will increment the internal measurement counter, and if a</span>
+<span class="sd">        measurement was not running, it will emit the &#39;measurement-start&#39;</span>
+<span class="sd">        signal.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurements_running</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_measurements_running</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_status</span><span class="p">(</span><span class="s1">&#39;running&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Handle callbacks</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_mainloop</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FlowControl.measurement_end"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.measurement_end">[docs]</a>    <span class="k">def</span> <span class="nf">measurement_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Indicate the end of a measurement.</span>
+
+<span class="sd">        FIXME: The following is disabled due to lack of exception catching.</span>
+<span class="sd">        This will decrement the internal measurement counter if abort=False,</span>
+<span class="sd">        and set it to 0 in abort=True. If the counter reached zero (e.g. the</span>
+<span class="sd">        last measurement was stopped, it will emit the &#39;measurement-end&#39;</span>
+<span class="sd">        signal.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">abort</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_measurements_running</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_measurements_running</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_measurements_running</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_measurements_running</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_status</span><span class="p">(</span><span class="s1">&#39;stopped&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Handle callbacks</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_mainloop</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FlowControl.run_mainloop"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.run_mainloop">[docs]</a>    <span class="k">def</span> <span class="nf">run_mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Run mainloop for a maximum of &lt;delay&gt; seconds.</span>
+<span class="sd">        If wait is True (default), sleep until &lt;delay&gt; seconds have passed.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">wait</span> <span class="ow">and</span> <span class="n">delay</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FlowControl.measurement_idle"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.measurement_idle">[docs]</a>    <span class="k">def</span> <span class="nf">measurement_idle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Indicate that the measurement is idle and handle events.</span>
+
+<span class="sd">        This function will check whether an abort has been requested and</span>
+<span class="sd">        handle queued events for a time up to &#39;delay&#39; (in seconds).</span>
+<span class="sd">        </span>
+<span class="sd">        Be aware that both time.time and time.sleep have a granularity of around 15ms on windows.</span>
+<span class="sd">        However, this should not be limiting.</span>
+
+<span class="sd">        It starts by emitting the &#39;measurement-idle&#39; signal to allow callbacks</span>
+<span class="sd">        to be executed by the time this function handles the event queue.</span>
+<span class="sd">        After that it handles events and sleeps for periods of 10msec. Every</span>
+<span class="sd">        &lt;emit_interval&gt; seconds it will emit another measurement-idle signal.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pause</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_abort</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_mainloop</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_abort</span><span class="p">()</span>
+
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_mainloop</span><span class="p">(</span><span class="n">delay</span><span class="o">-</span><span class="n">dt</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="k">if</span> <span class="n">dt</span> <span class="o">+</span> <span class="mf">0.02</span> <span class="o">&lt;</span> <span class="n">delay</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">delay</span> <span class="o">-</span> <span class="n">dt</span><span class="p">))</span>
+                <span class="k">return</span></div>
+
+    <span class="k">def</span> <span class="nf">_run_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scriptfile</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">execfile</span><span class="p">(</span><span class="n">scriptfile</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FlowControl.register_exit_script"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.register_exit_script">[docs]</a>    <span class="k">def</span> <span class="nf">register_exit_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scriptfile</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_exit_handler</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_script</span><span class="p">(</span><span class="n">scriptfile</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="FlowControl.register_exit_handler"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.register_exit_handler">[docs]</a>    <span class="k">def</span> <span class="nf">register_exit_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">func</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_handlers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exit_handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">func</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FlowControl.exit_request"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.exit_request">[docs]</a>    <span class="k">def</span> <span class="nf">exit_request</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Run all registered exit handlers.&#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_handlers</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">func</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error in func </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span></div>
+
+
+    <span class="c1">############</span>
+    <span class="c1">### status</span>
+    <span class="c1">############</span>
+
+<div class="viewcode-block" id="FlowControl.get_status"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.get_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Get status, one of &quot;running&quot;, &quot;stopped&quot;, &quot;starting&quot; &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="n">val</span>
+
+<div class="viewcode-block" id="FlowControl.finished_starting"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.finished_starting">[docs]</a>    <span class="k">def</span> <span class="nf">finished_starting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s2">&quot;stopped&quot;</span></div>
+
+<div class="viewcode-block" id="FlowControl.is_measuring"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.is_measuring">[docs]</a>    <span class="k">def</span> <span class="nf">is_measuring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;running&#39;</span></div>
+
+<div class="viewcode-block" id="FlowControl.check_abort"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.check_abort">[docs]</a>    <span class="k">def</span> <span class="nf">check_abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Check whether an abort has been requested.&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_abort</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_abort</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">measurement_end</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Human abort&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FlowControl.set_abort"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.set_abort">[docs]</a>    <span class="k">def</span> <span class="nf">set_abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Request an abort.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_abort</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="FlowControl.is_paused"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.is_paused">[docs]</a>    <span class="k">def</span> <span class="nf">is_paused</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pause</span></div>
+
+<div class="viewcode-block" id="FlowControl.set_pause"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.FlowControl.set_pause">[docs]</a>    <span class="k">def</span> <span class="nf">set_pause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pause</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Set / unset pause state.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pause</span> <span class="o">=</span> <span class="n">pause</span></div></div>
+
+<div class="viewcode-block" id="exception_handler"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.exception_handler">[docs]</a><span class="k">def</span> <span class="nf">exception_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">etype</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">tb</span><span class="p">,</span> <span class="n">tb_offset</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># when the &#39;tb_offset&#39; keyword argument is omitted above, ipython</span>
+    <span class="c1"># raises an error.</span>
+    <span class="n">TB</span> <span class="o">=</span> <span class="n">AutoFormattedTB</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;Context&#39;</span><span class="p">,</span> <span class="n">color_scheme</span><span class="o">=</span><span class="s1">&#39;Linux&#39;</span><span class="p">,</span> <span class="n">tb_offset</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">fc</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span>
+
+    <span class="c1"># for the unlikely event that an error occured after pushing the</span>
+    <span class="c1"># stop button</span>
+    <span class="n">fc</span><span class="o">.</span><span class="n">_abort</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">fc</span><span class="o">.</span><span class="n">is_measuring</span><span class="p">():</span>
+        <span class="c1"># put qtlab back in &#39;stopped&#39; state</span>
+        <span class="n">fc</span><span class="o">.</span><span class="n">measurement_end</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">TB</span><span class="p">(</span><span class="n">etype</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qtlab_exit"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.flow.qtlab_exit">[docs]</a><span class="k">def</span> <span class="nf">qtlab_exit</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Closing QKIT...&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

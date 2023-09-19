@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.core.lib.file_service.file_info_database_lib &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.core.lib.file_service.file_info_database_lib</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.core.lib.file_service.file_info_database_lib</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">qkit</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">qkit.storage.hdf_DateTimeGenerator</span> <span class="k">as</span> <span class="nn">dtg</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pickle</span>
+
+<div class="viewcode-block" id="UUID_base"><a class="viewcode-back" href="../../../../../qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.UUID_base">[docs]</a><span class="k">class</span> <span class="nc">UUID_base</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">_alphabet</span> <span class="o">=</span> <span class="s2">&quot;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span>
+
+<div class="viewcode-block" id="UUID_base.get_uuid"><a class="viewcode-back" href="../../../../../qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_uuid">[docs]</a>    <span class="k">def</span> <span class="nf">get_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">time</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        returns a UUID from a given time, e.g. returned by time.time()</span>
+<span class="sd">        The UUID is returned with a precision of (integer) seconds </span>
+<span class="sd">        and has a fixed length of six characters.</span>
+<span class="sd">        </span>
+<span class="sd">        Derived from encode_uuid(), orginally located in hdf_DateTimeGenerator.py (AS/MP/HR)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if not value: value = self._unix_timestamp</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="n">la</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_alphabet</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">time</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alphabet</span><span class="p">[</span><span class="n">time</span> <span class="o">%</span> <span class="n">la</span><span class="p">]</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span> <span class="o">/</span> <span class="n">la</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+    
+<div class="viewcode-block" id="UUID_base.get_time"><a class="viewcode-back" href="../../../../../qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">uuid</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns a integer time value from a given UUID timestamp (reverse of get_UUID())</span>
+<span class="sd">        orginally located in hdf_DateTimeGenerator.py (AS/MP/HR)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if not string: string = self._uuid</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">multiplier</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">uuid</span> <span class="o">=</span> <span class="n">uuid</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">la</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_alphabet</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">uuid</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alphabet</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">uuid</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fid.get_time: Can not decode this: </span><span class="si">{}</span><span class="s2">&lt;--&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="n">f</span> <span class="o">*</span> <span class="n">multiplier</span>
+            <span class="n">multiplier</span> <span class="o">*=</span> <span class="n">la</span>
+            <span class="n">uuid</span> <span class="o">=</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+        
+<div class="viewcode-block" id="UUID_base.get_date"><a class="viewcode-back" href="../../../../../qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_date">[docs]</a>    <span class="k">def</span> <span class="nf">get_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">uuid</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a date string from a given UUID timestamp (reverse of get_uuid())</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">,</span><span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_time</span><span class="p">(</span><span class="n">uuid</span><span class="p">)))</span></div></div>
+
+
+<div class="viewcode-block" id="file_system_service"><a class="viewcode-back" href="../../../../../qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service">[docs]</a><span class="k">class</span> <span class="nc">file_system_service</span><span class="p">(</span><span class="n">UUID_base</span><span class="p">):</span>
+    <span class="n">h5_db</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">set_db</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">measure_db</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">h5_info_db</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">_h5_n_mtime</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="n">_h5_mtime_db_path</span>   <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;logdir&#39;</span><span class="p">],</span><span class="s2">&quot;h5_mtime.db&quot;</span><span class="p">)</span>
+    <span class="n">_h5_info_cache_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;logdir&#39;</span><span class="p">],</span><span class="s2">&quot;h5_info_cache.db&quot;</span><span class="p">)</span>
+
+    <span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">_remove_cache_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            remove cached files to recreate the database</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_h5_mtime_db_path</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_h5_info_cache_path</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_load_cache_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; to speed up things, try to load the h5 </span>
+<span class="sd">            information from previous runs. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_new_cache</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_h5_mtime_db</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_h5_info_cache_db</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_mtime</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_h5_mtime_db_path</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_h5_mtime_db</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_h5_info_cache_path</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_h5_info_cache_db</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;m_time_db not found. Not using cached files for now. </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">e</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_new_cache</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_store_cache_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; writes the cached files on disk, </span>
+<span class="sd">        qkit.cfg[&#39;logdir&#39;] is used by default.</span>
+
+<span class="sd">        exeptions are not handled ... if something fails here </span>
+<span class="sd">        there is a severe general problem, e.g. the disk is full.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">write_protocol</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># For Python 2 compatibility 0=text, 1...x binary, -1 highest binary. </span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_h5_mtime_db_path</span><span class="p">,</span><span class="s1">&#39;wb+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_h5_n_mtime</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">protocol</span><span class="o">=</span><span class="n">write_protocol</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_h5_info_cache_path</span><span class="p">,</span><span class="s1">&#39;wb+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h5_info_db</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">protocol</span><span class="o">=</span><span class="n">write_protocol</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_datadir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fid_restrict_to_userdir&#39;</span><span class="p">,</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">dtg</span><span class="o">.</span><span class="n">DateTimeGenerator</span><span class="p">()</span><span class="o">.</span><span class="n">new_filename</span><span class="p">()[</span><span class="s1">&#39;_folder&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="file_system_service.update_file_db"><a class="viewcode-back" href="../../../../../qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.update_file_db">[docs]</a>    <span class="k">def</span> <span class="nf">update_file_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_cache_files</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fid_scan_datadir&#39;</span><span class="p">,</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;fid_scan_datadir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;file info database: Start to update database.&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">_</span> <span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_datadir</span><span class="p">()):</span> <span class="c1"># root, dirs, files</span>
+                    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_inspect_and_add_Leaf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">root</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;file info database: Updating database done.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_store_cache_files</span><span class="p">()</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Initialized the file info database (qkit.fid) in </span><span class="si">%.3f</span><span class="s2"> seconds.&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start_time</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_inspect_and_add_Leaf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fname</span><span class="p">,</span><span class="n">root</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        inspect the filenames if .h5, .set or .measurement</span>
+
+<span class="sd">        to speed up things, the files are only scanned </span>
+<span class="sd">        if something has changed (os.stat.m_time) on disk. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># join to absolute path:</span>
+        <span class="n">fqpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+
+        <span class="c1"># take the prefix ...</span>
+        <span class="n">uuid</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span>
+
+        <span class="c1"># ... and check the suffix</span>
+        <span class="k">if</span> <span class="n">fqpath</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;.h5&#39;</span><span class="p">:</span>
+
+            <span class="c1"># save the path using uuids as an index</span>
+            <span class="c1"># Note: All path entries with the same uuid are </span>
+            <span class="c1"># overwritten with the last found uuid indexed file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">h5_db</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">fqpath</span>
+
+            <span class="c1"># we only care about the mtime of .h5 files </span>
+            <span class="n">mtime</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">fqpath</span><span class="p">)</span><span class="o">.</span><span class="n">st_mtime</span>
+
+            <span class="c1"># store the file&#39;s modification time </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_h5_n_mtime</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">mtime</span>
+
+            <span class="k">if</span> <span class="n">mtime</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h5_mtime_db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h5_info_cache_db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">h5_info_db</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h5_info_cache_db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_collect_info</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span> <span class="n">fqpath</span><span class="p">)</span> <span class="c1"># collect_info is expensive.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_collect_info</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span> <span class="n">fqpath</span><span class="p">)</span> <span class="c1"># collect_info is expensive. </span>
+
+        <span class="k">elif</span> <span class="n">fqpath</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;set&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_db</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">fqpath</span>
+        <span class="k">elif</span> <span class="n">fqpath</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;ent&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">measure_db</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">fqpath</span>
+
+    <span class="k">def</span> <span class="nf">_collect_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">uuid</span><span class="p">,</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">tm</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">j_split</span> <span class="o">=</span> <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">j_split</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">7</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">ord</span><span class="p">(</span><span class="n">uuid</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">tm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_time</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+                    <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_date</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+                    <span class="n">user</span> <span class="o">=</span> <span class="n">j_split</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="n">run</span> <span class="o">=</span> <span class="n">j_split</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">user</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">run</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tm</span> <span class="o">=</span> <span class="n">uuid</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">j_split</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">201</span><span class="p">:</span>  <span class="c1"># not really a measurement file then</span>
+                        <span class="n">dt</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">dt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">:</span><span class="si">{}</span><span class="s1">:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">j_split</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">][:</span><span class="mi">4</span><span class="p">],</span> <span class="n">j_split</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">][</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">j_split</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">][</span><span class="mi">6</span><span class="p">:],</span> <span class="n">tm</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">tm</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="n">tm</span><span class="p">[</span><span class="mi">4</span><span class="p">:])</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="n">dt</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">run</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">h5_info_db</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">tm</span><span class="p">,</span> <span class="s1">&#39;datetime&#39;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span> <span class="s1">&#39;run&#39;</span><span class="p">:</span> <span class="n">run</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">user</span><span class="p">}</span>
+            
+            <span class="k">if</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fid_scan_hdf&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">h5_info_db</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;rating&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">})</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">h5f</span><span class="o">=</span><span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s2">&quot;comment&quot;</span> <span class="ow">in</span>  <span class="n">h5f</span><span class="p">[</span><span class="s1">&#39;/entry/data0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+                        <span class="n">h5_info_db</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="n">h5f</span><span class="p">[</span><span class="s1">&#39;/entry/data0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;comment&#39;</span><span class="p">]})</span>
+                    <span class="k">if</span> <span class="s2">&quot;dr_values&quot;</span> <span class="ow">in</span> <span class="n">h5f</span><span class="p">[</span><span class="s1">&#39;/entry/analysis0&#39;</span><span class="p">]:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="c1"># this is legacy and should be removed at some point</span>
+                            <span class="c1"># please use the entry/analysis0 attributes instead.</span>
+                            <span class="n">fit_comment</span> <span class="o">=</span> <span class="n">h5f</span><span class="p">[</span><span class="s1">&#39;/entry/analysis0/dr_values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comment&#39;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span>
+                            <span class="n">comm_begin</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fit_comment</span><span class="p">]</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">h5_info_db</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;fit_freq&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">h5f</span><span class="p">[</span><span class="s1">&#39;/entry/analysis0/dr_values&#39;</span><span class="p">][</span><span class="n">comm_begin</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">)])})</span>
+                            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+                                <span class="k">pass</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">h5_info_db</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;fit_time&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">h5f</span><span class="p">[</span><span class="s1">&#39;/entry/analysis0/dr_values&#39;</span><span class="p">][</span><span class="n">comm_begin</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">)])})</span>
+                            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+                                <span class="k">pass</span>
+                        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+                            <span class="k">pass</span>
+                    <span class="k">if</span> <span class="s2">&quot;measurement&quot;</span> <span class="ow">in</span> <span class="n">h5f</span><span class="p">[</span><span class="s1">&#39;/entry/data0&#39;</span><span class="p">]:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">mmt</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">h5f</span><span class="p">[</span><span class="s1">&#39;/entry/data0/measurement&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                            <span class="n">h5_info_db</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                                    <span class="p">{</span><span class="n">arg</span><span class="p">:</span> <span class="n">mmt</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;run_id&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;rating&#39;</span><span class="p">,</span> <span class="s1">&#39;smt&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">mmt</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">arg</span><span class="p">)}</span>
+                            <span class="p">)</span>
+                        <span class="k">except</span><span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                            <span class="k">pass</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">h5_info_db</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">h5f</span><span class="p">[</span><span class="s1">&#39;/entry/analysis0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">))</span>
+                    <span class="k">except</span><span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                        <span class="k">pass</span>
+                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;fid could not index file </span><span class="si">{}</span><span class="s2">, probably it is just new and empty. Original message: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">e</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;fid </span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">e</span><span class="p">))</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">h5f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">h5_info_db</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5_info_db</span>
+    
+<div class="viewcode-block" id="file_system_service.add_h5_file"><a class="viewcode-back" href="../../../../../qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.add_h5_file">[docs]</a>    <span class="k">def</span> <span class="nf">add_h5_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h5_filename</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;fid_scan_datadir&#39;</span><span class="p">]:</span>
+            <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_add</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;h5_filename&#39;</span><span class="p">:</span><span class="n">h5_filename</span><span class="p">})</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+        
+    <span class="k">def</span> <span class="nf">_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h5_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a file to the database, where h5_filename should be the absolute filepath to the h5 file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">h5_filename</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">h5_filename</span><span class="p">)</span>
+        <span class="n">uuid</span> <span class="o">=</span> <span class="n">basename</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">h5_filename</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">!=</span> <span class="s1">&#39;.h5&#39;</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Tried to add &#39;</span><span class="si">{:s}</span><span class="s2">&#39; to the qkit.fid database: Not a .h5 filename.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">h5_filename</span><span class="p">))</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">h5_filename</span><span class="p">):</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Store_db: Adding manually h5: &quot;</span> <span class="o">+</span> <span class="n">basename</span> <span class="o">+</span> <span class="s1">&#39;h5&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_inspect_and_add_Leaf</span><span class="p">(</span><span class="n">basename</span> <span class="o">+</span> <span class="s1">&#39;h5&#39;</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Tried to add &#39;</span><span class="si">{:s}</span><span class="s2">&#39; to the qkit.fid database: File does not exist.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">h5_filename</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">h5_filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;set&#39;</span><span class="p">):</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Store_db: Adding manually set: &quot;</span> <span class="o">+</span> <span class="n">basename</span> <span class="o">+</span> <span class="s1">&#39;set&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_inspect_and_add_Leaf</span><span class="p">(</span><span class="n">basename</span> <span class="o">+</span> <span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">h5_filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;measurement&#39;</span><span class="p">):</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Store_db: Adding manually measurement: &quot;</span> <span class="o">+</span> <span class="n">basename</span> <span class="o">+</span> <span class="s1">&#39;measurement&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_inspect_and_add_Leaf</span><span class="p">(</span><span class="n">basename</span> <span class="o">+</span> <span class="s1">&#39;measurement&#39;</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_grid_db</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_set_hdf_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">UUID</span><span class="p">,</span><span class="n">attribute</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="n">h5_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h5_db</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">h5_filepath</span><span class="p">,</span><span class="s1">&#39;r+&#39;</span><span class="p">)[</span><span class="s1">&#39;entry&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;analysis0&#39;</span> <span class="ow">in</span> <span class="n">h</span><span class="p">:</span>
+                <span class="n">h</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;analysis0&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">h</span><span class="p">[</span><span class="s1">&#39;analysis0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">h</span><span class="p">[</span><span class="s1">&#39;analysis0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">[</span><span class="s1">&#39;pandas&#39;</span><span class="p">]:</span>
+                    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+                    <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">h</span><span class="p">[</span><span class="s1">&#39;analysis0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+                            <span class="k">del</span> <span class="n">h</span><span class="p">[</span><span class="s1">&#39;analysis0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">h</span><span class="p">[</span><span class="s1">&#39;analysis0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">h</span><span class="p">[</span><span class="s1">&#39;analysis0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h5_info_db</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">attribute</span><span class="p">:</span><span class="n">value</span><span class="p">})</span>
+        
+<div class="viewcode-block" id="file_system_service.wait"><a class="viewcode-back" href="../../../../../qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">.1</span><span class="p">)</span> <span class="c1">#to prevent timing issues</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">locked</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

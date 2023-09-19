@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.gui.plot.plot &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.gui.plot.plot</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.gui.plot.plot</h1><div class="highlight"><pre>
+<span></span><span class="c1">#-*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">numpy.core.multiarray</span> <span class="kn">import</span> <span class="n">ndarray</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">qkit</span>
+<span class="kn">from</span> <span class="nn">qkit.storage</span> <span class="kn">import</span> <span class="n">store</span>
+<span class="kn">from</span> <span class="nn">qkit.storage.hdf_constants</span> <span class="kn">import</span> <span class="n">ds_types</span>
+<span class="kn">from</span> <span class="nn">qkit.core.lib.misc</span> <span class="kn">import</span> <span class="n">str3</span><span class="p">,</span><span class="n">concat</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">(</span><span class="s2">&quot;matplotlib&quot;</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
+        <span class="kn">from</span> <span class="nn">matplotlib.backends.backend_agg</span> <span class="kn">import</span> <span class="n">FigureCanvasAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
+        <span class="n">plot_enable</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
+        <span class="kn">from</span> <span class="nn">matplotlib.backends.backend_agg</span> <span class="kn">import</span> <span class="n">FigureCanvasAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
+        <span class="n">plot_enable</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="n">plot_enable</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1"># this is for live-plots</span>
+<div class="viewcode-block" id="plot"><a class="viewcode-back" href="../../../../qkit.gui.plot.html#qkit.gui.plot.plot.plot">[docs]</a><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">h5_filepath</span><span class="p">,</span> <span class="n">datasets</span><span class="o">=</span><span class="p">[],</span> <span class="n">refresh</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">live</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">echo</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Opens a .h5-file with qviewkit in a python subprocess.</span>
+<span class="sd">    </span>
+<span class="sd">    This is the outermost function to open a h5 file with qviewkit.</span>
+<span class="sd">    To be independent from other processes i.e. running measurement the viewer</span>
+<span class="sd">    is opend in a python subprocess. The function opens a shell and executes</span>
+<span class="sd">    the qviewkit main routine with the given arguments.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        h5_filepath: String, absolute filepath.</span>
+<span class="sd">        datasets: Optional arrays of dataset urls to be opened at start of </span>
+<span class="sd">            qviewkit, default: []</span>
+<span class="sd">        refresh: Optional integer refreshing time in seconds for live view, </span>
+<span class="sd">            default: 2</span>
+<span class="sd">        live: Boolean, optional for constant checks for updates. </span>
+<span class="sd">            default: True</span>
+<span class="sd">        echo: Boolean, optional. Echo settings for debugging, default: False</span>
+<span class="sd">    Return:</span>
+<span class="sd">        Popen call with the correct commend that opens a shell and executes</span>
+<span class="sd">        the main qviewkit routine with a given filename. If given, some</span>
+<span class="sd">        datasets open automaticall.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># the plot engine for live plots is set in the environement</span>
+    <span class="n">plot_viewer</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;plot_engine&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    
+    <span class="c1"># the final return call should look sth. like this:</span>
+    <span class="c1"># python -m qkit.gui.qviewkit.main -f [h5_filepath] -ds amplitude,phase -rt 2 -live</span>
+    
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;python&#39;</span><span class="p">]</span>
+    <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-m&#39;</span><span class="p">)</span>
+    <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_viewer</span><span class="p">)</span>
+    
+    <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">)</span>
+    <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h5_filepath</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">datasets</span><span class="p">:</span>
+        <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-ds&#39;</span><span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">+=</span> <span class="n">s</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
+        <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-rt&#39;</span><span class="p">)</span>
+    <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">refresh</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">live</span><span class="p">:</span>
+        <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-live&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">echo</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Qviewkit open cmd: &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">putenv</span><span class="p">(</span><span class="s2">&quot;HDF5_USE_FILE_LOCKING&quot;</span><span class="p">,</span><span class="s1">&#39;FALSE&#39;</span><span class="p">)</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">P</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">putenv</span><span class="p">(</span><span class="s2">&quot;HDF5_USE_FILE_LOCKING&quot;</span><span class="p">,</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<span class="c1"># this is for saving plots</span>
+<div class="viewcode-block" id="save_plots"><a class="viewcode-back" href="../../../../qkit.gui.plot.html#qkit.gui.plot.plot.save_plots">[docs]</a><span class="k">def</span> <span class="nf">save_plots</span><span class="p">(</span><span class="n">h5_filepath</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">save_pdf</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves plots of all datasets with default settings.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        h5_filepath: String, absolute filepath.</span>
+<span class="sd">        comment: Optional comment for the plots to be added to the filenames.</span>
+<span class="sd">            default : &#39;&#39;</span>
+<span class="sd">        save_pdf: Optional boolean setting for the output file type.</span>
+<span class="sd">            default: False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h5plot</span><span class="p">(</span><span class="n">h5_filepath</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">,</span> <span class="n">save_pdf</span><span class="o">=</span><span class="n">save_pdf</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="h5plot"><a class="viewcode-back" href="../../../../qkit.gui.plot.html#qkit.gui.plot.plot.h5plot">[docs]</a><span class="k">class</span> <span class="nc">h5plot</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    h5plot class plots and saves all dataset in the h5 file.</span>
+
+<span class="sd">    We recursively walk through the entry tree of datasets, check for their</span>
+<span class="sd">    ds_type and plot the data in a default setting with matplotlib. The plots </span>
+<span class="sd">    are then saved in an &#39;image&#39; folder beside the h5 file. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y_data</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ndarray</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">h5_filepath</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">save_pdf</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Inits h5plot with a h5_filepath (string, absolute path), optional </span>
+<span class="sd">        comment string, and optional save_pdf boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">plot_enable</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">(</span><span class="s2">&quot;matplotlib&quot;</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;matplotlib not installed. I can not save your measurement files as png. I will disable this function.&quot;</span><span class="p">)</span>
+            <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;save_png&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;save_png&#39;</span><span class="p">,</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_pdf</span> <span class="o">=</span> <span class="n">save_pdf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">h5_filepath</span>
+
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>   <span class="c1">#put filepath to platform standards</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filedir</span>  <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>   <span class="c1">#return directory component of the given pathname, here filepath</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filedir</span><span class="p">,</span><span class="s1">&#39;images&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_dir</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Error creating image directory.&#39;</span><span class="p">)</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># open the h5 file and get the hdf_lib object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="c1"># check for datasets</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pentry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="s1">&#39;/entry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">key</span><span class="o">=</span><span class="s1">&#39;/entry/&#39;</span><span class="o">+</span><span class="n">pentry</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">centry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;/entry/&#39;</span><span class="o">+</span><span class="n">pentry</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">centry</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;save_plot&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">plt</span><span class="p">()</span> <span class="c1"># this is the plot function</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exception in qkit/gui/plot/plot.py while plotting&quot;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="c1">#close hf file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Plots saved in &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_dir</span><span class="p">)</span>
+
+<div class="viewcode-block" id="h5plot.plt"><a class="viewcode-back" href="../../../../qkit.gui.plot.html#qkit.gui.plot.plot.h5plot.plt">[docs]</a>    <span class="k">def</span> <span class="nf">plt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the matplotlib figure, checks for some metadata and calls</span>
+<span class="sd">        the plotting with respect to the ds_type of the dataset.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the h5plot class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the given object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot; -&gt; plotting dataset: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_ds_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x_ds_url&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_ds_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;y_ds_url&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_ds_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;z_ds_url&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span><span class="n">tight_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span> <span class="o">=</span> <span class="p">{</span><span class="mi">24</span><span class="p">:</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="mi">21</span><span class="p">:</span> <span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="mi">18</span><span class="p">:</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">:</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">:</span> <span class="sa">u</span><span class="s1">&#39;µ&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">9</span><span class="p">:</span> <span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">12</span><span class="p">:</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">15</span><span class="p">:</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">18</span><span class="p">:</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">21</span><span class="p">:</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">24</span><span class="p">:</span> <span class="s1">&#39;y&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_styles</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="s1">&#39;.-&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="s1">&#39;.&#39;</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;coordinate&#39;</span><span class="p">]:</span>
+            <span class="c1">#self.plt_coord()</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;vector&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plt_vector</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;matrix&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plt_matrix</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;box&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plt_box</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;txt&#39;</span><span class="p">]:</span>
+            <span class="c1">#self.plt_txt()</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;view&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plt_view</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1">## Some labeling depending on the ds_type. The label variables are set</span>
+        <span class="c1">## in the respective plt_xxx() fcts.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">useOffset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">():</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+
+        <span class="n">save_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filedir</span><span class="p">))[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/entry/&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">:</span>
+            <span class="n">save_name</span> <span class="o">=</span> <span class="n">save_name</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span>
+        <span class="n">image_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_dir</span><span class="p">,</span><span class="n">save_name</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_pdf</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">image_path</span><span class="o">+</span><span class="s1">&#39;.pdf&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">image_path</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        except Exception as e:</span>
+<span class="sd">            print &quot;Exception in qkit/gui/plot/plot.py&quot;</span>
+<span class="sd">            print e</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="h5plot.plt_vector"><a class="viewcode-back" href="../../../../qkit.gui.plot.html#qkit.gui.plot.plot.h5plot.plt_vector">[docs]</a>    <span class="k">def</span> <span class="nf">plt_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot one-dimensional dataset. Print data vs. x-coordinate.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the h5plot class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the self- matplotlib </span>
+<span class="sd">            objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">_filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="n">str3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;_name_&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_label</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;_name_&#39;</span><span class="p">),</span><span class="s1">&#39; (&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">y_exp</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="s1">&#39;_unit_&#39;</span><span class="p">),</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds_url</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_data</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_label</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_data</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;_xname_&#39;</span><span class="p">),</span><span class="s1">&#39; (&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_exp</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">x_data</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="s1">&#39;_xunit_&#39;</span><span class="p">),</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_data</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_label</span> <span class="o">=</span> <span class="s1">&#39;_none_ / _none_&#39;</span>
+        <span class="n">plot_style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_styles</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">2</span><span class="p">]</span> <span class="c1"># default is &#39;x&#39; for one point and &#39;-&#39; for lines</span>
+        <span class="c1">#if len(self.y_data) == 1: #only one entry, print as cross</span>
+        <span class="c1">#    plot_style = &#39;x&#39;</span>
+        <span class="c1">#else:</span>
+        <span class="c1">#    plot_style = &#39;-&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_data</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="nb">int</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">x_exp</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_data</span><span class="p">)]</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="nb">int</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">y_exp</span><span class="p">),</span> <span class="n">plot_style</span><span class="p">)</span>   <span class="c1">#JB: avoid crash after pressing the stop button when arrays are of different lengths</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y_data</span><span class="p">,</span> <span class="n">plot_style</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="h5plot.plt_matrix"><a class="viewcode-back" href="../../../../qkit.gui.plot.html#qkit.gui.plot.plot.h5plot.plt_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">plt_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot two-dimensional dataset. print data color-coded y-coordinate</span>
+<span class="sd">        vs. x-coordinate.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the h5plot class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the self- matplotlib </span>
+<span class="sd">            objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds_url</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_label</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;_xname_&#39;</span><span class="p">),</span><span class="s1">&#39; (&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_exp</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="s1">&#39;_xunit_&#39;</span><span class="p">),</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">y_ds_url</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_label</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;_yname_&#39;</span><span class="p">),</span><span class="s1">&#39; (&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">y_exp</span><span class="p">]</span> <span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="s1">&#39;_yunit_&#39;</span><span class="p">),</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="c1">#transpose matrix to get x/y axis correct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span> <span class="o">*=</span> <span class="mf">10.</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_exp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_label</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;_name_&#39;</span><span class="p">),</span><span class="s1">&#39; (&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_exp</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span> <span class="s1">&#39;_unit_&#39;</span><span class="p">),</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+
+        <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span><span class="p">)</span><span class="o">*</span><span class="mf">10.</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">x_exp</span>
+        <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">x_data</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dx&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">x_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span><span class="p">)</span><span class="o">*</span><span class="mf">10.</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">y_exp</span>
+        <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">y_data</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dy&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">y_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># downsweeps in any direction have to be corrected</span>
+        <span class="c1"># this is triggered by dx/dy values &lt; 0</span>
+        <span class="c1"># data-matrix and min/max-values have to be swapped</span>
+        <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dy</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">)</span>
+
+        <span class="c1"># plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">_filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="n">str3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;_name_&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">,</span>
+                                  <span class="n">extent</span><span class="o">=</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">),</span>
+                                  <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+                                  <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span>
+                                  <span class="n">vmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_vrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_vrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+        <span class="c1">#self.cax = self.ax.pcolormesh(x_data, y_data, self.ds_data)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">set_rasterized</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cax</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="h5plot.plt_box"><a class="viewcode-back" href="../../../../qkit.gui.plot.html#qkit.gui.plot.plot.h5plot.plt_box">[docs]</a>    <span class="k">def</span> <span class="nf">plt_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot two-dimensional dataset. Print data color-coded y-coordinate</span>
+<span class="sd">        vs. x-coordinate.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the h5plot class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the self- matplotlib</span>
+<span class="sd">            objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds_url</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_label</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;_xname_&#39;</span><span class="p">),</span><span class="s1">&#39; (&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_exp</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="s1">&#39;_xunit_&#39;</span><span class="p">),</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">y_ds_url</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_label</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;_yname_&#39;</span><span class="p">),</span><span class="s1">&#39; (&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">y_exp</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span> <span class="s1">&#39;_yunit_&#39;</span><span class="p">),</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">z_ds_url</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z_ds</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_label</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;_zname_&#39;</span><span class="p">),</span><span class="s1">&#39; (&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">z_exp</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">z_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="s1">&#39;_zunit_&#39;</span><span class="p">),</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># transpose matrix to get x/y axis correct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span> <span class="o">*=</span> <span class="mf">10.</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_exp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_label</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;_name_&#39;</span><span class="p">),</span><span class="s1">&#39; (&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_exp</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="s1">&#39;_unit_&#39;</span><span class="p">),</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+
+        <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span><span class="p">)</span><span class="o">*</span><span class="mf">10.</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">x_exp</span>
+        <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">x_data</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dx&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">x_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span><span class="p">)</span><span class="o">*</span><span class="mf">10.</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">y_exp</span>
+        <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">y_data</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dy&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">y_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># downsweeps in any direction have to be corrected</span>
+        <span class="c1"># this is triggered by dx/dy values &lt; 0</span>
+        <span class="c1"># data-matrix and min/max-values have to be swapped</span>
+        <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dy</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">)</span>
+
+        <span class="c1"># plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">_filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;_name_&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">,</span>
+                                  <span class="n">extent</span><span class="o">=</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">),</span>
+                                  <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+                                  <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span>
+                                  <span class="n">vmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_vrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_vrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_data</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+        <span class="c1">#self.cax = self.ax.pcolormesh(x_data, y_data, self.ds_data)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">set_rasterized</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cax</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="h5plot.plt_coord"><a class="viewcode-back" href="../../../../qkit.gui.plot.html#qkit.gui.plot.plot.h5plot.plt_coord">[docs]</a>    <span class="k">def</span> <span class="nf">plt_coord</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># not (yet?) implemented. we&#39;ll see ...</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="h5plot.plt_txt"><a class="viewcode-back" href="../../../../qkit.gui.plot.html#qkit.gui.plot.plot.h5plot.plt_txt">[docs]</a>    <span class="k">def</span> <span class="nf">plt_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># not (yet?) implemented. we&#39;ll see ...</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="h5plot.plt_view"><a class="viewcode-back" href="../../../../qkit.gui.plot.html#qkit.gui.plot.plot.h5plot.plt_view">[docs]</a>    <span class="k">def</span> <span class="nf">plt_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot views with possible multi-level overlays.</span>
+<span class="sd">        </span>
+<span class="sd">        First shot at (automatically) plotting views.</span>
+<span class="sd">        Since this structure is rather flexible, there is no universal approach</span>
+<span class="sd">        for meaningful plots. First demand was IV curves from the transport </span>
+<span class="sd">        measurements.</span>
+<span class="sd">        The code is a recycled version of the _display_1D_view() fct of </span>
+<span class="sd">        qkit.gui.qviewkit.PlotWindow_lib</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the h5plot class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the self- matplotlib </span>
+<span class="sd">            objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># views are organized in overlays, the number of x vs y plot in one figure (i.e. data and fit)</span>
+        <span class="n">overlay_num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;overlays&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">overlay_urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">err_urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">_filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="n">str3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;_name_&#39;</span><span class="p">)))</span>
+        
+        <span class="c1"># the overlay_urls (urls of the x and y datasets that ar plotted) are extracted from the metadata</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">overlay_num</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">ov</span> <span class="o">=</span> <span class="n">str3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;xy_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">ov</span><span class="p">:</span>
+                <span class="n">overlay_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ov</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">))</span>
+            <span class="n">err_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;xy_&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;_error&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_xs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_ys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_errs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="n">overlay_urls</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds_xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="n">xy</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds_ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="n">xy</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+            
+        <span class="k">for</span> <span class="n">err_url</span> <span class="ow">in</span> <span class="n">err_urls</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ds_errs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="n">err_url</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ds_errs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        the ds_type are detected. this determines which dataset is displayed as a 1D plot.</span>
+<span class="sd">        since the initial demand for the plotting comes from IV measurements and for easy handling,</span>
+<span class="sd">        the default display in qviewkit is saved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_label</span> <span class="o">=</span> <span class="n">str3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;_name_&#39;</span><span class="p">))</span>
+        <span class="n">view_params</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">str3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;view_params&quot;</span><span class="p">,</span> <span class="p">{})))</span>
+        <span class="c1">#if &#39;aspect&#39; in view_params:</span>
+        <span class="c1">#    self.ax.set_aspect = view_params.get(&#39;aspect&#39;, &#39;auto&#39;)</span>
+        <span class="n">markersize</span> <span class="o">=</span> <span class="n">view_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;markersize&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="c1"># iteratring over all x- (and y-)datasets and checking for dimensions gives the data to be plotted</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x_ds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_xs</span><span class="p">):</span>
+            <span class="n">y_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_ys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">err_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_errs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            
+            <span class="c1">#1D data is easy, for matrix and box the very last recorded 1D data is plotted</span>
+            <span class="k">if</span> <span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;coordinate&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;vector&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;vector&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;coordinate&#39;</span><span class="p">]:</span>
+                    <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_ds</span><span class="p">)</span>
+                    <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_ds</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">err_ds</span><span class="p">:</span>
+                        <span class="n">err_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">err_ds</span><span class="p">)</span>
+    
+                <span class="k">elif</span> <span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;matrix&#39;</span><span class="p">]:</span>
+                    <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_ds</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s2">&quot;default_trace&quot;</span> <span class="ow">in</span>  <span class="n">view_params</span><span class="p">:</span>
+                        <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_ds</span><span class="p">[:,</span><span class="n">view_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default_trace&quot;</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_ds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># The code was like this, but I believe the axis is wrong</span>
+                    <span class="k">if</span> <span class="n">err_ds</span><span class="p">:</span>
+                        <span class="n">err_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">err_ds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+                <span class="k">elif</span> <span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;box&#39;</span><span class="p">]:</span>
+                    <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_ds</span><span class="p">)</span>
+                    <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_ds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,:])</span>
+                    <span class="k">if</span> <span class="n">err_ds</span><span class="p">:</span>
+                        <span class="n">err_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">err_ds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,:])</span>
+    
+            <span class="c1">## This is in our case used so far only for IQ plots. The functionality derives from this application.</span>
+            <span class="k">elif</span> <span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;matrix&#39;</span><span class="p">]:</span>
+                <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_ds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_ds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            
+            <span class="k">elif</span> <span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;box&#39;</span><span class="p">]:</span>
+                <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_ds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,:])</span>
+                <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_ds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,:])</span>
+
+            <span class="n">plot_style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_styles</span><span class="p">[</span><span class="n">view_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;plot_style&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)]</span> <span class="c1"># default is &#39;x&#39; for one point and &#39;-&#39; for lines</span>
+            <span class="k">if</span> <span class="n">err_ds</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x_data</span><span class="p">)],</span> <span class="n">yerr</span><span class="o">=</span><span class="n">err_data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x_data</span><span class="p">)],</span> <span class="n">label</span><span class="o">=</span><span class="n">y_ds</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">x_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span> <span class="c1"># caculate order of magnitude for unit-prefix</span>
+                    <span class="n">y_exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exp</span><span class="p">(</span><span class="n">y_data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x_data</span><span class="p">)])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_data</span><span class="o">*</span><span class="mi">10</span><span class="o">**-</span><span class="n">x_exp</span><span class="p">,</span> <span class="n">y_data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x_data</span><span class="p">)]</span><span class="o">*</span><span class="mi">10</span><span class="o">**-</span><span class="n">y_exp</span><span class="p">,</span> <span class="n">plot_style</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">y_ds</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">y_data</span><span class="p">,</span> <span class="n">plot_style</span><span class="p">)</span>
+
+            <span class="c1"># x- and y-labels come from view_params[&#39;labels&#39;] or if not provided from the last added entry in the overlay</span>
+            <span class="k">if</span> <span class="n">view_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;labels&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x_label</span> <span class="o">=</span> <span class="n">view_params</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">y_label</span> <span class="o">=</span> <span class="n">view_params</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x_label</span> <span class="o">=</span> <span class="n">str3</span><span class="p">(</span><span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;_none_&quot;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">y_label</span> <span class="o">=</span> <span class="n">str3</span><span class="p">(</span><span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;_none_&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_unit</span> <span class="o">=</span> <span class="n">str3</span><span class="p">(</span><span class="n">x_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span><span class="s2">&quot;_none_&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_unit</span> <span class="o">=</span> <span class="n">str3</span><span class="p">(</span><span class="n">y_ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span><span class="s2">&quot;_none_&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_label</span> <span class="o">+=</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="n">x_exp</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_unit</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_label</span> <span class="o">+=</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_prefixes</span><span class="p">[</span><span class="n">y_exp</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_unit</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_exp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function calculates the order of magnitude (exponent in steps of 3) to use for unit-prefix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">data</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">])))</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">_get_vrange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">percent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This function calculates ranges for the colorbar to get rid of spikes in the data.</span>
+<span class="sd">        If the data is evenly distributed, this should not change anything in your colorbar.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">percent</span><span class="p">)</span>
+        <span class="n">_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="mi">100</span><span class="o">-</span><span class="n">percent</span><span class="p">)</span>
+        <span class="n">_min</span> <span class="o">-=</span> <span class="p">(</span><span class="n">_max</span><span class="o">-</span><span class="n">_min</span><span class="p">)</span><span class="o">*</span><span class="n">percent</span><span class="o">/</span><span class="p">(</span><span class="mf">100.</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">percent</span><span class="p">)</span>
+        <span class="n">_max</span> <span class="o">+=</span> <span class="p">(</span><span class="n">_max</span><span class="o">-</span><span class="n">_min</span><span class="p">)</span><span class="o">*</span><span class="n">percent</span><span class="o">/</span><span class="p">(</span><span class="mf">100.</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">percent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_min</span><span class="p">,</span><span class="n">_max</span><span class="p">]</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">argparse</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;plot.py hdf and matplotlib-based plotting of datasets / KIT 2015&quot;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span><span class="s1">&#39;--file&#39;</span><span class="p">,</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;hdf/h5 filename to open&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--comment&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;(optional) comment to append at filenames&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-pdf&#39;</span><span class="p">,</span><span class="s1">&#39;--save-pdf&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;(optional) save default plots&#39;</span><span class="p">)</span>
+
+    <span class="n">args</span><span class="o">=</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="c1"># get the full path</span>
+    <span class="n">filepath</span><span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">save_plots</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span><span class="n">comment</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">comment</span><span class="p">,</span><span class="n">save_pdf</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">save_pdf</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

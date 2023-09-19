@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.virtual_MultiplexingReadout &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.virtual_MultiplexingReadout</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.virtual_MultiplexingReadout</h1><div class="highlight"><pre>
+<span></span><span class="c1"># virtual_MultiplexingReadout.py</span>
+<span class="c1"># initiated and written by M. Jerger 2011/2012</span>
+<span class="c1"># updated by A. Schneider &lt;andre.schneider@kit.edu&gt; and J. Braumueller &lt;jochen.braumueller@kit.edu&gt;, 05/2016, 08/2016, 04/2018</span>
+
+<span class="c1"># This script may be regarded as a wrapper, handling data acquisition with the ADC (commonly known here as mspec)</span>
+<span class="c1"># and readout pulse generation by the DAC (which is the AWG used for generating readout pulses).</span>
+
+<span class="c1"># Now, in 2016, the Martinis AWGs are outdated (and still buggy) as they do not provide longer readout pulses</span>
+<span class="c1"># due to a limitation in memory.</span>
+<span class="c1"># The script is updated to also be usable with other AWGs (Tabor, Tektronix).</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">usage:</span>
+
+<span class="sd">readout = qt.instruments.create(&#39;readout&#39;,&#39;virtual_MultiplexingReadout&#39;,sample=qubit)</span>
+<span class="sd">            </span>
+<span class="sd">Mandatory sample attributes:</span>
+<span class="sd">    readout_awg, readout_mw_src, mspec</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+
+<span class="kn">from</span> <span class="nn">qkit.core.instrument_base</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.special</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">qkit.measure.timedomain.awg</span> <span class="kn">import</span> <span class="n">load_awg</span> <span class="k">as</span> <span class="n">lawg</span>
+
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout">[docs]</a><span class="k">class</span> <span class="nc">virtual_MultiplexingReadout</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+        <span class="c1"># ToDo: object should not set params previously set by the user</span>
+
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;virtual&#39;</span><span class="p">])</span>
+
+        <span class="c1">#self._instruments = instruments.get_instruments()</span>
+
+        <span class="c1"># Add parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;LO&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;tone_freq&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;tone_relamp&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;tone_pha&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;rad&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;tone_amp&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;V&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;adc_clock&#39;</span><span class="p">,</span>     <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;dac_clock&#39;</span><span class="p">,</span>     <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;dac_duration&#39;</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;dac_channel_I&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;dac_channel_Q&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;adc_channel_I&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;adc_channel_Q&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;dac_attack&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;dac_decay&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;global_pha&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;dac_delay&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;update&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;readout&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample</span> <span class="o">=</span> <span class="n">sample</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mspec</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">mspec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tone_relamp</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tone_pha</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_LO</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tone_amp</span> <span class="o">=</span> <span class="mi">1</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">readout_awg</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;You haven&#39;t provided a readout_awg. I can&#39;t set the readout pulse for you.&quot;</span>
+                            <span class="s2">&quot;Please also think of specifying the readout if-frequency.&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="p">:</span>
+            <span class="c1">#default settings</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">set_clock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">readout_clock</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dac_clock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">get_clock</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_I</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_Q</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dac_attack</span> <span class="o">=</span> <span class="mi">0</span><span class="c1">#5e-9</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dac_decay</span> <span class="o">=</span> <span class="mi">0</span><span class="c1">#5e-9</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_tone_freq</span> <span class="o">=</span> <span class="p">[</span><span class="mf">30e6</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dac_duration</span> <span class="o">=</span> <span class="mf">400e-9</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dac_delay</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Defaults not set properly: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span>
+
+            <span class="c1">#specific settings + check that awg name exists</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Cannot resolve awg name. Provide name attribute in awg instrument driver.&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;GHzDAC&quot;</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">():</span>   <span class="c1">#Martinis board</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_set_dac_delay</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="c1">#self._dac_duration = 10e-9</span>
+            <span class="k">elif</span> <span class="s2">&quot;Tabor_WX1284C&quot;</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">():</span>   <span class="c1">#Tabor AWG</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">set_trigger_impedance</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>   <span class="c1">#50 Ohms</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_set_dac_delay</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">_numchannels</span> <span class="o">==</span> <span class="mi">4</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_I</span> <span class="o">=</span> <span class="mi">3</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_Q</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">preset_readout</span><span class="p">()</span>   <span class="c1">#sets runmode = &#39;AUTO&#39;, trigger_mode=&#39;TRIG&#39;, starts with the end of the manipulation signal</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_I</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_Q</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="k">elif</span> <span class="s2">&quot;Tektronix&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_set_dac_delay</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">set_ch1_status</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">set_ch2_status</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Specified AWG unknown. Aborting.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_I</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_Q</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_LO</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tone_relamp</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tone_pha</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QtoI_relpha</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Q phase relative to I</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QtoI_relamp</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># ratio of Q amplitude to I amplitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tone_amp</span> <span class="o">=</span> <span class="mi">1</span>
+        
+        <span class="c1"># used for DDC</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowpass_order</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cut_off_freq_ratio</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># ratio of the IQ frequency up to that is transmitted</span>
+        <span class="c1"># lowpass_delay = (lowpass_order / 2) / freqs</span>
+        <span class="c1"># a lowpass of order N delays the signal by N/2 samples</span>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.get_all"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.get_all">[docs]</a>    <span class="k">def</span> <span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_LO</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_get_adc_clock"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_get_adc_clock">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_adc_clock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            sample rate of the analog to digital converter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mspec</span><span class="o">.</span><span class="n">get_clock</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_dac_clock"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_dac_clock">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_dac_clock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clock</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            sample rate of the digital to analog converter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dac_clock</span> <span class="o">=</span> <span class="n">clock</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_dac_duration"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_dac_duration">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_dac_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            defines the time duration of the signal output on the dac</span>
+<span class="sd">            this defines the readout pulse length and maximum repetition rate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dac_duration</span> <span class="o">=</span> <span class="n">duration</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_get_dac_duration"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_get_dac_duration">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_dac_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dac_duration</span></div>
+        
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_dac_channel_I"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_dac_channel_I">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_dac_channel_I</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            set dac channel that outputs the I signal, -1=None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_I</span> <span class="o">=</span> <span class="n">channel</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_I</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_Q</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;no output signal is produced if both dac_channel_I and dac_channel_Q are none&#39;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_dac_channel_Q"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_dac_channel_Q">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_dac_channel_Q</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            set dac channel that outputs the Q signal, -1=None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_Q</span> <span class="o">=</span> <span class="n">channel</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_I</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_Q</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;no output signal is produced if both dac_channel_I and dac_channel_Q are none&#39;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_adc_channel_I"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_adc_channel_I">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_adc_channel_I</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            set adc channel that acquires the I signal, -1=None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_I</span> <span class="o">=</span> <span class="n">channel</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_I</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_Q</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;no signal is acquired if both dac_channel_I and dac_channel_Q are none&#39;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_adc_channel_Q"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_adc_channel_Q">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_adc_channel_Q</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            set adc channel that acquires the Q signal, -1=None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_Q</span> <span class="o">=</span> <span class="n">channel</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_I</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_Q</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;no signal is acquired if -1dac_channel_I and dac_channel_Q are none&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_dac_attack"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_dac_attack">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_dac_attack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attack</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; set attack time of the readout pulse &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dac_attack</span> <span class="o">=</span> <span class="n">attack</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_dac_decay"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_dac_decay">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_dac_decay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decay</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; set decay time of the readout pulse &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dac_decay</span> <span class="o">=</span> <span class="n">decay</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_LO"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_LO">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_LO</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the readout microwave source to a given frequency and stores this value for future evalution</span>
+<span class="sd">        :param frequency: frequency of the readout microwave source</span>
+<span class="sd">        :return: </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">readout_mw_src</span><span class="o">.</span><span class="n">set_frequency</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_LO</span> <span class="o">=</span> <span class="n">frequency</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_get_LO"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_get_LO">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_LO</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LO</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_tone_amp"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_tone_amp">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_tone_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tone_amp</span> <span class="o">=</span> <span class="n">amp</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_get_tone_amp"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_get_tone_amp">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_tone_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tone_amp</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_tone_freq"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_tone_freq">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_tone_freq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freqs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tone_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_get_tone_freq"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_get_tone_freq">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_tone_freq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tone_freq</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_tone_relamp"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_tone_relamp">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_tone_relamp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amps</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tone_relamp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">amps</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_get_tone_relamp"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_get_tone_relamp">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_tone_relamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tone_relamp</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_tone_pha"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_tone_pha">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_tone_pha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phases</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tone_pha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_get_tone_pha"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_get_tone_pha">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_tone_pha</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tone_pha</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_global_pha"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_global_pha">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_global_pha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_get_global_pha"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_get_global_pha">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_global_pha</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span></div>
+        
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_set_dac_delay"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_set_dac_delay">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_dac_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">delay</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets the pause time before the dac pulse in s</span>
+<span class="sd">        a value &lt;= -1 will take sample.exc_T</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dac_delay</span> <span class="o">=</span> <span class="n">delay</span></div>
+<div class="viewcode-block" id="virtual_MultiplexingReadout.do_get_dac_delay"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.do_get_dac_delay">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_dac_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_delay</span></div>
+        
+
+
+    <span class="c1"># +++++ ADC acquisition ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+    <span class="k">def</span> <span class="nf">_acquire_IQ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        essentially do a mspec.acquire and return I and Q</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mspec</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_I</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_I</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_Q</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_adc_channel_Q</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">I</span><span class="p">,</span> <span class="n">Q</span>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.readout"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.readout">[docs]</a>    <span class="k">def</span> <span class="nf">readout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeTrace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ddc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        measure transmission of the tones set</span>
+<span class="sd">            --&gt; return amplitude and phase data at the given IQ frequency and also the full I and Q time trace</span>
+<span class="sd">            if set to true using IQ_decode</span>
+<span class="sd">        :param timeTrace: also output raw trace for further processing</span>
+<span class="sd">        :param ddc: performs a digital down conversion of your readout tone to get the time trace at the frequency of interest</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Is</span><span class="p">,</span> <span class="n">Qs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_IQ</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ddc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Is</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">sig_amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Is</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_freq</span><span class="p">)))</span>
+                <span class="n">sig_pha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Is</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_freq</span><span class="p">)))</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Is</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="n">sig_amp</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:],</span> <span class="n">sig_pha</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">IQ_decode</span><span class="p">(</span><span class="n">Is</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">],</span> <span class="n">Qs</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sig_amp</span><span class="p">,</span> <span class="n">sig_pha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">IQ_decode</span><span class="p">(</span><span class="n">Is</span><span class="p">,</span> <span class="n">Qs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Is</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">sig_amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Is</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">Is</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_freq</span><span class="p">)))</span>
+                <span class="n">sig_pha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Is</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">Is</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_freq</span><span class="p">)))</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Is</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="n">sig_amp</span><span class="p">[</span><span class="n">idx</span><span class="p">,:,</span> <span class="p">:],</span> <span class="n">sig_pha</span><span class="p">[</span><span class="n">idx</span><span class="p">,:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">digital_down_conversion</span><span class="p">(</span><span class="n">Is</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">],</span> <span class="n">Qs</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sig_amp</span><span class="p">,</span> <span class="n">sig_pha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">digital_down_conversion</span><span class="p">(</span><span class="n">Is</span><span class="p">,</span> <span class="n">Qs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timeTrace</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sig_amp</span><span class="p">,</span> <span class="n">sig_pha</span><span class="p">,</span> <span class="n">Is</span><span class="p">,</span> <span class="n">Qs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sig_amp</span><span class="p">,</span> <span class="n">sig_pha</span></div>
+
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.spectrum"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.spectrum">[docs]</a>    <span class="k">def</span> <span class="nf">spectrum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            measure transmission of the tones set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">I</span><span class="p">,</span> <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_IQ</span><span class="p">()</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="c1"># in segmented mode, take only one segment</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">IQ_fft</span><span class="p">(</span><span class="n">I</span><span class="p">[:,</span> <span class="n">segment</span><span class="p">],</span> <span class="n">Q</span><span class="p">[:,</span> <span class="n">segment</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">IQ_fft</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.IQ_fft"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.IQ_fft">[docs]</a>    <span class="k">def</span> <span class="nf">IQ_fft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">samplerate</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            calculate fourier transform of the acquired waveform</span>
+
+<span class="sd">            Input:</span>
+<span class="sd">                I, Q       - signal acquired at rate samplerate</span>
+<span class="sd">                samplerate - rate at which I and Q were sampled</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">samplerate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span> <span class="n">samplerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_adc_clock</span><span class="p">()</span>
+
+        <span class="n">sig_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>
+        <span class="n">sig_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">sig_t</span><span class="p">))</span>
+        <span class="n">sig_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LO</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">sig_t</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="n">samplerate</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">sig_x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sig_f</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">sig_f</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.IQ_decode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.IQ_decode">[docs]</a>    <span class="k">def</span> <span class="nf">IQ_decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">freqs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">samplerate</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            calculate fourier analysis of the acquired waveform and</span>
+<span class="sd">            return amplitude and phase of requested frequency components</span>
+
+<span class="sd">            Input:</span>
+<span class="sd">                I, Q       - signal acquired at rate samplerate</span>
+<span class="sd">                freqs      - interesting frequency components</span>
+<span class="sd">                samplerate - rate at which I and Q were sampled</span>
+<span class="sd">                phase      - apply additional rotation to I+1j*Q</span>
+
+<span class="sd">            Output:</span>
+<span class="sd">                two vectors: amplitude and phase of each fft point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">samplerate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">samplerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_adc_clock</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">freqs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">freqs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tone_freq</span>
+        <span class="k">if</span> <span class="n">phase</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span>
+        <span class="n">freqs</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_LO</span><span class="p">)</span>
+
+        <span class="n">sig_t</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Q</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">phase</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourieranalysis</span><span class="p">(</span><span class="n">sig_t</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">samplerate</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.fourieranalysis"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.fourieranalysis">[docs]</a>    <span class="k">def</span> <span class="nf">fourieranalysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal_t</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">samplerate</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        useful for only a few samples and freqs because no interpolation is needed</span>
+<span class="sd">        :param signal_t: The complex waveform to be analyzed</span>
+<span class="sd">        :param freqs: Float or array of Floats of frequencies</span>
+<span class="sd">        :param samplerate:</span>
+<span class="sd">        :return: [amplitudes, phases], each of them being an array over len(freqs)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">f</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal_t</span><span class="p">))</span> <span class="o">/</span> <span class="n">samplerate</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">freqs</span><span class="p">])</span>
+        <span class="n">f_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">signal_t</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal_t</span><span class="p">)</span>
+        <span class="n">sig_amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">f_signal</span><span class="p">)</span>
+        <span class="n">sig_pha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">f_signal</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sig_amp</span><span class="p">,</span> <span class="n">sig_pha</span></div>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.digital_down_conversion"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.digital_down_conversion">[docs]</a>    <span class="k">def</span> <span class="nf">digital_down_conversion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        performs a digital down conversion to get rid of the carrier frequency.</span>
+<span class="sd">        Useful for timetrace readout, when only envelope is needed.</span>
+<span class="sd">        :param I:</span>
+<span class="sd">        :param Q:</span>
+<span class="sd">        :param freqs:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">freqs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_freq</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LO</span>
+        <span class="n">samplerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_adc_clock</span><span class="p">()</span>
+        <span class="n">sig_amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">freqs</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">)))</span>
+        <span class="n">sig_pha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">freqs</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">)))</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">))</span> <span class="o">/</span> <span class="n">samplerate</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">freqs</span><span class="p">):</span>
+            <span class="n">cut_off_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cut_off_freq_ratio</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">samplerate</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowpass_order</span><span class="p">,</span> <span class="n">cut_off_freq</span><span class="p">,</span> <span class="s1">&#39;low&#39;</span><span class="p">)</span>  <span class="c1"># design the filter</span>
+            <span class="n">signal_down</span> <span class="o">=</span> <span class="p">(</span><span class="n">I</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">Q</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">f</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">signal_down_lp</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">signal_down</span><span class="p">)</span>
+            <span class="n">sig_amp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">signal_down_lp</span><span class="p">)</span>
+            <span class="n">sig_pha</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">signal_down_lp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sig_amp</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">sig_pha</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># transform because readout expects the data this way</span></div>
+
+    <span class="c1"># +++++ DAC (AWG) settings ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+        
+<div class="viewcode-block" id="virtual_MultiplexingReadout.update"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        General method to update all (DAC) settings</span>
+<span class="sd">        </span>
+<span class="sd">        create DAC waveforms and update DAC, set DAC (AWG) to run mode (and switch outputs on)</span>
+<span class="sd">        using IQ.encode and the hidden method self._update_dac()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># calculate required IF frequencies</span>
+        <span class="n">tones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_freq</span><span class="p">)</span>
+        <span class="n">ntones</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tones</span><span class="p">)</span>
+        <span class="n">IFtones</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tones</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_LO</span><span class="p">)</span>
+
+        <span class="c1"># perform sanity check</span>
+        <span class="n">IFMax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">IFtones</span><span class="p">))</span>
+        <span class="c1"># print(&#39;IF tones are &#39;, (IFtones/1e6), &#39;MHz&#39;)</span>
+        <span class="c1"># this is only a quick check as the maximum bandwidth of an ADC card is lower than half of the sampling rate</span>
+        <span class="k">if</span> <span class="n">IFMax</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">get_clock</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : maximum IF frequency of </span><span class="si">%f</span><span class="s1">MHz is above the limit of the DAC.&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">IFMax</span><span class="o">/</span><span class="mf">1e6</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">IFMax</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mspec</span><span class="o">.</span><span class="n">get_clock</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : maximum IF frequency of </span><span class="si">%f</span><span class="s1">MHz is above the limit of the ADC.&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">IFMax</span><span class="o">/</span><span class="mf">1e6</span><span class="p">))</span>
+
+        <span class="c1"># build I and Q waveforms and send them to the DAC</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tone_relamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">amplitudes</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="n">ntones</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ntones</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_relamp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">amplitudes</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="n">ntones</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_relamp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ntones</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_relamp</span><span class="p">)</span> <span class="o">==</span> <span class="n">ntones</span><span class="p">:</span>
+            <span class="n">amplitudes</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="n">ntones</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_relamp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;tone_relamp shape does not fit number of multiplexed frequencies. Setting tone_relamp to 1&quot;</span><span class="p">)</span>
+            <span class="n">amplitudes</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="n">ntones</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ntones</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tone_pha</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">phases</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ntones</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_pha</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">phases</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tone_pha</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ntones</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_pha</span><span class="p">)</span> <span class="o">==</span> <span class="n">ntones</span><span class="p">:</span>
+            <span class="n">phases</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tone_pha</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">phases</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ntones</span><span class="p">)</span>
+
+        <span class="c1">#if self._tone_relpha: #check for relative phases between I and Q pulse</span>
+        <span class="c1">#    phases_Q = np.ones(ntones) * self._tone_relpha + phases</span>
+        <span class="c1">#else:</span>
+        <span class="c1">#    phases_Q = phases</span>
+        
+        <span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">m1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">IQ_encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dac_duration</span><span class="p">,</span> <span class="n">IFtones</span><span class="p">,</span> <span class="p">[</span><span class="n">amplitudes</span><span class="p">,</span> <span class="n">amplitudes</span><span class="p">],</span> <span class="p">[</span><span class="n">phases</span><span class="p">,</span> <span class="n">phases</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">QtoI_relpha</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dac_clock</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dac_attack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dac_decay</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_dac</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_I</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_Q</span><span class="p">],</span> <span class="p">[</span><span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">],</span><span class="n">marker1</span> <span class="o">=</span> <span class="p">[</span><span class="n">m1</span><span class="p">,</span><span class="n">m1</span><span class="p">],</span><span class="n">marker2</span> <span class="o">=</span> <span class="p">[</span><span class="n">m1</span><span class="p">,</span><span class="n">m1</span><span class="p">])</span></div>
+      
+    <span class="k">def</span> <span class="nf">_update_dac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">marker1</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">marker2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">drive</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            update waveform data on the awg</span>
+
+<span class="sd">            Input:</span>
+<span class="sd">                samples - matrix of samples to put on awg channels</span>
+<span class="sd">                channels - channels to install them on</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;You haven&#39;t provided a readout awg so I can&#39;t load a pulse in. &quot;</span>
+                            <span class="s2">&quot;You have to do it manually!&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">marker1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">marker1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">marker1</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">marker2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">marker2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">marker2</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span>
+
+        <span class="k">if</span> <span class="s2">&quot;GHzDAC&quot;</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">():</span>   <span class="c1">#Martinis board</span>
+            <span class="n">drive</span> <span class="o">=</span> <span class="s1">&#39;c:&#39;</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">waveforms&#39;</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)):</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">channels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span> <span class="k">continue</span> <span class="c1"># only apply I or Q if the user wishes that</span>
+                <span class="n">channel</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="n">channels</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                
+                <span class="n">fn</span> <span class="o">=</span> <span class="n">drive</span> <span class="o">+</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">ch</span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">channel</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">send_waveform</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:],</span> <span class="n">marker1</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:],</span> <span class="n">marker2</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:],</span> <span class="n">fn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dac_clock</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">load_waveform</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="s1">&#39;ch</span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">channel</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+                
+            <span class="c1"># setup channel overall amplitude</span>
+            <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_I</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_Q</span><span class="p">]:</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="p">,</span> <span class="s1">&#39;set_ch</span><span class="si">%d</span><span class="s1">_amplitude&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">))(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_amp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+            
+        <span class="k">elif</span> <span class="s2">&quot;Tabor_WX1284C&quot;</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">():</span>   <span class="c1">#Tabor AWG</span>
+            <span class="c1">#self._awg.preset_readout()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">set_clock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">readout_clock</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Clock and amplitude settings not written.&#39;</span><span class="p">)</span>
+
+            <span class="n">seg_n</span><span class="o">=</span><span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">32000</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;:TRAC:DEF</span><span class="si">%i</span><span class="s2">?&quot;</span><span class="o">%</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">seg_n</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+            <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span><span class="o">/</span><span class="mf">2.3</span><span class="p">,</span><span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;I&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span><span class="o">/</span><span class="mf">2.3</span><span class="p">,</span><span class="n">samples</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Q&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span><span class="o">/</span><span class="mf">2.3</span><span class="p">,</span><span class="n">marker1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;M_I&#39;</span><span class="p">)</span>
+            <span class="c1">#plt.plot(marker2[0]/2.3,label = &#39;M_Q&#39;)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">wfm_send2</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">samples</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">m1</span> <span class="o">=</span> <span class="n">marker1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">m2</span> <span class="o">=</span> <span class="n">marker2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_I</span><span class="p">,</span> <span class="n">seg</span><span class="o">=</span><span class="n">seg_n</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">define_sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dac_channel_I</span><span class="p">,[</span><span class="n">seg_n</span><span class="p">,</span><span class="n">seg_n</span><span class="p">,</span><span class="n">seg_n</span><span class="p">])</span>
+
+        <span class="k">elif</span> <span class="s2">&quot;Tektronix&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">():</span>   <span class="c1">#Tektronix AWG</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">set_clock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">readout_clock</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">set_ch1_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_amp</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="o">.</span><span class="n">set_ch2_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tone_amp</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Clock and amplitude settings not written.&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">:</span>
+                <span class="n">lawg</span><span class="o">.</span><span class="n">update_sequence</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span><span class="k">lambda</span> <span class="n">t</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="p">[</span><span class="n">samples</span><span class="p">[</span><span class="n">channels</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span><span class="n">samples</span><span class="p">[</span><span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">]]],</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">,</span> <span class="n">awg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awg</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="p">[[</span><span class="n">marker1</span><span class="p">,</span><span class="n">marker2</span><span class="p">],[</span><span class="n">marker1</span><span class="p">,</span><span class="n">marker2</span><span class="p">]],</span> <span class="n">show_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Please provide sample object in instantiating readout when using Tektronix AWG for readout.&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="virtual_MultiplexingReadout.IQ_encode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_MultiplexingReadout.virtual_MultiplexingReadout.IQ_encode">[docs]</a>    <span class="k">def</span> <span class="nf">IQ_encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">frequencies</span><span class="p">,</span> <span class="n">amplitudes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">phases</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">samplerate</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">attack</span> <span class="o">=</span> <span class="mf">2e-9</span><span class="p">,</span> <span class="n">decay</span> <span class="o">=</span> <span class="mf">2e-9</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            provide I and Q data that will create a single side band multitone signal</span>
+<span class="sd">            --&gt; generate sin and cos waveforms for I and Q with IF frequency</span>
+
+<span class="sd">            Input:</span>
+<span class="sd">                amplitudes   - normalized amplitudes (1xN) or I and Q amplitudes (2xN) of each tone</span>
+<span class="sd">                frequencies  - IF frequencies desired</span>
+<span class="sd">                duration     - duration of the waveform in real time</span>
+<span class="sd">                samplerate   - sample rate of the output device</span>
+<span class="sd">                attack/decay - width of trailing and leading edges</span>
+
+<span class="sd">            Output:</span>
+<span class="sd">                two vectors containing samples for I and Q</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">samplerate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span> <span class="n">samplerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dac_clock</span>
+        <span class="n">nSamples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">samplerate</span><span class="o">*</span><span class="n">duration</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nSamples</span><span class="p">)</span>
+        <span class="n">frequencies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">frequencies</span><span class="p">)</span>
+        <span class="n">omegas</span> <span class="o">=</span> <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">frequencies</span><span class="o">/</span><span class="n">samplerate</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">amplitudes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">amplitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">frequencies</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">amplitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">amplitudes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">amplitudes</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span> <span class="n">amplitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">amplitudes</span><span class="p">,</span> <span class="n">amplitudes</span><span class="p">])</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">phases</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">phases</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">frequencies</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">phases</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">phases</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span> <span class="n">phases</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">phases</span><span class="p">,</span> <span class="n">phases</span><span class="p">])</span>
+            
+        <span class="c1"># generate multitone waveform</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">nSamples</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mf">16.</span><span class="p">)</span><span class="o">*</span><span class="mi">16</span><span class="p">))</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">nSamples</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mf">16.</span><span class="p">)</span><span class="o">*</span><span class="mi">16</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">frequencies</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">I</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">nSamples</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">amplitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">omegas</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">*</span><span class="n">indices</span><span class="o">+</span><span class="n">phases</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="p">])</span>
+            <span class="n">Q</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">nSamples</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">amplitudes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">omegas</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">*</span><span class="n">indices</span><span class="o">+</span><span class="n">phases</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">idx</span><span class="p">])</span>
+            
+        <span class="c1"># apply envelope: erf, erf(\pm 2) is almost 0/1, erf(\pm 1) is ~15/85%</span>
+        <span class="n">nAttack</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">samplerate</span><span class="o">*</span><span class="n">attack</span><span class="p">)</span>
+        <span class="n">sAttack</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nAttack</span><span class="p">)))</span>
+        <span class="n">I</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">nAttack</span><span class="p">]</span> <span class="o">*=</span> <span class="n">sAttack</span>
+        <span class="n">Q</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">nAttack</span><span class="p">]</span> <span class="o">*=</span> <span class="n">sAttack</span>
+        <span class="n">nDecay</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">samplerate</span><span class="o">*</span><span class="n">decay</span><span class="p">)</span>
+        <span class="n">sDecay</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">nDecay</span><span class="p">)))</span>
+        <span class="n">I</span><span class="p">[(</span><span class="n">nSamples</span><span class="o">-</span><span class="n">nDecay</span><span class="p">):</span><span class="n">nSamples</span><span class="p">]</span> <span class="o">*=</span> <span class="n">sDecay</span> 
+        <span class="n">Q</span><span class="p">[(</span><span class="n">nSamples</span><span class="o">-</span><span class="n">nDecay</span><span class="p">):</span><span class="n">nSamples</span><span class="p">]</span> <span class="o">*=</span> <span class="n">sDecay</span> 
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+        <span class="n">m1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">I</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_delay</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_delay</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">dac_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">overlap</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="o">.</span><span class="n">readout_delay</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dac_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_delay</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dac_delay</span><span class="o">*</span><span class="n">samplerate</span><span class="o">/</span><span class="mi">16</span><span class="p">)</span><span class="o">*</span><span class="mi">16</span><span class="p">),</span><span class="n">I</span><span class="p">)</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dac_delay</span><span class="o">*</span><span class="n">samplerate</span><span class="o">/</span><span class="mi">16</span><span class="p">)</span><span class="o">*</span><span class="mi">16</span><span class="p">),</span><span class="n">Q</span><span class="p">)</span>
+            <span class="n">m1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dac_delay</span><span class="o">*</span><span class="n">samplerate</span><span class="o">/</span><span class="mi">16</span><span class="p">)</span><span class="o">*</span><span class="mi">16</span><span class="p">),</span><span class="n">m1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span><span class="n">m1</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

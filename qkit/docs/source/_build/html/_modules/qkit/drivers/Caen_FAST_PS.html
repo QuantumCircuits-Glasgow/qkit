@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.Caen_FAST_PS &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.Caen_FAST_PS</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.Caen_FAST_PS</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Caen Fast-PS class, to perform the communication between the Wrapper and the device</span>
+<span class="c1"># Marco Pfirrmann, marco.pfirrmann@kit.edu 2017</span>
+<span class="c1">#</span>
+<span class="c1"># based on the work on the Keithley_2636A driver by</span>
+<span class="c1"># Pieter de Groot &lt;pieterdegroot@gmail.com&gt;, 2008</span>
+<span class="c1"># Martijn Schaafsma &lt;qtlab@mcschaafsma.nl&gt;, 2008</span>
+<span class="c1"># Hannes Rotzinger, hannes.rotzinger@kit.edu 2010</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span> <span class="nn">qkit.core.instrument_base</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<div class="viewcode-block" id="Caen_FAST_PS"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS">[docs]</a><span class="k">class</span> <span class="nc">Caen_FAST_PS</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	This is the driver for the Caen Fast-PS Power Supply</span>
+<span class="sd">	Usage:</span>
+<span class="sd">	Initialize with</span>
+<span class="sd">	&lt;name&gt; = instruments.create(&#39;&lt;name&gt;&#39;, &#39;Caen_fast_ps&#39;, address=&#39;&lt;GPIB address&gt;&#39;, reset=&lt;bool&gt;&#39;)</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">10001</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Initializes the Caen_fast_ps, and communicates with the wrapper.</span>
+<span class="sd">		Input:</span>
+<span class="sd">		name (string)    : name of the instrument</span>
+<span class="sd">		address (string) : GPIB address</span>
+<span class="sd">		reset (bool)     : resets to default values, default=False</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Initializing instrument Caen_fast_ps&#39;</span><span class="p">)</span>
+		<span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">_host</span> <span class="o">=</span> <span class="n">address</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="o">=</span> <span class="n">port</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_soc</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span><span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_soc</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span> <span class="o">=</span> <span class="s1">&#39;#AK&#39;</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;voltage&#39;</span><span class="p">,</span>
+			<span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="n">minval</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;setvoltage&#39;</span><span class="p">,</span>
+			<span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="n">minval</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+ 
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;current&#39;</span><span class="p">,</span>
+			<span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">minval</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+				
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;setcurrent&#39;</span><span class="p">,</span>
+			<span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">minval</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+			
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span>
+			<span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;output_mode&#39;</span><span class="p">,</span>
+			<span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;current_ramp_rate&#39;</span><span class="p">,</span>
+			<span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;A/s&#39;</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;voltage_ramp_rate&#39;</span><span class="p">,</span>
+			<span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;A/s&#39;</span><span class="p">,</span> <span class="n">minval</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;floating_mode&#39;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;ramp_current&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;ramp_voltage&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;on&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Caen_FAST_PS.get_all"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.get_all">[docs]</a>	<span class="k">def</span> <span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads all implemented parameters from the instrument,</span>
+<span class="sd">		and updates the wrapper.</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get all&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;voltage&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;current&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;output_mode&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;setcurrent&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;setvoltage&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;current_ramp_rate&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;voltage_ramp_rate&#39;</span><span class="p">)</span></div>
+		
+<div class="viewcode-block" id="Caen_FAST_PS.do_get_voltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_get_voltage">[docs]</a>	<span class="k">def</span> <span class="nf">do_get_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the voltage signal from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			volt (float) : Voltage in Volts</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get voltage&#39;</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MRV:?&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_get_setvoltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_get_setvoltage">[docs]</a>	<span class="k">def</span> <span class="nf">do_get_setvoltage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the setvoltage signal from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			setvolt (float) : Voltage in Volts</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get setvoltage&#39;</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MWV:?&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_set_setvoltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_set_setvoltage">[docs]</a>	<span class="k">def</span> <span class="nf">do_set_setvoltage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">setvoltage</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the setvoltage signal from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			setvoltage (float) : setvoltage in volts</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : set setvoltage to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">setvoltage</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MWV:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">setvoltage</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> <span class="k">return</span> <span class="kc">True</span>
+		<span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_get_current"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_get_current">[docs]</a>	<span class="k">def</span> <span class="nf">do_get_current</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the current signal from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			current (float) : current in amps</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get current&#39;</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MRI:?&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_get_setcurrent"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_get_setcurrent">[docs]</a>	<span class="k">def</span> <span class="nf">do_get_setcurrent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the setcurrent signal from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			setcurrent (float) : setcurrent in amps</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get setcurrent&#39;</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MWI:?&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_set_setcurrent"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_set_setcurrent">[docs]</a>	<span class="k">def</span> <span class="nf">do_set_setcurrent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">setcurrent</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the setcurrent signal from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			setcurrent (float) : setcurrent in amps</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : set setcurrent to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">setcurrent</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MWI:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">setcurrent</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span>
+			<span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>  <span class="c1"># stores the actual current value in instrument.parameters</span>
+			<span class="k">return</span> <span class="kc">True</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_get_status"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_get_status">[docs]</a>	<span class="k">def</span> <span class="nf">do_get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the output status from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			status (int) : Usually True/False for On/Off, other integers specify certain errors. Conversion not (yet?) implemented.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get status&#39;</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MST:?&#39;</span><span class="p">)</span>
+		<span class="n">ret</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+		<span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_get_output_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_get_output_mode">[docs]</a>	<span class="k">def</span> <span class="nf">do_get_output_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the output mode from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			mode (str) : &#39;V&#39; oder &#39;I&#39;</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get mode&#39;</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;LOOP:?&#39;</span><span class="p">)</span>
+		<span class="n">ret</span> <span class="o">=</span> <span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_set_output_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_set_output_mode">[docs]</a>	<span class="k">def</span> <span class="nf">do_set_output_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Sets the output mode from the instrument</span>
+<span class="sd">		## There seems to be an error somewhere. The mode is set correctly but the return response does not work propperly</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			mode (str) : &#39;V&#39; or &#39;I&#39;</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : set mode&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">off</span><span class="p">()</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;LOOP:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">mode</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="p">()</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> <span class="k">return</span> <span class="kc">True</span>
+		<span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_get_current_ramp_rate"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_get_current_ramp_rate">[docs]</a>	<span class="k">def</span> <span class="nf">do_get_current_ramp_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the setcurrent signal from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			rate (float) : current_ramp_rate in A/s</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get current ramp rate&#39;</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MSRI:?&#39;</span><span class="p">)</span>
+		<span class="n">ret</span> <span class="o">=</span> <span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_set_current_ramp_rate"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_set_current_ramp_rate">[docs]</a>	<span class="k">def</span> <span class="nf">do_set_current_ramp_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the setcurrent signal from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			rate (float) : current_ramp_rate in A/s</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : set current ramp rate to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">rate</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MSRI:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">rate</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> <span class="k">return</span> <span class="kc">True</span>
+		<span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_get_voltage_ramp_rate"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_get_voltage_ramp_rate">[docs]</a>	<span class="k">def</span> <span class="nf">do_get_voltage_ramp_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the setcurrent signal from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			rate (float) : voltage_ramp_rate in V/s</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get voltage ramp rate&#39;</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MSRV:?&#39;</span><span class="p">)</span>
+		<span class="n">ret</span> <span class="o">=</span> <span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_set_voltage_ramp_rate"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_set_voltage_ramp_rate">[docs]</a>	<span class="k">def</span> <span class="nf">do_set_voltage_ramp_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Reads the setcurrent signal from the instrument</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			rate (float) : voltage_ramp_rate in V/s</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : set voltage ramp rate to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">rate</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MSRV:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">rate</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> <span class="k">return</span> <span class="kc">True</span>
+		<span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_set_floating_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_set_floating_mode">[docs]</a>	<span class="k">def</span> <span class="nf">do_set_floating_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Enables(Deables) the floating mode. However, earth fuse must be removed (inserted.)</span>
+<span class="sd">		Input:</span>
+<span class="sd">			mode (str) : &#39;N&#39; = non floating, &#39;F&#39; = floating</span>
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : set floating mode to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+		<span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Earth fuse has to be inserted&quot;</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;F&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Earth fuse has to be removed&quot;</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;wrong input&#39;</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SETFLOAT:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span>
+			<span class="k">return</span> <span class="kc">True</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.do_get_floating_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.do_get_floating_mode">[docs]</a>	<span class="k">def</span> <span class="nf">do_get_floating_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		returns the floating mode</span>
+<span class="sd">		Input: None</span>
+<span class="sd">		Output (STR): F = floating, N = non-floating</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get floating mode&#39;</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SETFLOAT:?&#39;</span><span class="p">)</span>
+		<span class="n">ret</span> <span class="o">=</span> <span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="k">return</span> <span class="n">ret</span></div>
+
+	<span class="c1"># shortcuts</span>
+<div class="viewcode-block" id="Caen_FAST_PS.off"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.off">[docs]</a>	<span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Sets status to False</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MOFF&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> <span class="k">return</span> <span class="kc">True</span>
+		<span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.on"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.on">[docs]</a>	<span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Sets status to True</span>
+
+<span class="sd">		Input:</span>
+<span class="sd">			None</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MON&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> <span class="k">return</span> <span class="kc">True</span>
+		<span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="Caen_FAST_PS.ramp_finished"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.ramp_finished">[docs]</a>	<span class="k">def</span> <span class="nf">ramp_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+		<span class="k">while</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MST:?&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">12</span> <span class="o">==</span> <span class="mi">2</span><span class="o">**</span><span class="mi">12</span><span class="p">:</span> <span class="c1">#MP: gets 32bit status array; 12th from last bit indicates ramping process</span>
+			<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+		<span class="k">return</span> <span class="kc">True</span></div>
+	
+<div class="viewcode-block" id="Caen_FAST_PS.ramp_current"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.ramp_current">[docs]</a>	<span class="k">def</span> <span class="nf">ramp_current</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current</span><span class="p">,</span> <span class="n">ramp_rate</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">wait</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Ramps current with given rate</span>
+<span class="sd">		</span>
+<span class="sd">		Input:</span>
+<span class="sd">			current (float) : destination value in A</span>
+<span class="sd">			ramp_rate (float) : ramp rate in A/s (optional)</span>
+<span class="sd">			wait (bool) : wait until set current value is reached before returning its value (recommended)</span>
+<span class="sd">		</span>
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="k">if</span> <span class="n">ramp_rate</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_set_current_ramp_rate</span><span class="p">(</span><span class="n">ramp_rate</span><span class="p">)</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : ramp current to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">current</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MWIR:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">current</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> 
+			<span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
+				<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+				<span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ramp_finished</span><span class="p">():</span>
+					<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+				<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+			<span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>  <span class="c1"># stores the actual current value in instrument.parameters</span>
+			<span class="k">return</span> <span class="kc">True</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span></div>
+    
+<div class="viewcode-block" id="Caen_FAST_PS.ramp_voltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.ramp_voltage">[docs]</a>	<span class="k">def</span> <span class="nf">ramp_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">voltage</span><span class="p">,</span> <span class="n">ramp_rate</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">wait</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Ramps voltage with given rate</span>
+<span class="sd">		</span>
+<span class="sd">		Input:</span>
+<span class="sd">			voltage (float) : destination value in V</span>
+<span class="sd">			ramp_rate (float) : ramp rate in V/s (optional)</span>
+<span class="sd">			wait (bool) : wait until set current value is reached before returning its value (recommended)</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="k">if</span> <span class="n">ramp_rate</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_set_voltage_ramp_rate</span><span class="p">(</span><span class="n">ramp_rate</span><span class="p">)</span>
+		<span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : ramp voltage to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">voltage</span><span class="p">)</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MWVR:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">voltage</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">wait</span><span class="p">:</span>
+				<span class="k">return</span> <span class="kc">True</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+				<span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ramp_finished</span><span class="p">():</span>
+					<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+				<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+				<span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">do_get_voltage</span><span class="p">())</span></div>
+
+	<span class="k">def</span> <span class="nf">_ask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_soc</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_soc</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Caen_FAST_PS.set_coil"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Caen_FAST_PS.Caen_FAST_PS.set_coil">[docs]</a>	<span class="k">def</span> <span class="nf">set_coil</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coil</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Adapts the PID values to the specific coils in our lab</span>
+<span class="sd">		</span>
+<span class="sd">		Input:</span>
+<span class="sd">			coil (int) : {0:default, 1:solenoid_red, 2:yoke_red, 3:solenoid_janice}</span>
+
+<span class="sd">		Output:</span>
+<span class="sd">			None</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">PID_dict</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:[</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">:[</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">:[</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">:[</span><span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="mi">0</span><span class="p">]}</span>
+		<span class="n">PID</span> <span class="o">=</span> <span class="n">PID_dict</span><span class="p">[</span><span class="n">coil</span><span class="p">]</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MWG:43:</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">PID</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MWG:44:</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">PID</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MWG:45:</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span><span class="n">PID</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span>
+		<span class="n">recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;MSAVE&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">recv</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ak_str</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;ERROR: &#39;</span> <span class="o">+</span> <span class="n">error_msg</span><span class="p">[</span><span class="n">recv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span>   </div></div>
+        
+        
+<span class="n">error_msg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;01&#39;</span><span class="p">:</span><span class="s2">&quot;Unknown command&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;02&#39;</span><span class="p">:</span><span class="s2">&quot;Unknown Parameter&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;03&#39;</span><span class="p">:</span><span class="s2">&quot;Index out of range&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;04&#39;</span><span class="p">:</span><span class="s2">&quot;Not Enough Arguments&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;05&#39;</span><span class="p">:</span><span class="s2">&quot;Privilege Level Requirement not met&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;06&#39;</span><span class="p">:</span><span class="s2">&quot;Saving Error on device&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;07&#39;</span><span class="p">:</span><span class="s2">&quot;Invalid password&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;08&#39;</span><span class="p">:</span><span class="s2">&quot;Power supply in fault&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;09&#39;</span><span class="p">:</span><span class="s2">&quot;Power supply already ON&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;10&#39;</span><span class="p">:</span><span class="s2">&quot;Setpoint is out of model limits&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;11&#39;</span><span class="p">:</span><span class="s2">&quot;Setpoint is out of software limits&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;12&#39;</span><span class="p">:</span><span class="s2">&quot;Setpoint is not a number&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;13&#39;</span><span class="p">:</span><span class="s2">&quot;Module is OFF&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;14&#39;</span><span class="p">:</span><span class="s2">&quot;Slew Rate out of limits&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;15&#39;</span><span class="p">:</span><span class="s2">&quot;Device is set in local mode&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;16&#39;</span><span class="p">:</span><span class="s2">&quot;Module is not in waveform mode&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;17&#39;</span><span class="p">:</span><span class="s2">&quot;Module is in waveform mode&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;18&#39;</span><span class="p">:</span><span class="s2">&quot;Device is set in remote mode&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;19&#39;</span><span class="p">:</span><span class="s2">&quot;Module is already in the selected loop mode&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;20&#39;</span><span class="p">:</span><span class="s2">&quot;Module is not in the selected loop mode&quot;</span><span class="p">,</span>
+			<span class="s1">&#39;99&#39;</span><span class="p">:</span><span class="s2">&quot;Unknown error&quot;</span><span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

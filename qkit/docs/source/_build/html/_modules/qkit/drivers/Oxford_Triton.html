@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.Oxford_Triton &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.Oxford_Triton</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.Oxford_Triton</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Oxford_Triton.py</span>
+<span class="c1"># MP@KIT 09/2016</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span> <span class="nn">qkit.core.instrument_base</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="Oxford_Triton"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton">[docs]</a><span class="k">class</span> <span class="nc">Oxford_Triton</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is the python driver for the Oxford Triton 200 fridge</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">    Initialise with</span>
+<span class="sd">    &lt;name&gt; = instruments.create(&#39;&lt;name&gt;&#39;, host=&#39;&lt;IP address&gt;&#39;, port=&lt;port&gt;)</span>
+<span class="sd">    For the bypass functionality, you need to specify the RaspberryPi as HOST,</span>
+<span class="sd">    where a proxy server runs, passing all commands to the Triton control PC.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initializes</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            name (string)    : name of the instrument</span>
+<span class="sd">            address (string) : IP address</span>
+<span class="sd">            port (int)       : port</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Initializing instrument&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_soc</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_soc</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">))</span>
+        
+        <span class="c1"># Implement parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                           <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span>
+                           <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
+                           <span class="n">units</span><span class="o">=</span><span class="s1">&#39;K&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;resistance&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                           <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span>
+                           <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">200000</span><span class="p">,</span>
+                           <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Ohm&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;pressure&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                           <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span>
+                           <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                           <span class="n">units</span><span class="o">=</span><span class="s1">&#39;mbar&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;valve&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+                           <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;pulse_tube&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+                           <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;still_power&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                           <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span>
+                           <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                           <span class="n">units</span><span class="o">=</span><span class="s1">&#39;uW&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;base_power&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                           <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span>
+                           <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                           <span class="n">units</span><span class="o">=</span><span class="s1">&#39;uW&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;warm_up_heater&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+                           <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;pump&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;bypass&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;turbo_speed&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;turbo_power&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">)</span>
+        
+        <span class="c1"># Implement functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_all&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;start_pre_cooling&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;empty_pre_cooling&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;start_condensing&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;cool_down&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;warm_up&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_status&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_automatisation&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;stop_automatisation&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_base_control&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_base_control&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="Oxford_Triton.get_all"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.get_all">[docs]</a>    <span class="k">def</span> <span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_temperature</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_pressure</span><span class="p">(</span><span class="n">gauge</span><span class="o">=</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_valve</span><span class="p">(</span><span class="n">valve</span><span class="o">=</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_still_power</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_base_power</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_warm_up_heater</span><span class="p">()</span></div>
+    
+    <span class="c1">###</span>
+    <span class="c1"># Communication with device</span>
+    <span class="c1">###</span>
+    
+<div class="viewcode-block" id="Oxford_Triton.start_pre_cooling"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.start_pre_cooling">[docs]</a>    <span class="k">def</span> <span class="nf">start_pre_cooling</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Starts pre cooling</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : start pre-cooling&#39;</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:SYS:DR:ACTN:PCL&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.empty_pre_cooling"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.empty_pre_cooling">[docs]</a>    <span class="k">def</span> <span class="nf">empty_pre_cooling</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Emptys pre cooling</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : empty pre-cool circuit&#39;</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:SYS:DR:ACTN:EPCL&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.start_condensing"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.start_condensing">[docs]</a>    <span class="k">def</span> <span class="nf">start_condensing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Starts condensing</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : start condensing&#39;</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:SYS:DR:ACTN:COND&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.cool_down"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.cool_down">[docs]</a>    <span class="k">def</span> <span class="nf">cool_down</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Starts full cool down</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : cool down&#39;</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:SYS:DR:ACTN:CLDN&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.warm_up"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.warm_up">[docs]</a>    <span class="k">def</span> <span class="nf">warm_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Starts warm up</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : warm up&#39;</span><span class="p">)</span>
+        <span class="c1"># self.set_warm_up_heater(True)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:SYS:DR:ACTN:WARM&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.get_status"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.get_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get status</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            status (str)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get status&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:SYS:DR:STATUS&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">19</span><span class="p">:]</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.get_automatisation"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.get_automatisation">[docs]</a>    <span class="k">def</span> <span class="nf">get_automatisation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get name of running automatisation</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            automatisation (str)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : get name of running automatisation&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:SYS:DR:ACTN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">17</span><span class="p">:]</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.stop_automatisation"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.stop_automatisation">[docs]</a>    <span class="k">def</span> <span class="nf">stop_automatisation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Stop automatisation</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : stop automatisation&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:SYS:DR:ACTN:STOP&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">26</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;VALID&#39;</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.get_base_control"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.get_base_control">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_control</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get base temperature</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+<span class="sd">        Output:</span>
+<span class="sd">            status (bool)</span>
+<span class="sd">            P (float)</span>
+<span class="sd">            I (int)</span>
+<span class="sd">            D (int)</span>
+<span class="sd">            temperature (float)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T5:TEMP:LOOP:MODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;NOT_FOUND&#39;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T8:TEMP:LOOP:MODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;ON&#39;</span>
+            <span class="n">t_set</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T8:TEMP:LOOP:TSET&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T8:TEMP:LOOP:P&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">24</span><span class="p">:])</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T8:TEMP:LOOP:I&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">24</span><span class="p">:])</span>
+            <span class="n">D</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T8:TEMP:LOOP:D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">24</span><span class="p">:])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T8:TEMP:LOOP:MODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;NOT_FOUND&#39;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T5:TEMP:LOOP:MODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;ON&#39;</span>
+            <span class="n">t_set</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T5:TEMP:LOOP:TSET&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T5:TEMP:LOOP:P&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">24</span><span class="p">:])</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T5:TEMP:LOOP:I&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">24</span><span class="p">:])</span>
+            <span class="n">D</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T5:TEMP:LOOP:D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">24</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;False&#39;</span>
+        <span class="k">return</span> <span class="n">status</span><span class="p">,</span> <span class="n">t_set</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">D</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : getting base controle &#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">))</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.set_base_control"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.set_base_control">[docs]</a>    <span class="k">def</span> <span class="nf">set_base_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="mf">12.</span><span class="p">,</span> <span class="n">I</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set base controle to temperature usint PID values</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            temperature (float), optional, default = 0</span>
+<span class="sd">            P (float), optional, default = 12.</span>
+<span class="sd">            I (int), optional, default = 100.</span>
+<span class="sd">            D (int), optional, default = 0.</span>
+<span class="sd">            status (bool), optional, default = True</span>
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">if</span> <span class="n">status</span><span class="p">:</span>
+            <span class="n">thermometer</span> <span class="o">=</span> <span class="mi">8</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : setting base temperature to </span><span class="si">%f</span><span class="s1"> using P </span><span class="si">%f</span><span class="s1"> I </span><span class="si">%i</span><span class="s1"> D</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">D</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">temperature</span> <span class="o">&gt;=</span> <span class="mf">2.2</span><span class="p">:</span>
+                <span class="n">thermometer</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_pulse_tube</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_still_power</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_valve</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_valve</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:DEV:T</span><span class="si">%i</span><span class="s1">:TEMP:LOOP:HTR:H1:MODE:ON:P:</span><span class="si">%f</span><span class="s1">:I:</span><span class="si">%i</span><span class="s1">:D:</span><span class="si">%i</span><span class="s1">:TSET:</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">thermometer</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)))</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;INVALID&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : turn off base control&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T5:TEMP:LOOP:MODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;ON&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:DEV:T5:TEMP:LOOP:MODE:OFF&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">35</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;VALID&#39;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T8:TEMP:LOOP:MODE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;ON&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:DEV:T8:TEMP:LOOP:MODE:OFF&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">35</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;VALID&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;False&#39;</span></div>
+    
+    <span class="c1">###</span>
+    <span class="c1"># GET and SET functions</span>
+    <span class="c1">###</span>
+    
+    
+<div class="viewcode-block" id="Oxford_Triton.do_get_temperature"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_get_temperature">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get temperature of thermometer at channel</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            channel (int), default = 8, RuOx at MC</span>
+<span class="sd">        Output:</span>
+<span class="sd">            temperature (float)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : getting temperature of channel </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">channel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T</span><span class="si">%i</span><span class="s1">:TEMP:SIG:TEMP&#39;</span> <span class="o">%</span> <span class="n">channel</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">26</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_get_resistance"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_get_resistance">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_resistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get resistance of thermometer at channel</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            channel (int), default = 8, RuOx at MC</span>
+<span class="sd">        Output:</span>
+<span class="sd">            resistance (float)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : getting resistance of channel </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">channel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:T</span><span class="si">%i</span><span class="s1">:TEMP:SIG:RES&#39;</span> <span class="o">%</span> <span class="n">channel</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">25</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_get_pressure"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_get_pressure">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_pressure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gauge</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get pressure at gauge</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            pressure_meter (int), default=1, tank</span>
+<span class="sd">        Output:</span>
+<span class="sd">            pressure (float)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : getting pressure at gauge </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">gauge</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:P</span><span class="si">%i</span><span class="s1">:PRES:SIG:PRES&#39;</span> <span class="o">%</span> <span class="n">gauge</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">26</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_get_valve"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_get_valve">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_valve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valve</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get valve status at valve</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            valve number (int)</span>
+<span class="sd">        Output:</span>
+<span class="sd">            status (bool)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">status_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;CLOSE&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;OPEN&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;TOGGLE&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : getting valve </span><span class="si">%s</span><span class="s1"> status&#39;</span> <span class="o">%</span> <span class="n">valve</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">status_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:V</span><span class="si">%i</span><span class="s1">:VALV:SIG:STATE&#39;</span> <span class="o">%</span> <span class="n">valve</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:]]</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_set_valve"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_set_valve">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_valve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valve</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set valve status at valve_number to status</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            valve number (int)</span>
+<span class="sd">            status (bool)</span>
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">status_dict</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;CLOSE&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;OPEN&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;TOGGLE&#39;</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:DEV:V</span><span class="si">%i</span><span class="s1">:VALV:SIG:STATE:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">valve</span><span class="p">,</span> <span class="n">status_dict</span><span class="p">[</span><span class="n">status</span><span class="p">]))</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:]</span> <span class="o">==</span> <span class="n">status_dict</span><span class="p">[</span><span class="n">status</span><span class="p">]</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_get_pulse_tube"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_get_pulse_tube">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_pulse_tube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get pulse tube status</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+<span class="sd">        Output:</span>
+<span class="sd">            status (bool)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">status_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;OFF&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ON&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : getting pulse tube status&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:C1:PTC:SIG:STATE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">26</span><span class="p">:]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_set_pulse_tube"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_set_pulse_tube">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_pulse_tube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set pulst tube to status</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            status (bool)</span>
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">status_dict</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;OFF&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;ON&#39;</span><span class="p">}</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : setting pulse tube to </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">status</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:DEV:C1:PTC:SIG:STATE:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">status_dict</span><span class="p">[</span><span class="n">status</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">27</span><span class="p">:]</span> <span class="o">==</span> <span class="n">status_dict</span><span class="p">[</span><span class="n">status</span><span class="p">]</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_get_still_power"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_get_still_power">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_still_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get still heater power</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+<span class="sd">        Output:</span>
+<span class="sd">            power (float)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : getting still power&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:H2:HTR:SIG:POWR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">25</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_set_still_power"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_set_still_power">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_still_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">power</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set still heater to power</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            power (float)</span>
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : setting still heater power to </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">power</span><span class="p">)</span>
+        <span class="n">add</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">power</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:DEV:H2:HTR:SIG:POWR:</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">power</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">37</span> <span class="o">+</span> <span class="n">add</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;VALID&#39;</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_get_base_power"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_get_base_power">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_base_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get base heater power</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+<span class="sd">        Output:</span>
+<span class="sd">            power (float)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : getting base power&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:H1:HTR:SIG:POWR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">25</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_set_base_power"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_set_base_power">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_base_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">power</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set base heater to power</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            power (float)</span>
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : setting base heater power to </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">power</span><span class="p">)</span>
+        <span class="n">add</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">power</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:DEV:H1:HTR:SIG:POWR:</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">power</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">37</span> <span class="o">+</span> <span class="n">add</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;VALID&#39;</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_get_warm_up_heater"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_get_warm_up_heater">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_warm_up_heater</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get status of warm up heater</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+<span class="sd">        Output:</span>
+<span class="sd">            status (bool)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : getting warm up heater status&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:H3:HTR:SIG:POWR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">25</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span></div>
+    
+<div class="viewcode-block" id="Oxford_Triton.do_set_warm_up_heater"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_Triton.Oxford_Triton.do_set_warm_up_heater">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_warm_up_heater</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set warm up heater to status</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            status (bool)</span>
+<span class="sd">        Output:</span>
+<span class="sd">            bool as confirmation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : setting warm up heater to </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">status</span><span class="p">)</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">status</span><span class="p">:</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="mi">10000</span>
+        <span class="n">add</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">power</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:DEV:H3:HTR:SIG:POWR:</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">power</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">37</span> <span class="o">+</span> <span class="n">add</span><span class="p">:]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_warm_up_heater</span><span class="p">()</span> <span class="ow">is</span> <span class="n">status</span></div>
+    
+    <span class="k">def</span> <span class="nf">_ask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_soc</span><span class="o">.</span><span class="n">sendall</span><span class="p">((</span><span class="n">cmd</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_soc</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">_do_set_pump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pump</span><span class="o">=</span><span class="s2">&quot;COMP&quot;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set pump on or off</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            pump: one of &#39;TURB1&#39;, &#39;FP&#39;, &#39;COMP&#39;</span>
+<span class="sd">            state (bool)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : setting pump </span><span class="si">{}</span><span class="s1"> to state </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pump</span><span class="p">,</span> <span class="s2">&quot;ON&quot;</span> <span class="k">if</span> <span class="n">state</span> <span class="k">else</span> <span class="s2">&quot;OFF&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;SET:DEV:</span><span class="si">{}</span><span class="s1">:PUMP:SIG:STATE:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pump</span><span class="p">,</span> <span class="s2">&quot;ON&quot;</span> <span class="k">if</span> <span class="n">state</span> <span class="k">else</span> <span class="s2">&quot;OFF&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">&quot;:VALID&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">_do_get_pump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pump</span><span class="o">=</span><span class="s2">&quot;COMP&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get pump state (bool)</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            pump: one of &#39;TURB1&#39;, &#39;FP&#39;, &#39;COMP&#39;</span>
+<span class="sd">        Output:</span>
+<span class="sd">            status (bool)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Getting pump </span><span class="si">{}</span><span class="s1"> state&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pump</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:</span><span class="si">{}</span><span class="s1">:PUMP:SIG:STATE&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pump</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">&quot;ON&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">_do_set_bypass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Open or close bypass and switch compressor accordingly.</span>
+<span class="sd">        Does a safety check wether P2&lt;750mbar</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            state (bool): True: open bypass and switch off compressor,</span>
+<span class="sd">                          False: close bypass and switch on compressor</span>
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : </span><span class="si">{}</span><span class="s1"> bypass&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;open&quot;</span> <span class="k">if</span> <span class="n">state</span> <span class="k">else</span> <span class="s2">&quot;close&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># opening, do safety check</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_get_pressure</span><span class="p">(</span><span class="n">gauge</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">750</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> bypass not successful. P2 is above 750mbar.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;open&quot;</span> <span class="k">if</span> <span class="n">state</span> <span class="k">else</span> <span class="s2">&quot;close&quot;</span><span class="p">))</span>
+            <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="mi">9989</span><span class="p">))</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;open</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">response</span> <span class="o">==</span> <span class="s2">&quot;Ok&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_do_set_pump</span><span class="p">(</span><span class="s2">&quot;COMP&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Opening bypass not successful &#39;</span><span class="si">{}</span><span class="s2">&#39; Compressor still on&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># closing</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_do_set_pump</span><span class="p">(</span><span class="s2">&quot;COMP&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="mi">9989</span><span class="p">))</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;close</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">response</span> <span class="o">==</span> <span class="s2">&quot;Ok&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+    
+    <span class="k">def</span> <span class="nf">_do_get_bypass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="mi">9989</span><span class="p">))</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;get_status</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">response</span> <span class="o">==</span> <span class="s2">&quot;open&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">response</span> <span class="o">==</span> <span class="s2">&quot;closed&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">valueError</span><span class="p">(</span><span class="s2">&quot;get_bypass responded with &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+    
+    <span class="k">def</span> <span class="nf">_do_get_turbo_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Getting speed of the turbo pump&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:TURB1:PUMP:SIG:SPD&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">28</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="k">def</span> <span class="nf">_do_get_turbo_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Getting power of the turbo pump&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s1">&#39;READ:DEV:TURB1:PUMP:SIG:POWR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">29</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

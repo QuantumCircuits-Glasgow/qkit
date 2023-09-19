@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.analysis package &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.analysis.circle_fit package" href="qkit.analysis.circle_fit.html" />
+    <link rel="prev" title="qkit package" href="qkit.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">qkit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">qkit.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.html#module-qkit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">qkit</a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+      <li class="breadcrumb-item active">qkit.analysis package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.analysis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-analysis-package">
+<h1>qkit.analysis package<a class="headerlink" href="#qkit-analysis-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qkit.analysis.circle_fit.html">qkit.analysis.circle_fit package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html">qkit.analysis.circle_fit.circle_fit_2019 package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#module-qkit.analysis.circle_fit.circle_fit_2019.circuit">qkit.analysis.circle_fit.circle_fit_2019.circuit module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#module-qkit.analysis.circle_fit.circle_fit_2019">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html">qkit.analysis.circle_fit.circle_fit_classic package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#module-qkit.analysis.circle_fit.circle_fit_classic.calibration">qkit.analysis.circle_fit.circle_fit_classic.calibration module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#module-qkit.analysis.circle_fit.circle_fit_classic.circlefit">qkit.analysis.circle_fit.circle_fit_classic.circlefit module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#module-qkit.analysis.circle_fit.circle_fit_classic.circuit">qkit.analysis.circle_fit.circle_fit_classic.circuit module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#module-qkit.analysis.circle_fit.circle_fit_classic.utilities">qkit.analysis.circle_fit.circle_fit_classic.utilities module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#module-qkit.analysis.circle_fit.circle_fit_classic">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.html#module-qkit.analysis.circle_fit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-qkit.analysis.CurveXtractor">
+<span id="qkit-analysis-curvextractor-module"></span><h2>qkit.analysis.CurveXtractor module<a class="headerlink" href="#module-qkit.analysis.CurveXtractor" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.CurveXtractor.CurveXtractor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.CurveXtractor.</span></span><span class="sig-name descname"><span class="pre">CurveXtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xdata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ydata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zdata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/CurveXtractor.html#CurveXtractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.CurveXtractor.CurveXtractor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for graphical curve extraction.
+Use the mouse to find points in your data.
+Use the keyboard to generate a spline following your points.
+Finally, extract a curve from the data, which is in the vicinity of the spline.
+Note, use of the module requires the widget backend for matplotlib.</p>
+<p>Attributes:</p>
+<p>set_data: set x-, y- and zdata from which curves will be extracted.
+set_smoothness: set smoothness of the splines used to approximate the curves in the data.
+set_points: manually add points and curves you want to extract from the data.
+extract_points: extract curves from the data, which are follow the splines.
+plot_results: plot extracted points.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.CurveXtractor.CurveXtractor.find_along_splines">
+<span class="sig-name descname"><span class="pre">find_along_splines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/CurveXtractor.html#CurveXtractor.find_along_splines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.CurveXtractor.CurveXtractor.find_along_splines" title="Permalink to this definition"></a></dt>
+<dd><p>Search the extremum along the spline functions, in a certain width.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>width: Width (in units of y-axis) around which points are considered for the search.</dt><dd><p>This can also be an array, each element corresponding to one curve.
+The default value for width is 5% of the y-range.</p>
+</dd>
+</dl>
+<p>peak:  If True/False, the maximum/minimum in the specified region is returned.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.CurveXtractor.CurveXtractor.get_results">
+<span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/CurveXtractor.html#CurveXtractor.get_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.CurveXtractor.CurveXtractor.get_results" title="Permalink to this definition"></a></dt>
+<dd><p>Get results from find_along_splines.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>x_results: list of arrays containing x values (1 for each spline).
+y_results: list of arrays containing y values (1 for each spline).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.CurveXtractor.CurveXtractor.plot_results">
+<span class="sig-name descname"><span class="pre">plot_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/CurveXtractor.html#CurveXtractor.plot_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.CurveXtractor.CurveXtractor.plot_results" title="Permalink to this definition"></a></dt>
+<dd><p>Plot results from find_along_splines.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.CurveXtractor.CurveXtractor.set_data">
+<span class="sig-name descname"><span class="pre">set_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ydata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/CurveXtractor.html#CurveXtractor.set_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.CurveXtractor.CurveXtractor.set_data" title="Permalink to this definition"></a></dt>
+<dd><p>Adds x-, y- and zdata.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>xdata: xaxis data
+ydata: yaxis data
+zdata: 2d matix of zdata</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.CurveXtractor.CurveXtractor.set_points">
+<span class="sig-name descname"><span class="pre">set_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/CurveXtractor.html#CurveXtractor.set_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.CurveXtractor.CurveXtractor.set_points" title="Permalink to this definition"></a></dt>
+<dd><p>This routine starts the graphical interface for adding points.</p>
+<p>Use left mouse button to add points to the current curve.
+Use right mouse button to add another curve.
+Press delete (entf) to remove the last point.</p>
+<p>Once you are finished press enter to calculate splines following your curves.
+If you are satisfied with the result, continue with extract_points.
+In case you want to change something, press enter to return to the editing mode.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>show_info: show the information of the doc string in the plot.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.CurveXtractor.CurveXtractor.set_smoothness">
+<span class="sig-name descname"><span class="pre">set_smoothness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smoothness</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/CurveXtractor.html#CurveXtractor.set_smoothness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.CurveXtractor.CurveXtractor.set_smoothness" title="Permalink to this definition"></a></dt>
+<dd><p>Set smoothness of the splines.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>smoothness: Smoothness parameter. Small smoothness forces the spline closer to the points used to generate it.</dt><dd><p>Higher smoothness allows the spline to deviate more strongly from the given curve.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="qkit-analysis-iv-curve-module">
+<h2>qkit.analysis.IV_curve module<a class="headerlink" href="#qkit-analysis-iv-curve-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="qkit-analysis-iv-curve2-module">
+<h2>qkit.analysis.IV_curve2 module<a class="headerlink" href="#qkit-analysis-iv-curve2-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="qkit-analysis-iv-curve3-module">
+<h2>qkit.analysis.IV_curve3 module<a class="headerlink" href="#qkit-analysis-iv-curve3-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-qkit.analysis.avoided_crossing_fit">
+<span id="qkit-analysis-avoided-crossing-fit-module"></span><h2>qkit.analysis.avoided_crossing_fit module<a class="headerlink" href="#module-qkit.analysis.avoided_crossing_fit" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.avoided_crossing_fit.</span></span><span class="sig-name descname"><span class="pre">ACF</span></span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Avoided crossing fit class (<a class="reference external" href="mailto:AS&#37;&#52;&#48;KIT">AS<span>&#64;</span>KIT</a> 2017):
+Useful for extracting the coupling strenght from avoided level crossings between an arbirary number of functions.</p>
+<blockquote>
+<div><dl>
+<dt>Attributes:</dt><dd><p>set_xdata:     Set x-data for the fit.
+set_ydata:     Set y-data for the fit.
+set_functions: Set functions of the undressed/uncoupled systems. You can also define functions by yourself.</p>
+<blockquote>
+<div><p>Here it is important, that the function input is formatted as: New_fct(x, par1, par2, …)</p>
+</div></blockquote>
+<p>set_init_pars: Set initial parameters for the fit (not necessary for an anticrossing between two curves).
+set_all:       Set all afore mentioned variables.</p>
+<p>fit:            Perform fit and generate results attribute. The latter stores the fit results and corresponding errors (least squares).
+plot_init_pars: Plot xy-input coupled modes for the initial parameters. This can be useful for finding good starting values.
+plot_results:   Plot xy-input and fit results.
+crossing_fct:   Calculates the energy levels of a coupled system of an arbirary number of modes (assuming transverse/XX-coupling of the modes).
+print_results:  Print fit results (crudely formatted).</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.constant_line">
+<span class="sig-name descname"><span class="pre">constant_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.constant_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.constant_line" title="Permalink to this definition"></a></dt>
+<dd><p>A constant line.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x: x-value (allows for the output of arrays)
+a: return value</p>
+</dd>
+<dt>Returns:</dt><dd><p>An array with same length as x and value: a</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.crossing_fct">
+<span class="sig-name descname"><span class="pre">crossing_fct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pars</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.crossing_fct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.crossing_fct" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluates the functions of the coupled modes (diagonalizes the matrix).</p>
+<dl>
+<dt>Input:</dt><dd><p>x:        x-values where the the functions are to be evaluated
+fct_pars: List of arrays, each array contains parameters of the corresponding (undressed) function.</p>
+<blockquote>
+<div><p>The last array in the list contains values for the coupling strenghts.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>List of arrays, where the i’th array cointains the y-values of branch i of the coupled system.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit functions of the coupled modes to the stored xy-data.
+Generates the results attribute, i.e. a list containing results for each free parameters:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Index of the function the parameter belongs to
+For the coupling strenght this indicates the modes it belongs to</p></li>
+<li><p>Name of the parameter</p></li>
+<li><p>Value as extracted from the fit</p></li>
+<li><p>Standard deviation of the value</p></li>
+</ol>
+</div></blockquote>
+<dl class="simple">
+<dt>Args:</dt><dd><p>show_data: If true, fit data is displayed after the fit.
+show_plot: If true, plot is displayed after the fit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.hyperbola">
+<span class="sig-name descname"><span class="pre">hyperbola</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.hyperbola"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.hyperbola" title="Permalink to this definition"></a></dt>
+<dd><p>A hyperbola around x = b with offset c.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x: x value
+a:
+b: Offset in x-direction
+c: Offset in y-direction</p>
+</dd>
+<dt>Returns:</dt><dd><p>An array with same length as x and return value: a*(x - b)**2 + c</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.parabola">
+<span class="sig-name descname"><span class="pre">parabola</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.parabola"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.parabola" title="Permalink to this definition"></a></dt>
+<dd><p>A parabola with curvature a around x = b with offset c.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x: x value
+a: second derivative / 2
+b: Offset in x-direction
+c: Offset in y-direction</p>
+</dd>
+<dt>Returns:</dt><dd><p>An array with same length as x and return value: a*(x - b)**2 + c</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.plot_init_pars">
+<span class="sig-name descname"><span class="pre">plot_init_pars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.plot_init_pars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.plot_init_pars" title="Permalink to this definition"></a></dt>
+<dd><p>Plot of input xy-datasets and coupled modes for the initial parameters.
+This is useful to find reasonable initial values for the fit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.plot_results">
+<span class="sig-name descname"><span class="pre">plot_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.plot_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.plot_results" title="Permalink to this definition"></a></dt>
+<dd><p>Plot of input xy-datasets and the coupled modes using the fit results.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.print_results">
+<span class="sig-name descname"><span class="pre">print_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.print_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.print_results" title="Permalink to this definition"></a></dt>
+<dd><p>Prints the fit results in a legible form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.set_all">
+<span class="sig-name descname"><span class="pre">set_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.set_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.set_all" title="Permalink to this definition"></a></dt>
+<dd><p>Set initial parameters for the fit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>x:  x-datasets for the fit (at least 2 arrays, can be entered as a list).</dt><dd><p>x-arrays should be ordered by eigenvalue (ascending order).</p>
+</dd>
+<dt>y:  y-datasets for the fit (at least 2 arrays, can be entered as a list).</dt><dd><p>y-arrays should be ordered by eigenvalue (ascending order).</p>
+</dd>
+<dt>f:  functions for the fit (at least 2, can be entered as a list). </dt><dd><p>Each function should describe one of the undressed modes (i.e. without interaction/level repelling). 
+By default, functions are set to constant_line and straight_line.</p>
+</dd>
+<dt>p0: Initial parameters for the fit. Order should be: parameter1 of fct1, par2 fct1, …, g12, g13, .. </dt><dd><p>If no initial parameters are given all values are set to 1.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.set_functions">
+<span class="sig-name descname"><span class="pre">set_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.set_functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.set_functions" title="Permalink to this definition"></a></dt>
+<dd><p>Set functions for the fit.
+Each function should describe one of the undressed modes (i.e. without interaction/level repelling).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>functions of the undressed modes (at least 2). 
+A list of functions is also allowed as input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.set_init_pars">
+<span class="sig-name descname"><span class="pre">set_init_pars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.set_init_pars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.set_init_pars" title="Permalink to this definition"></a></dt>
+<dd><p>Set initial parameters for the fit.
+Order should be: parameter1 of fct1, par2 fct1, …, g12, g13, …
+If the number of input parameters is insuffcient they are later on set to 1.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>List of initial parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.set_xdata">
+<span class="sig-name descname"><span class="pre">set_xdata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.set_xdata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.set_xdata" title="Permalink to this definition"></a></dt>
+<dd><p>Set x-datasets for the fit.
+x-arrays should be ordered by eigenvalue of the y-arrays (ascending order).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x-arrays of the undressed modes (at least 2).
+A list of arrays is also allowed as input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.set_ydata">
+<span class="sig-name descname"><span class="pre">set_ydata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.set_ydata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.set_ydata" title="Permalink to this definition"></a></dt>
+<dd><p>Set y-datasets for the fit.
+y-arrays should be ordered by eigenvalue (ascending order).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>y-arrays of the undressed modes (at least 2).
+A list of arrays is also allowed as input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.straight_line">
+<span class="sig-name descname"><span class="pre">straight_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.straight_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.straight_line" title="Permalink to this definition"></a></dt>
+<dd><p>A straight line with slope a and offset b.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x: x-value
+a: Slope
+b: Offset in y-direction</p>
+</dd>
+<dt>Returns:</dt><dd><p>An array with same length as x and return value: a * x + b</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.avoided_crossing_fit.ACF.transmon_f01">
+<span class="sig-name descname"><span class="pre">transmon_f01</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">I_ext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">djj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/avoided_crossing_fit.html#ACF.transmon_f01"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.avoided_crossing_fit.ACF.transmon_f01" title="Permalink to this definition"></a></dt>
+<dd><p>Dispersion of a tunable transmon qubit with junction asymmetry.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x:     x-value
+w0:    Maximum qubit frequency without detuning.
+L:     Oscillation period in current/x-value.
+I_ext: Offset current/x offset.
+djj:   Josephson junction asymmetry (Ic1 - Ic2)/(Ic1 + Ic2)</p>
+</dd>
+<dt>Returns:</dt><dd><p>Primal transition frequency of a transmon qubit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.iq_cloud_analysis">
+<span id="qkit-analysis-iq-cloud-analysis-module"></span><h2>qkit.analysis.iq_cloud_analysis module<a class="headerlink" href="#module-qkit.analysis.iq_cloud_analysis" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.iq_cloud_analysis.</span></span><span class="sig-name descname"><span class="pre">IQCloudAnalysis</span></span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.analyse_qubit_clouds">
+<span class="sig-name descname"><span class="pre">analyse_qubit_clouds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.analyse_qubit_clouds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.analyse_qubit_clouds" title="Permalink to this definition"></a></dt>
+<dd><p>This routine performs an IQ cloud analyis with the given gaussian mixture model and
+interprets the two most prominent states as the qubit system.
+The rotation, the angle and the separation of the qubit clouds is determined.
+When the qubit frequency is given the temperature is calculated.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.calc_amplitude_phase">
+<span class="sig-name descname"><span class="pre">calc_amplitude_phase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.calc_amplitude_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.calc_amplitude_phase" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.calc_cloud_distance">
+<span class="sig-name descname"><span class="pre">calc_cloud_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cloud_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cloud_b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.calc_cloud_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.calc_cloud_distance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.calc_covariance_properties">
+<span class="sig-name descname"><span class="pre">calc_covariance_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.calc_covariance_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.calc_covariance_properties" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.calc_mahalanobis_dist">
+<span class="sig-name descname"><span class="pre">calc_mahalanobis_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.calc_mahalanobis_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.calc_mahalanobis_dist" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the squared mahalanobis distance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.calc_temperature">
+<span class="sig-name descname"><span class="pre">calc_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cloud_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cloud_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_freq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.calc_temperature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.calc_temperature" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the temperature from the weights for the
+corresponding frequencies of the states which must be given in units of Hz.
+If freq.size = n_states - 1 the zero ground state energy is automatically added.
+Consequently, for two states freq can also just be a number i.e. the frequency of the excited state</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.fit_clouds">
+<span class="sig-name descname"><span class="pre">fit_clouds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.fit_clouds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.fit_clouds" title="Permalink to this definition"></a></dt>
+<dd><p>Fit of the clouds with the given gaussian mixture model.
+The clouds are randomly numerated and have to be sorted later on
+TODO: include option to use warm start of GaussianMixture to speed up convergence (using previous fit result)
+TODO: it would be nice if one could also set the inits in this routine: means_init=None, weights_init=None, precisions_init=None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.fit_clouds_weight">
+<span class="sig-name descname"><span class="pre">fit_clouds_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_covar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.fit_clouds_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.fit_clouds_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum likelihood fit of the weights.
+Simple implementation only for 2 states possible.
+TODO: for more states a warm start could give similar results</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.plot_clouds">
+<span class="sig-name descname"><span class="pre">plot_clouds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'histogram'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.015</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.plot_clouds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.plot_clouds" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.plot_weights">
+<span class="sig-name descname"><span class="pre">plot_weights</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.plot_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.plot_weights" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.rotate_data">
+<span class="sig-name descname"><span class="pre">rotate_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.rotate_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.rotate_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.set_IQ_data_sweep">
+<span class="sig-name descname"><span class="pre">set_IQ_data_sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_avg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.set_IQ_data_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.set_IQ_data_sweep" title="Permalink to this definition"></a></dt>
+<dd><p>Load 2-dimensional IQ data in the form [avg, sweep]
+If needed scale the data with a given dist_avg</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.set_axes">
+<span class="sig-name descname"><span class="pre">set_axes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.set_axes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.set_axes" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.set_up_gaussian_mixture_model">
+<span class="sig-name descname"><span class="pre">set_up_gaussian_mixture_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_states</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spherical'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.set_up_gaussian_mixture_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.set_up_gaussian_mixture_model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.sort_clouds_positions">
+<span class="sig-name descname"><span class="pre">sort_clouds_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.sort_clouds_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.sort_clouds_positions" title="Permalink to this definition"></a></dt>
+<dd><p>Sorts the states according to a reference positions.
+If ref_pos is None the first position of the sweep is chosen as reference.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.sort_clouds_weights">
+<span class="sig-name descname"><span class="pre">sort_clouds_weights</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.sort_clouds_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.sort_clouds_weights" title="Permalink to this definition"></a></dt>
+<dd><p>Sorts the states according to their weight</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.weights_fit">
+<span class="sig-name descname"><span class="pre">weights_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/iq_cloud_analysis.html#IQCloudAnalysis.weights_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.iq_cloud_analysis.IQCloudAnalysis.weights_fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fast maximum likelihood fit of the weights for two states.
+The position and the variance must be given</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.manual_point_picker">
+<span id="qkit-analysis-manual-point-picker-module"></span><h2>qkit.analysis.manual_point_picker module<a class="headerlink" href="#module-qkit.analysis.manual_point_picker" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.manual_point_picker.ManualPointPicker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.manual_point_picker.</span></span><span class="sig-name descname"><span class="pre">ManualPointPicker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmap_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/manual_point_picker.html#ManualPointPicker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.manual_point_picker.ManualPointPicker" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.manual_point_picker.ManualPointPicker.get_data_list">
+<span class="sig-name descname"><span class="pre">get_data_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/manual_point_picker.html#ManualPointPicker.get_data_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.manual_point_picker.ManualPointPicker.get_data_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.manual_point_picker.ManualPointPicker.on_key">
+<span class="sig-name descname"><span class="pre">on_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/manual_point_picker.html#ManualPointPicker.on_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.manual_point_picker.ManualPointPicker.on_key" title="Permalink to this definition"></a></dt>
+<dd><p>point with mouse on a data point and press one of the numbers 1-9
+press “0” or “r” to remove data point from the list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.manual_point_picker.ManualPointPicker.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/manual_point_picker.html#ManualPointPicker.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.manual_point_picker.ManualPointPicker.plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.manual_point_picker.ManualPointPicker.refresh_artist">
+<span class="sig-name descname"><span class="pre">refresh_artist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/manual_point_picker.html#ManualPointPicker.refresh_artist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.manual_point_picker.ManualPointPicker.refresh_artist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.manual_point_picker.ManualPointPicker.set_figure">
+<span class="sig-name descname"><span class="pre">set_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/manual_point_picker.html#ManualPointPicker.set_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.manual_point_picker.ManualPointPicker.set_figure" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.manual_point_picker.ManualPointPicker.start_point_picker">
+<span class="sig-name descname"><span class="pre">start_point_picker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/manual_point_picker.html#ManualPointPicker.start_point_picker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.manual_point_picker.ManualPointPicker.start_point_picker" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="qkit-analysis-pointtracker-module">
+<h2>qkit.analysis.pointtracker module<a class="headerlink" href="#qkit-analysis-pointtracker-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-qkit.analysis.qfit">
+<span id="qkit-analysis-qfit-module"></span><h2>qkit.analysis.qfit module<a class="headerlink" href="#module-qkit.analysis.qfit" title="Permalink to this heading"></a></h2>
+<p>usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qkit</span> <span class="kn">import</span> <span class="n">qfit</span> <span class="k">as</span> <span class="n">qfit</span>
+<span class="n">qf</span> <span class="o">=</span> <span class="n">qfit</span><span class="o">.</span><span class="n">QFIT</span><span class="p">()</span>
+<span class="n">qf</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;data/file.h5&#39;</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;phase&#39;</span><span class="p">])</span>
+<span class="n">qf</span><span class="o">.</span><span class="n">rotate_IQ_plane</span><span class="p">()</span>
+<span class="n">qf</span><span class="o">.</span><span class="n">fit_exp</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.qfit.</span></span><span class="sig-name descname"><span class="pre">QFIT</span></span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.discover_hdf_data">
+<span class="sig-name descname"><span class="pre">discover_hdf_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.discover_hdf_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.discover_hdf_data" title="Permalink to this definition"></a></dt>
+<dd><p>Read hdf data file and store urls that match entries or seem reasonable. 
+- Inputs: entries (optional): specifies entries in h5 file whose urls to be returned</p>
+<ul class="simple">
+<li><p>entries can be a list of string keywords (entries) in the form [‘string1’,string2’,…,’stringn’]</p></li>
+<li><p>when no entries are specified, discover_hdf_data looks for a frequency axis or a pulse length axis
+for the (first) coordinate axis and also searches amplitude_avg and phase_avg. If not present,
+the urls of ‘amplitude’ and ‘phase’ data are discovered</p></li>
+<li><p>TODO: a nice feature would be to save a hint in each h5 file which entries to use for quick fitting</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.find_latest_file">
+<span class="sig-name descname"><span class="pre">find_latest_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ftype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.find_latest_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.find_latest_file" title="Permalink to this definition"></a></dt>
+<dd><p>Find latest file of type ‘ftype’ in the data directory. 
+The file name (including absolute path) is stored in self.file_name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Perform fitting and plotting based on the function stored in self.fit_function. 
+self.fit_function may be set manually with an arbitrary function before executing fit(self):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f_custom</span><span class="p">(</span><span class="n">coordinate</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">coordinate</span><span class="o">+</span><span class="n">p1</span><span class="p">)</span><span class="o">*</span><span class="n">p2</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">p3</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">fit_function</span> <span class="o">=</span> <span class="n">f_custom</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>   <span class="c1">#must be provided</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.fit_Lorentzian">
+<span class="sig-name descname"><span class="pre">fit_Lorentzian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.fit_Lorentzian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.fit_Lorentzian" title="Permalink to this definition"></a></dt>
+<dd><p>Regular Lorentzian fit.
+Optional Input: list of start parameters p0: Can be a smaller list than the actual number of parameters 
+(addressing only the first n start parameters). p0 can also contain ‘None’ entries in order to select 
+specific entries to set manually.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.fit_Lorentzian_sqrt">
+<span class="sig-name descname"><span class="pre">fit_Lorentzian_sqrt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.fit_Lorentzian_sqrt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.fit_Lorentzian_sqrt" title="Permalink to this definition"></a></dt>
+<dd><p>Square root of a Lorentzian fit e.g. for resonator magnitude data (since only the squared linear magnitude data 
+typically results in a Lorentzian response).
+Optional Input: list of start parameters p0: Can be a smaller list than the actual number of parameters 
+(addressing only the first n start parameters). p0 can also contain ‘None’ entries in order to select 
+specific entries to set manually.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.fit_Skewed_Lorentzian">
+<span class="sig-name descname"><span class="pre">fit_Skewed_Lorentzian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.fit_Skewed_Lorentzian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.fit_Skewed_Lorentzian" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.fit_damped_sine">
+<span class="sig-name descname"><span class="pre">fit_damped_sine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.fit_damped_sine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.fit_damped_sine" title="Permalink to this definition"></a></dt>
+<dd><p>Damped sine fit to be used e.g. to fit Rabi/Ramsey oscillations.
+Optional Input: list of start parameters p0: Can be a smaller list than the actual number of parameters 
+(addressing only the first n start parameters). p0 can also contain ‘None’ entries in order to select 
+specific entries to set manually.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.fit_exp">
+<span class="sig-name descname"><span class="pre">fit_exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.fit_exp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.fit_exp" title="Permalink to this definition"></a></dt>
+<dd><p>Simple exponential fit.
+Optional Input: list of start parameters p0: Can be a smaller list than the actual number of parameters 
+(addressing only the first n start parameters). p0 can also contain ‘None’ entries in order to select 
+specific entries to set manually.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.fit_exp_sine">
+<span class="sig-name descname"><span class="pre">fit_exp_sine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.fit_exp_sine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.fit_exp_sine" title="Permalink to this definition"></a></dt>
+<dd><p>Asymmetric exponential sine fit to be used to fit e.g. Vacuum Rabi oscillations.
+Optional Input: list of start parameters p0: Can be a smaller list than the actual number of parameters 
+(addressing only the first n start parameters). p0 can also contain ‘None’ entries in order to select 
+specific entries to set manually.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.fit_sine">
+<span class="sig-name descname"><span class="pre">fit_sine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.fit_sine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.fit_sine" title="Permalink to this definition"></a></dt>
+<dd><p>Sine fit to be used to fit non-decaying harmonic oscillations.
+Optional Input: list of start parameters p0: Can be a smaller list than the actual number of parameters 
+(addressing only the first n start parameters). p0 can also contain ‘None’ entries in order to select 
+specific entries to set manually.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.load" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Load data from either:</dt><dd><ul class="simple">
+<li><p>numpy arrays: must specify keyword arguments ‘coordinate’ and ‘data’</p></li>
+<li><p>data file (h5 or text based file): specify filename</p></li>
+<li><p>recent data file in data_dir: no arguments provided</p></li>
+</ul>
+</dd>
+</dl>
+<p>h5 entries need to be given with keyword ‘entries’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.phase_grad">
+<span class="sig-name descname"><span class="pre">phase_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.phase_grad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.phase_grad" title="Permalink to this definition"></a></dt>
+<dd><p>Unwrap, (optionally) spline smooth, and differentiate phase data. 
+The freuqnecy derivative of transmission or reflection phase data that follows 
+a arctan function yields a Lorentzian distribution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.read_hdf_data">
+<span class="sig-name descname"><span class="pre">read_hdf_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.read_hdf_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.read_hdf_data" title="Permalink to this definition"></a></dt>
+<dd><p>Read hdf data and set attributes self.coordinate, self.data. 
+Return data as a numpy array if requested by ‘return_data’ argument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.rotate_IQ_plane">
+<span class="sig-name descname"><span class="pre">rotate_IQ_plane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.rotate_IQ_plane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.rotate_IQ_plane" title="Permalink to this definition"></a></dt>
+<dd><p>The data optimizer is fed with microwave data of both quadratures, typically amplitude and phase.
+It effectively performs a principle axis transformation in the complex plane of all data points
+that are located along a line for a typical projective qubit state measurement without single-shot
+fidelity and using a ADC acquisition card. Successively, data optimizer returns a projection along
+the in-line direction quadrature containing maximum information. Indeally, no information is lost
+as no data is left in the orthogonal quadrature.</p>
+<p>The algorithm locates one of the edge data points on either end of the line-shaped data point distribution
+by summing and maximizing the mutual distances between data points. It then calculates the distance
+of each data point with respect to this distinct extremal data point.</p>
+<p>We assume that the possible outcomes of a strong and projective quantum measurement, i.e. the qubit
+states <a href="#id1"><span class="problematic" id="id2">|</span></a>0&gt;, <a href="#id3"><span class="problematic" id="id4">|</span></a>1&gt;, result in two distinct locations in the complex plane, corresponding to signatures
+of the dispersive readout resonator. In the absence of single-shot readout fidelity, the pre-averaging
+that is perfomed by the ADC card in the complex plane leads to counts in between the piles denoting <a href="#id5"><span class="problematic" id="id6">|</span></a>0&gt;
+and <a href="#id7"><span class="problematic" id="id8">|</span></a>1&gt;. The points laong this line are distributed due to statistical measurement noise and ultimately
+due to the quantum uncertainty. As the averaging takes place in the complex plane, all points recorded
+in such a measurement should be located on a line. In case of a phase sensitive reflection measurement
+at a high internal quality cavity, points may span a segment of a circle that can be caused by noise
+caused measurements of the resonator position away from the two quantumn positions.</p>
+<p>The line shape of the data distribution generally justifies the projection of measurement data to an
+arbitrary axis without altering the internal data shape.</p>
+<p>Errors are calculated projected on the axis complex data points are aligned along. Data is normalized
+prior to returning.</p>
+<p>Requires coordinate, amplitude, and phase data to be specified via entries keyword. 
+self.amplitude and self.phase can be lists of vectors or a single (averaged) data set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.qfit.QFIT.spline_smooth">
+<span class="sig-name descname"><span class="pre">spline_smooth</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/qfit.html#QFIT.spline_smooth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.qfit.QFIT.spline_smooth" title="Permalink to this definition"></a></dt>
+<dd><p>Spline smooth the data set in self.data. The smoothing parameter is set via the ‘spline_knots’ entry in self.cfg.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="qkit-analysis-qps-rings-module">
+<h2>qkit.analysis.qps_rings module<a class="headerlink" href="#qkit-analysis-qps-rings-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-qkit.analysis.resonator">
+<span id="qkit-analysis-resonator-module"></span><h2>qkit.analysis.resonator module<a class="headerlink" href="#module-qkit.analysis.resonator" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.resonator.</span></span><span class="sig-name descname"><span class="pre">Resonator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Resonator class for fitting (live or after measurement) amplitude and phase data at multiple functions. The data is stored in .h5-files, having a NeXus compatible organization.
+Required are datasets frequency (/entry/data0/frequency), amplitude (/entry/data0/amplitude), and phase (/entry/data0/phase).
+input:
+hf_path (HDF5-filepath): Path to file containing datasets to be fitted</p>
+<p>Possible fits are ‘lorentzian’, ‘skewed lorentzian’, ‘circle’, and ‘fano’ with each fit taking arguments
+fit_all (boolean, optional): True or False, default: False, fit all entries in the amplitude dataset or only last one
+f_min (float, optional): Lower boundary for fit function
+f_max (float, optional): Upper boundary for fit function</p>
+<dl class="simple">
+<dt>usage:</dt><dd><p>res=Resonator(filepath)
+res.fit_lorentzian(fit_all=True,f_min=5.667e9,f_max=5.668e9)
+res.fit_fano(fit_all=True)
+res.fit_circle(fit_all=True,f_max=5.668e9)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator.close" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator.debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator.debug" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.ds_url_power">
+<span class="sig-name descname"><span class="pre">ds_url_power</span></span><a class="headerlink" href="#qkit.analysis.resonator.Resonator.ds_url_power" title="Permalink to this definition"></a></dt>
+<dd><p>catching error if datasets are empty while creating resonator object
+i.g. while live-fitting</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.fit_circle">
+<span class="sig-name descname"><span class="pre">fit_circle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reflection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator.fit_circle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator.fit_circle" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.fit_fano">
+<span class="sig-name descname"><span class="pre">fit_fano</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_filter_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator.fit_fano"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator.fit_fano" title="Permalink to this definition"></a></dt>
+<dd><p>fano fit for amp data in the f_min-f_max frequency range
+squared amps are fitted at fano using scipy.leastsq
+fit parameter, chi2, q0, and generated amp are stored in the hdf-file</p>
+<p>input:
+fit_all (bool): True or False, default: False. Whole data (True) or only last “slice” (False) is fitted (optional)
+f_min (float): lower boundary for data to be fitted (optional, default: None, results in min(frequency-array))
+f_max (float): upper boundary for data to be fitted (optional, default: None, results in max(frequency-array))</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.fit_lorentzian">
+<span class="sig-name descname"><span class="pre">fit_lorentzian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_filter_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator.fit_lorentzian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator.fit_lorentzian" title="Permalink to this definition"></a></dt>
+<dd><p>lorentzian fit for amp data in the f_min-f_max frequency range
+squared amps are fitted at lorentzian using scipy.leastsq
+fit parameter, chi2, and generated amp are stored in the hdf-file</p>
+<p>input:
+fit_all (bool): True or False, default: False. Whole data (True) or only last “slice” (False) is fitted (optional)
+f_min (float): lower boundary for data to be fitted (optional, default: None, results in min(frequency-array))
+f_max (float): upper boundary for data to be fitted (optional, default: None, results in max(frequency-array))</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.fit_skewed_lorentzian">
+<span class="sig-name descname"><span class="pre">fit_skewed_lorentzian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_filter_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator.fit_skewed_lorentzian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator.fit_skewed_lorentzian" title="Permalink to this definition"></a></dt>
+<dd><p>skewed lorentzian fit for amp data in the f_min-f_max frequency range
+squared amps are fitted at skewed lorentzian using scipy.leastsq
+fit parameter, chi2, and generated amp are stored in the hdf-file</p>
+<p>input:
+fit_all (bool): True or False, default: False. Whole data (True) or only last “slice” (False) is fitted (optional)
+f_min (float): lower boundary for data to be fitted (optional, default: None, results in min(frequency-array))
+f_max (float): upper boundary for data to be fitted (optional, default: None, results in max(frequency-array))</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.set_file">
+<span class="sig-name descname"><span class="pre">set_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator.set_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator.set_file" title="Permalink to this definition"></a></dt>
+<dd><p>sets hf file
+input:
+hf (HDF5-file)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.set_prefilter">
+<span class="sig-name descname"><span class="pre">set_prefilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gaussian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator.set_prefilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator.set_prefilter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.set_x_coord">
+<span class="sig-name descname"><span class="pre">set_x_coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_co</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator.set_x_coord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator.set_x_coord" title="Permalink to this definition"></a></dt>
+<dd><p>sets x-coordinate for the datasets
+input:
+x_co (string): url of the x-coordinate</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.resonator.Resonator.set_y_coord">
+<span class="sig-name descname"><span class="pre">set_y_coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_co</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/resonator.html#Resonator.set_y_coord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.resonator.Resonator.set_y_coord" title="Permalink to this definition"></a></dt>
+<dd><p>sets y-coordinate for the datasets
+input:
+y_co (string): url of the y-coordinate</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.analysis" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.html" class="btn btn-neutral float-left" title="qkit package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.analysis.circle_fit.html" class="btn btn-neutral float-right" title="qkit.analysis.circle_fit package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

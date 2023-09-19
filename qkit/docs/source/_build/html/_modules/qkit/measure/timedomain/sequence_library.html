@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.timedomain.sequence_library &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.measure.timedomain.sequence_library</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.measure.timedomain.sequence_library</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">sequency_library.py</span>
+<span class="sd">A. Stehli (05/2018)</span>
+
+<span class="sd">This library provides the measurement sequences for standard qubit experiments.</span>
+<span class="sd">Currently this includes:</span>
+<span class="sd">    rabi experiment</span>
+<span class="sd">    T1 measurments</span>
+<span class="sd">    Ramsey experiments</span>
+<span class="sd">    Spin/Hahn echo</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">import</span> <span class="nn">qkit.measure.timedomain.pulse_sequence</span> <span class="k">as</span> <span class="nn">ps</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">TODO: How to implement the mixer calibration? Should it be stored in the sample object or in an external file where it can be acessed?</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="rabi"><a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.sequence_library.rabi">[docs]</a><span class="k">def</span> <span class="nf">rabi</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">pulse_shape</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">ShapeLib</span><span class="o">.</span><span class="n">rect</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate sequence object for a rabi experiment (varying drive pulse lengths).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sample:      sample object</span>
+<span class="sd">            pulse_shape: shape of the pulses (i.e. square, gauss, ...)</span>
+<span class="sd">            amplitude:   relative ampitude of the sequence</span>
+<span class="sd">            iq_frequency: IQ-frequency for heterodyne mixing. If iq_frequency is None, the sample.iq_frequency is used.</span>
+<span class="sd">                            If iq_frequency is 0 homodyne mixing is employed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Sequence object for rabi experiment</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">iq_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s2">&quot;iq_frequency&quot;</span><span class="p">):</span>
+            <span class="n">iq_frequency</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">iq_frequency</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;IQ-frequency set to </span><span class="si">{:.0f}</span><span class="s2"> MHz.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iq_frequency</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">iq_frequency</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Sample has no attribute iq_frequency.</span><span class="se">\n</span><span class="s2"> IQ-frequency set to 0 for homodyne mixing.&quot;</span><span class="p">)</span>
+    <span class="n">rabi_tone</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Pulse</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">pulse_shape</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;rabi-tone&quot;</span><span class="p">,</span>
+                         <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="n">iq_frequency</span><span class="p">)</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PulseSequence</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">rabi_tone</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add_readout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sequence</span></div>
+
+
+<div class="viewcode-block" id="t1"><a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.sequence_library.t1">[docs]</a><span class="k">def</span> <span class="nf">t1</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">pulse_shape</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">ShapeLib</span><span class="o">.</span><span class="n">rect</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a sequence with one pi pulse followed by a time delay.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sample:       sample object</span>
+<span class="sd">            pulse_shape:  shape of the pulses (i.e. square, gauss, ...)</span>
+<span class="sd">            amplitude:    relative ampitude of the sequence</span>
+<span class="sd">            iq_frequency: IQ-frequency for heterodyne mixing. If iq_frequency is None, the sample.iq_frequency is used.</span>
+<span class="sd">                            If iq_frequency is 0 homodyne mixing is employed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Sequence object for T1 measurement</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">iq_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s2">&quot;iq_frequency&quot;</span><span class="p">):</span>
+            <span class="n">iq_frequency</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">iq_frequency</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;IQ-frequency set to </span><span class="si">{:.0f}</span><span class="s2"> MHz.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iq_frequency</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">iq_frequency</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Sample has no attribute iq_frequency.</span><span class="se">\n</span><span class="s2"> IQ-frequency set to 0 for homodyne mixing.&quot;</span><span class="p">)</span>
+    <span class="n">pi_pulse</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Pulse</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">tpi</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">pulse_shape</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pi&quot;</span><span class="p">,</span>
+                        <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="n">iq_frequency</span><span class="p">)</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PulseSequence</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pi_pulse</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add_wait</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add_readout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sequence</span></div>
+
+
+<div class="viewcode-block" id="ramsey"><a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.sequence_library.ramsey">[docs]</a><span class="k">def</span> <span class="nf">ramsey</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">pulse_shape</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">ShapeLib</span><span class="o">.</span><span class="n">rect</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a sequence with two pi/2 pulses seperated by a time delay.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sample:       sample object</span>
+<span class="sd">        pulse_shape:  shape of the pulses (i.e. square, gauss, ...)</span>
+<span class="sd">        amplitude:    relative ampitude of the sequence</span>
+<span class="sd">        iq_frequency: IQ-frequency for heterodyne mixing. If iq_frequency is None, the sample.iq_frequency is used.</span>
+<span class="sd">                      If iq_frequency is 0 homodyne mixing is employed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Sequence object for ramsey measurement</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">spinecho</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pulse_shape</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="spinecho"><a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.sequence_library.spinecho">[docs]</a><span class="k">def</span> <span class="nf">spinecho</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">n_pi</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pulse_shape</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">ShapeLib</span><span class="o">.</span><span class="n">rect</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate sequence with two pi/2 pulses at the ends and a number n_pi pi pulses inbetween</span>
+<span class="sd">    pi2 - time/(2*n) - pi - time/n - pi - ... - pi - time/(2*n) - pi2</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        sample:       sample object</span>
+<span class="sd">        n_pi:         number of pi-pulses</span>
+<span class="sd">        pulse_shape:  shape of the pulses (i.e. square, gauss, ...)</span>
+<span class="sd">        amplitude:    relative ampitude of the sequence</span>
+<span class="sd">        iq_frequency: IQ-frequency for heterodyne mixing. If iq_frequency is None, the sample.iq_frequency is used.</span>
+<span class="sd">                      If iq_frequency is 0 homodyne mixing is employed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Sequence object for spinecho measurement</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">iq_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s2">&quot;iq_frequency&quot;</span><span class="p">):</span>
+            <span class="n">iq_frequency</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">iq_frequency</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;IQ-frequency set to </span><span class="si">{:.0f}</span><span class="s2"> MHz.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iq_frequency</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">iq_frequency</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Sample has no attribute iq_frequency.</span><span class="se">\n</span><span class="s2"> IQ-frequency set to 0 for homodyne mixing.&quot;</span><span class="p">)</span>
+    <span class="n">pi_pulse</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Pulse</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">tpi</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">pulse_shape</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pi&quot;</span><span class="p">,</span>
+                        <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="n">iq_frequency</span><span class="p">)</span>
+    <span class="n">pi2_pulse</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Pulse</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">tpi2</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">pulse_shape</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pi/2&quot;</span><span class="p">,</span>
+                         <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="n">iq_frequency</span><span class="p">)</span>
+
+    <span class="n">sequence</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PulseSequence</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_pi</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sequence</span><span class="o">.</span><span class="n">add_wait</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sequence</span><span class="o">.</span><span class="n">add_wait</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n_pi</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_pi</span><span class="p">):</span>
+            <span class="n">sequence</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pi_pulse</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">!=</span> <span class="n">n_pi</span><span class="p">:</span>
+                <span class="n">sequence</span><span class="o">.</span><span class="n">add_wait</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="o">/</span><span class="n">n_pi</span><span class="p">)</span>
+        <span class="n">sequence</span><span class="o">.</span><span class="n">add_wait</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n_pi</span><span class="p">))</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add_readout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sequence</span></div>
+
+
+<div class="viewcode-block" id="spinlocking"><a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.sequence_library.spinlocking">[docs]</a><span class="k">def</span> <span class="nf">spinlocking</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">pi2sign</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">add_pi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">wait_time</span><span class="o">=</span><span class="mf">5e-9</span><span class="p">,</span> <span class="n">pulse_shape</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">ShapeLib</span><span class="o">.</span><span class="n">rect</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate sequence with two pi/2 pulses (around y-axis) at the ends and a drive in-between.</span>
+<span class="sd">    The drive is phase shifted by 90 degrees in respect to the pi/2 pulses (rotates around x-axis).</span>
+<span class="sd">    Furthermore a pi-pulse (around x-axis) may be added (True by default) before as well as after the drive.</span>
+<span class="sd">    This reduces the susceptibility to low frequency oscillations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sample:       sample object</span>
+<span class="sd">        pi2sign:      sign of the first pi/2 pulse</span>
+<span class="sd">        add_pi:       if True an additional pi-pulse is added before and after the drive</span>
+<span class="sd">        wait_time:    wait time between pi/2 or pi-pulse and the drive</span>
+<span class="sd">        pulse_shape:  shape of the pi and pi/2 pulses (i.e. square, gauss, ...)</span>
+<span class="sd">        amplitude:    relative ampitude of the sequence</span>
+<span class="sd">        iq_frequency: IQ-frequency for heterodyne mixing. If iq_frequency is None, the sample.iq_frequency is used.</span>
+<span class="sd">                        If iq_frequency is 0 homodyne mixing is employed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Sequence object for spinecho measurement</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">iq_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s2">&quot;iq_frequency&quot;</span><span class="p">):</span>
+            <span class="n">iq_frequency</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">iq_frequency</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;IQ-frequency set to </span><span class="si">{:.0f}</span><span class="s2"> MHz.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iq_frequency</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">iq_frequency</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Sample has no attribute iq_frequency.</span><span class="se">\n</span><span class="s2"> IQ-frequency set to 0 for homodyne mixing.&quot;</span><span class="p">)</span>
+    <span class="c1"># check if pi/2-pulse needs to be flipped</span>
+    <span class="k">if</span> <span class="n">pi2sign</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="mi">270</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="mi">90</span>
+
+    <span class="c1"># define pulses</span>
+    <span class="n">pi_pulse</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Pulse</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">tpi</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">pulse_shape</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pi&quot;</span><span class="p">,</span>
+                        <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="n">iq_frequency</span><span class="p">)</span>
+    <span class="n">pi2_pulse1</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Pulse</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">tpi2</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">pulse_shape</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pi/2&quot;</span><span class="p">,</span>
+                          <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="n">iq_frequency</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="n">phase</span><span class="p">)</span>
+    <span class="n">pi2_pulse2</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Pulse</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">tpi2</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">pulse_shape</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pi/2(Y)&quot;</span><span class="p">,</span>
+                          <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="n">iq_frequency</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+    <span class="n">locking_tone</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Pulse</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">ShapeLib</span><span class="o">.</span><span class="n">rect</span><span class="p">,</span>
+                            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;locking-drive&quot;</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="n">iq_frequency</span><span class="p">)</span>
+
+    <span class="c1"># add pulses to sequence</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PulseSequence</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pi2_pulse1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">add_pi</span><span class="p">:</span>
+        <span class="n">sequence</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pi_pulse</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add_wait</span><span class="p">(</span><span class="n">wait_time</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">locking_tone</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add_wait</span><span class="p">(</span><span class="n">wait_time</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">add_pi</span><span class="p">:</span>
+        <span class="n">sequence</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pi_pulse</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pi2_pulse2</span><span class="p">)</span>
+    <span class="n">sequence</span><span class="o">.</span><span class="n">add_readout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sequence</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

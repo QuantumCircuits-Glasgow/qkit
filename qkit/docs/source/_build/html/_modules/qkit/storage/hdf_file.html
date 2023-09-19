@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.storage.hdf_file &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.storage.hdf_file</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.storage.hdf_file</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created 2015</span>
+
+<span class="sd">@author: H. Rotzinger, MP Pfirrmann, M Wildermuth</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">qkit</span>
+<span class="kn">from</span> <span class="nn">qkit.storage.hdf_constants</span> <span class="kn">import</span> <span class="n">ds_types</span>
+<span class="kn">from</span> <span class="nn">distutils.version</span> <span class="kn">import</span> <span class="n">LooseVersion</span>
+
+<span class="n">file_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="n">h5py</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="s2">&quot;3.5.0&quot;</span><span class="p">):</span> <span class="c1"># new file locking</span>
+    <span class="n">file_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">locking</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="n">h5py</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="s2">&quot;3.0.0&quot;</span><span class="p">):</span> <span class="c1"># intermediate</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Qkit HDF file handling: In h5py between 3.0 and 3.5, there are problems with file locking handling. Please update to h5py==3.5.0&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="H5_file"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_file.H5_file">[docs]</a><span class="k">class</span> <span class="nc">H5_file</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base hdf5 class intended for qkit.</span>
+<span class="sd">    </span>
+<span class="sd">    hdf5 based Data class as compatible as possible to the standard data class. </span>
+<span class="sd">    It is in many respects more restricted to the hdf5_data.py class, </span>
+<span class="sd">    it e.g. does only create one group in the HDF5 file, etc.</span>
+<span class="sd">    </span>
+<span class="sd">    The class itself contans only the interface to the hdf5 file and </span>
+<span class="sd">    can be used also standalone.</span>
+<span class="sd">    Here we again wrap the create_dataset() fctn and the append() fct does the</span>
+<span class="sd">    trick of placing added data in the correct position in the dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">output_file</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span><span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Inits the H5_file at the path &#39;output_file&#39; with the access mode</span>
+<span class="sd">        &#39;mode&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newfile</span> <span class="o">=</span> <span class="kc">False</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;qt-file&quot;</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;qkit&quot;</span><span class="p">,</span><span class="kc">None</span><span class="p">):</span>
+            <span class="s2">&quot;File existed before and was created by qkit.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_required_groups</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="s2">&quot;new file or none qkit file&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newfile</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_base_attributes</span><span class="p">()</span>
+        
+            <span class="c1"># set all standard attributes</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        
+<div class="viewcode-block" id="H5_file.create_file"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_file.H5_file.create_file">[docs]</a>    <span class="k">def</span> <span class="nf">create_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">output_file</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span><span class="o">**</span><span class="n">file_kwargs</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="H5_file.set_base_attributes"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_file.H5_file.set_base_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">set_base_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;stores some attributes and creates the default data group&quot;</span>
+        <span class="c1"># store version of the file format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;qkit&quot;</span><span class="p">,</span> <span class="s2">&quot;1.0&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>  <span class="c1"># qkit version</span>
+        <span class="c1"># make the structure compatible with the nexus format</span>
+        <span class="c1"># maybe some day the data can by analyzed by the software supporting nexus</span>
+        <span class="c1"># first the entry group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;NeXus_version&quot;</span><span class="p">,</span><span class="s2">&quot;4.3.0&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">require_group</span><span class="p">(</span><span class="s2">&quot;entry&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;NX_class&quot;</span><span class="p">,</span><span class="s2">&quot;NXentry&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;data_latest&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;analysis_latest&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;updating&quot;</span><span class="p">,</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># create a nexus data group        </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dgrp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">require_group</span><span class="p">(</span><span class="s2">&quot;data0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agrp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">require_group</span><span class="p">(</span><span class="s2">&quot;analysis0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vgrp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">require_group</span><span class="p">(</span><span class="s2">&quot;views&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dgrp</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;NX_class&quot;</span><span class="p">,</span><span class="s2">&quot;NXdata&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dgrp</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;NX_class&quot;</span><span class="p">,</span><span class="s2">&quot;NXdata&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+    
+<div class="viewcode-block" id="H5_file.setup_required_groups"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_file.H5_file.setup_required_groups">[docs]</a>    <span class="k">def</span> <span class="nf">setup_required_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># make the structure compatible with the nexus format</span>
+        <span class="c1"># maybe some day the data can by analyzed by the software supporting nexus</span>
+        <span class="c1"># first the entry group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">require_group</span><span class="p">(</span><span class="s2">&quot;entry&quot;</span><span class="p">)</span>
+        <span class="c1"># create a nexus data group        </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dgrp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">require_group</span><span class="p">(</span><span class="s2">&quot;data0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agrp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">require_group</span><span class="p">(</span><span class="s2">&quot;analysis0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vgrp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">require_group</span><span class="p">(</span><span class="s2">&quot;views&quot;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="H5_file.create_dataset"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_file.H5_file.create_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span> <span class="n">tracelength</span><span class="p">,</span> <span class="n">ds_type</span> <span class="o">=</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;vector&#39;</span><span class="p">],</span>
+                       <span class="n">folder</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dataset for one, two, and three dimensional data</span>
+<span class="sd">        </span>
+<span class="sd">            Args:</span>
+<span class="sd">                </span>
+<span class="sd">                &#39;tracelength&#39;</span>
+<span class="sd">            </span>
+<span class="sd">                &#39;dim&#39;</span>
+<span class="sd">                    is 1 for a single data point in a 1D scan (array of scalars)</span>
+<span class="sd">                    is the length of the first trace in 2D scan (array of vectors)</span>
+<span class="sd">                    For 2D scans the traces have to have the same tracelength</span>
+<span class="sd">                    and are simply appended to the trace array</span>
+<span class="sd">            </span>
+<span class="sd">                &#39;folder&#39; is a optional group relative to the default group</span>
+<span class="sd">            </span>
+<span class="sd">                &#39;kwargs&#39; are appended as attributes to the dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">=</span> <span class="n">ds_type</span>
+        
+        <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">shape</span>    <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span>
+            <span class="n">maxshape</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span>
+            <span class="n">chunks</span><span class="o">=</span><span class="kc">True</span>
+            
+        <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">shape</span>    <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">maxshape</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">tracelength</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">shape</span>    <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">maxshape</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">tracelength</span><span class="p">)</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Create datasets: &#39;</span><span class="si">%s</span><span class="s2">&#39; is wrong number of dims.&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+
+        <span class="k">if</span> <span class="n">folder</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dgrp</span>
+        <span class="k">elif</span> <span class="n">folder</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agrp</span>
+        <span class="k">elif</span> <span class="n">folder</span> <span class="o">==</span> <span class="s2">&quot;views&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vgrp</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;please specify either: folder = &#39;data&#39; , folder = &#39;analysis&#39; or folder =&#39;view&#39; &quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+            
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Item &#39;</span><span class="si">%s</span><span class="s2">&#39; already exists in data set.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="c1">#return False        </span>
+            
+        <span class="c1"># by default we create float datasets        </span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span><span class="s1">&#39;f&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># we store text as unicode; this seems somewhat non-standard for hdf</span>
+        <span class="k">if</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;txt&#39;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">dtype</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">special_dtype</span><span class="p">(</span><span class="n">vlen</span><span class="o">=</span><span class="n">unicode</span><span class="p">)</span> <span class="c1"># python 2</span>
+            <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+                <span class="n">dtype</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">special_dtype</span><span class="p">(</span><span class="n">vlen</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span> <span class="c1"># python 3</span>
+        <span class="c1">#create the dataset ...;  delete it first if it exists, unless it is data</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> 
+            <span class="k">if</span> <span class="n">folder</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Dataset &#39;</span><span class="si">%s</span><span class="s2">&#39; in &#39;data&#39; already exists. Cannot overwrite datasets in &#39;data&#39;!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="c1"># comment: The above line does remove the reference to the dataset but does not free the space aquired</span>
+                <span class="c1"># fixme if possible ...</span>
+                
+        <span class="k">if</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;txt&#39;</span><span class="p">]:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">maxshape</span><span class="o">=</span><span class="n">maxshape</span><span class="p">,</span> <span class="n">chunks</span> <span class="o">=</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grp</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">maxshape</span><span class="o">=</span><span class="n">maxshape</span><span class="p">,</span> <span class="n">chunks</span> <span class="o">=</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">fillvalue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        
+        <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span><span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;ds_type&quot;</span><span class="p">,</span> <span class="n">ds_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;matrix&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;box&#39;</span><span class="p">]:</span>
+            <span class="c1">## fill value only needed for &gt;1D datasets</span>
+            <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># add attibutes</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+             <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">a</span><span class="p">,(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">a</span><span class="p">])</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+             
+        <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ds</span></div>
+        
+<div class="viewcode-block" id="H5_file.append"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_file.H5_file.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ds</span><span class="p">,</span><span class="n">data</span><span class="p">,</span> <span class="n">next_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pointwise</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Method for appending hdf5 data. </span>
+<span class="sd">        </span>
+<span class="sd">        A simple append method for data traces.</span>
+<span class="sd">        Reshapes the array and updates the attributes.</span>
+<span class="sd">        The optional &#39;next_matrix&#39; atrribute arranges the incoming data in a </span>
+<span class="sd">        value_box correctly.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            hdf_dataset &#39;ds&#39;</span>
+<span class="sd">            numpy array &#39;data&#39;</span>
+<span class="sd">            boolean &#39;next_matrix&#39;</span>
+<span class="sd">            pointwise (Boolean): if True, the data is appended pointwise, i.e. to the innermost dimension</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The function operates on the given variables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># it gets a little ugly with all the different user-cases here ...</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1">## 1dim dataset (text, coordinate, vector)</span>
+            <span class="c1">## multiple inputs: text, scalar (not needed?), list/np.array with one or multiple entries</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;txt&#39;</span><span class="p">]:</span>
+                <span class="c1">## text</span>
+                <span class="n">dim1</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+                <span class="n">ds</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">dim1</span><span class="p">,))</span>
+                <span class="n">ds</span><span class="p">[</span><span class="n">dim1</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                ## This should not be needed anymore as there are non-user typecasts to np arrays before calling this fct.</span>
+<span class="sd">                elif len(data.shape) == 0:              </span>
+<span class="sd">                    ## scalar input; this is more or less useless, all non-text data gets cast</span>
+<span class="sd">                    ## into np.array prior to calling this function.</span>
+<span class="sd">                    dim1 = ds.shape[0]+1</span>
+<span class="sd">                    fill[0] += 1</span>
+<span class="sd">                    ds.resize((dim1,))</span>
+<span class="sd">                    ds[fill[0]-1] = data</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1">## np array (or list)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>                  
+                    <span class="c1">## single entry</span>
+                    <span class="n">dim1</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+                    <span class="n">ds</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">dim1</span><span class="p">,))</span>
+                    <span class="n">ds</span><span class="p">[</span><span class="n">dim1</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+                <span class="k">else</span><span class="p">:</span>                               
+                    <span class="c1">## list of entries               </span>
+                    <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+                        <span class="c1">## here the data gets not appended but overwritten!</span>
+                        <span class="n">ds</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),))</span>
+                        <span class="n">ds</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1">## data append</span>
+                        <span class="n">dim1</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> 
+                        <span class="n">ds</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">dim1</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),))</span>
+                        <span class="n">ds</span><span class="p">[</span><span class="n">dim1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>       
+            <span class="c1">## 2 dim dataset: matrix</span>
+            <span class="c1">## multiple inputs: list/np.array with one or multiple entries</span>
+            <span class="n">fill</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fill&#39;</span><span class="p">)</span>
+            <span class="n">dim1</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">pointwise</span><span class="p">:</span>
+                <span class="n">dim0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="c1">## single entry; sorting like in the &#39;len(ds.shape) == 3&#39; case</span>
+                <span class="k">if</span> <span class="n">next_matrix</span><span class="p">:</span>
+                    <span class="n">dim0</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">fill</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">fill</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">dim0</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># very first slice</span>
+                    <span class="n">fill</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">dim1</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">ds</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">dim0</span><span class="p">,</span><span class="n">dim1</span><span class="p">))</span>
+                <span class="n">fill</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">ds</span><span class="p">[</span><span class="n">fill</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">fill</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="c1">## list of entries, sort the data &#39;slice by slice&#39;</span>
+                <span class="n">dim0</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">fill</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+                    <span class="n">ds</span><span class="p">[</span><span class="n">dim0</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">data</span>  <span class="c1"># reset overwrites last data series (last row matrix)</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># standard reset = False</span>
+                    <span class="n">fill</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">ds</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">dim0</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+                    <span class="n">ds</span><span class="p">[</span><span class="n">dim0</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">modify</span><span class="p">(</span><span class="s1">&#39;fill&#39;</span><span class="p">,</span> <span class="n">fill</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>      
+            <span class="c1">## 3 dim dataset: box</span>
+            <span class="c1">## input: np.array with multiple entries</span>
+            <span class="n">dim0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">dim1</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">fill</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fill&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">next_matrix</span><span class="p">:</span>
+                <span class="n">dim0</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">fill</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">fill</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">dim0</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">fill</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">dim1</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+                <span class="n">ds</span><span class="p">[</span><span class="n">fill</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">fill</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>  <span class="c1"># reset overwrites last data series</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># standard reset = False</span>
+                <span class="n">ds</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">dim0</span><span class="p">,</span><span class="n">dim1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+                <span class="n">fill</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">ds</span><span class="p">[</span><span class="n">fill</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">fill</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">modify</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span> <span class="n">fill</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="H5_file.flush"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_file.H5_file.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="H5_file.close_file"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_file.H5_file.close_file">[docs]</a>    <span class="k">def</span> <span class="nf">close_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># delegate close</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">newfile</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;updating&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="n">s</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

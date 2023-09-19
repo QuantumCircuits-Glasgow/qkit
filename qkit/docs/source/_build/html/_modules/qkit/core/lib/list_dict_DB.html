@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.core.lib.list_dict_DB &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.core.lib.list_dict_DB</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.core.lib.list_dict_DB</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="c1">#Copyright (c) 2017 Justin Winokur</span>
+<span class="c1">#</span>
+<span class="c1">#Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1">#of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1">#in the Software without restriction, including without limitation the rights</span>
+<span class="c1">#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1">#copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1">#furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1">#The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1">#copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1">#THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1">#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1">#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1">#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1">#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1">#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1">#SOFTWARE.</span>
+<span class="c1"># HR: imported into qkit 28.1.2018 from </span>
+<span class="c1"># https://github.com/Jwink3101/list_dict_DB</span>
+<span class="c1">#</span>
+<span class="c1"># (pip install list_dict_DB is also possible)</span>
+
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">types</span>
+
+<div class="viewcode-block" id="list_dict_DB"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB">[docs]</a><span class="k">class</span> <span class="nc">list_dict_DB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">items</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">default_attribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  \
+                    <span class="n">exclude_attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                              \
+                    <span class="n">allowMultipleEdit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">alwaysReturnList</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>        \
+                    <span class="n">indexObjects</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a multi-item DB from a list of dictionaries that may be</span>
+<span class="sd">        queried by any specified attribute.</span>
+
+<span class="sd">        This is useful since, once created, lookup/query/&quot;in&quot; checks are</span>
+<span class="sd">        O(1), Creation is still O(N)</span>
+
+<span class="sd">        Note: Unless an entry is changed with update(), it must be reindexed</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        items  [ *empty* ] (list)</span>
+<span class="sd">            List of dictionaries with each attribute</span>
+<span class="sd">        </span>
+<span class="sd">        attributes [None] (list, None)</span>
+<span class="sd">            Either a list of attributes to index, or if specified as None</span>
+<span class="sd">            (default) it will add every attribute of every item and assign </span>
+<span class="sd">            missing ones to be `default_attribute` (unless excluded)</span>
+<span class="sd">        </span>
+<span class="sd">            NOTE: If attributes is set, you may still add items with extra</span>
+<span class="sd">                  attributes. They just won&#39;t be indexed. </span>
+<span class="sd">                  Or use add_attribute()</span>
+<span class="sd">        </span>
+<span class="sd">        exclude_attributes [ *empty* ] (list)</span>
+<span class="sd">            Attributes that shouldn&#39;t ever be added even if attributes=None </span>
+<span class="sd">            for dynamic addition of attributes.</span>
+<span class="sd">        </span>
+<span class="sd">        default_attribute [None] (*any*)</span>
+<span class="sd">            Default attribute to assign if `attributes=None` and it is missing.</span>
+<span class="sd">            If the specified object is callable, it will call it (for example,</span>
+<span class="sd">            `default_attribute=list` will make it an empty list), Otherwise,</span>
+<span class="sd">            it will set it to whatever value is specified.</span>
+<span class="sd">        </span>
+<span class="sd">        Options: (These may be changed later too)</span>
+<span class="sd">        --------</span>
+<span class="sd">        </span>
+<span class="sd">        allowMultipleEdit [False] (bool)</span>
+<span class="sd">            Allows the remove() method to delete multiple items and and </span>
+<span class="sd">            update() method to update multiple items</span>
+<span class="sd">        </span>
+<span class="sd">        alwaysReturnList [True] (bool)</span>
+<span class="sd">            If set to True, will always return a list</span>
+<span class="sd">        </span>
+<span class="sd">        indexObjects: [False]</span>
+<span class="sd">            If True, will automatically take any object and use its</span>
+<span class="sd">            __dict__ as the dict. </span>
+<span class="sd">            </span>
+<span class="sd">            Note </span>
+<span class="sd">                * Changing to False after adding an object will cause issues.</span>
+<span class="sd">                * Does not support __slots__ since they are immutable</span>
+<span class="sd">            </span>
+
+<span class="sd">        Additional Opperations:</span>
+<span class="sd">        ----------------------</span>
+
+<span class="sd">        This supports index-lookup with a dictionary as well as</span>
+<span class="sd">        a python `in` check and lookup by a dictionary</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">            see list_dict_DB.print_example()</span>
+
+<span class="sd">        Tips:</span>
+<span class="sd">        ------</span>
+
+<span class="sd">            * You can simply dump the DB with JSON using the DB.items()</span>
+<span class="sd">              and then reload it with a new DB</span>
+<span class="sd">            </span>
+<span class="sd">            * There is also an attribute called `_index` which can be used to</span>
+<span class="sd">              query by index.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1"># Handle inputs</span>
+        <span class="k">if</span> <span class="n">items</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">exclude_attributes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">exclude_attributes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowMultipleEdit</span> <span class="o">=</span> <span class="n">allowMultipleEdit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alwaysReturnList</span> <span class="o">=</span> <span class="n">alwaysReturnList</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">indexObjects</span> <span class="o">=</span> <span class="n">indexObjects</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">attributes</span> <span class="c1"># Will be reset in first add        </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_attr_None</span> <span class="o">=</span> <span class="n">attributes</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_attribute</span> <span class="o">=</span> <span class="n">default_attribute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exclude_attributes</span> <span class="o">=</span> <span class="n">exclude_attributes</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Will keep track</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_empty</span> <span class="o">=</span> <span class="n">_emptyList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ix</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="c1"># Add the items</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_i</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Counter for iterator if not called with iteritems</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    
+        <span class="c1"># Edge case: No items</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">[]</span>
+        
+<div class="viewcode-block" id="list_dict_DB.add"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an item or items to the DB</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,(</span><span class="nb">list</span><span class="p">,</span><span class="nb">tuple</span><span class="p">,</span><span class="n">types</span><span class="o">.</span><span class="n">GeneratorType</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="c1"># handle other object types</span>
+        <span class="n">item0</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span>
+            <span class="k">if</span> <span class="n">attributes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">attributes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span><span class="n">attrib</span> <span class="k">for</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="n">attributes</span> \
+                                <span class="k">if</span> <span class="n">attrib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_attributes</span><span class="p">]</span> <span class="c1"># Make a copy</span>
+            
+
+            <span class="c1"># Set up the lookup</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="n">attribute</span><span class="p">:</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span> <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">}</span>
+        
+        <span class="n">ix</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">)</span> <span class="c1"># The length will be 1+ the last ix so do not change this</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_attr_None</span><span class="p">:</span> <span class="c1"># Set to None which means we add all</span>
+            <span class="k">for</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_attributes</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">attrib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">default_attribute</span><span class="p">)</span>
+        <span class="c1"># Add built in ones</span>
+        <span class="k">for</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attrib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_attribute</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">):</span>
+                    <span class="n">item</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_attribute</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">item</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_attribute</span>
+                    
+            <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_append</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">ix</span><span class="p">)</span>
+
+        <span class="c1"># Finally add it</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ix</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="list_dict_DB.query"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">A</span><span class="p">,</span><span class="o">**</span><span class="n">K</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Query the value for attribute. Will always return a</span>
+<span class="sd">        single item if only one matches, otherwise it will return a list.</span>
+
+<span class="sd">        Tip: If you ALWAYS want a list, do:</span>
+<span class="sd">            list(DB.query(...))</span>
+<span class="sd">        </span>
+<span class="sd">        Usage</span>
+<span class="sd">        -----     </span>
+<span class="sd">        </span>
+<span class="sd">        Any combination of the following will works</span>
+<span class="sd">        </span>
+<span class="sd">        Keywords: Only check equality</span>
+<span class="sd">                   </span>
+<span class="sd">        &gt;&gt;&gt; DB.query(attrib=val)               </span>
+<span class="sd">        &gt;&gt;&gt; DB.query(attrib1=val1,attrib2=val2)  # Match both</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; DB.query({&#39;attrib&#39;:val})                  </span>
+<span class="sd">        &gt;&gt;&gt; DB.query({&#39;attrib1&#39;:val1,&#39;attrib2&#39;:val2}) # Match Both</span>
+<span class="sd">                                      </span>
+<span class="sd">        Query Objects (DB.Q, DB.Qobj)</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; Q = DB.Q() # Load Qobj from list_dict_DB</span>
+<span class="sd">        &gt;&gt;&gt; DB.query(DQ.attrib == val)            </span>
+<span class="sd">        &gt;&gt;&gt; DB.query( (Q.attrib1 == val1) &amp;  (Q.attrib1 == val2) )  # Parentheses are important!</span>
+<span class="sd">        &gt;&gt;&gt; DB.query( (Q.attrib1 == val1) &amp;  (Q.attrib1 != val2))</span>
+<span class="sd">                                   </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ixs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span><span class="p">(</span><span class="o">*</span><span class="n">A</span><span class="p">,</span><span class="o">**</span><span class="n">K</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ixs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">alwaysReturnList</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">ixs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="n">ixs</span><span class="p">]</span></div>
+        
+
+<div class="viewcode-block" id="list_dict_DB.isin"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.isin">[docs]</a>    <span class="k">def</span> <span class="nf">isin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">A</span><span class="p">,</span><span class="o">**</span><span class="n">K</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if there is at least one item that matches the given query</span>
+<span class="sd">        </span>
+<span class="sd">        see query() for usage</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span><span class="p">(</span><span class="o">*</span><span class="n">A</span><span class="p">,</span><span class="o">**</span><span class="n">K</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">0</span></div>
+
+<div class="viewcode-block" id="list_dict_DB.reindex"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.reindex">[docs]</a>    <span class="k">def</span> <span class="nf">reindex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reindex the dictionary for specified attributes (or all)</span>
+<span class="sd">        </span>
+<span class="sd">        Usage</span>
+<span class="sd">        -----</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; DB.reindex()                # All</span>
+<span class="sd">        &gt;&gt;&gt; DB.reindex(&#39;attrib&#39;)        # Reindex &#39;attrib&#39;</span>
+<span class="sd">        &gt;&gt;&gt; DB.reindex(&#39;attrib1&#39;,&#39;attrib2&#39;) # Multiple</span>
+<span class="sd">        </span>
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">            update() method which does not require reindexing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span>
+            
+            <span class="c1"># Just an extra check (and makes a copy)</span>
+            <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span><span class="n">attr</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes</span> \
+                        <span class="k">if</span> <span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_attributes</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">attributes</span> <span class="o">=</span> <span class="n">args</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_attributes</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot reindex an excluded attribute&#39;</span><span class="p">)</span> 
+
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span> <span class="c1"># Reset</span>
+        
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_append</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">ix</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="list_dict_DB.update"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">queryKWs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update an entry without needing to reindex the DB (or a specific </span>
+<span class="sd">        attribute)</span>
+<span class="sd">        </span>
+<span class="sd">        Usage:</span>
+<span class="sd">        ------</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; DB.update(updated_dict, query_dict_or_Qobj, query_attrib1=val1,...)</span>
+<span class="sd">        &gt;&gt;&gt; DB.update(updated_dict, query_attrib1=val1,...)</span>
+<span class="sd">        </span>
+<span class="sd">        Inputs:</span>
+<span class="sd">        -------</span>
+<span class="sd">        </span>
+<span class="sd">        updated_dict : Dictionary with which to update the entry. This is</span>
+<span class="sd">                       done using the typical dict().update() construct to</span>
+<span class="sd">                       overwrite it</span>
+<span class="sd">        </span>
+<span class="sd">        query_dict_or_Qobj   </span>
+<span class="sd">                     : Either the dictionary used in the query or a Qobj that </span>
+<span class="sd">                       defines a more advanced query</span>
+<span class="sd">        </span>
+<span class="sd">        query_attrib1=val1</span>
+<span class="sd">                     : Additional (or sole) query attributes</span>
+<span class="sd">    </span>
+<span class="sd">        DB Options:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        This is set at instantiation but can be changed &#39;DB&#39; is the list_dict_DB</span>
+
+<span class="sd">        DB.allowMultipleEdit</span>
+<span class="sd">                        - If True, will update multiple items</span>
+<span class="sd">    </span>
+<span class="sd">        Notes:</span>
+<span class="sd">        ------</span>
+<span class="sd">            * Updating an item requires a deletion in a list that has length n </span>
+<span class="sd">              equal to the number of items matching an attribute. This is O(n).</span>
+<span class="sd">              However changing the entry directly and reindexing is O(N) where</span>
+<span class="sd">              N is the size of the DB. If many items are changing and you do not</span>
+<span class="sd">              need to query them in between, it *may* be faster to directly</span>
+<span class="sd">              update the item and reindex</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">updated_dict</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">updated_dict</span><span class="p">,</span><span class="n">query</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incorrect number of inputs. See documentation&#39;</span><span class="p">)</span>
+        
+        <span class="n">updated_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">updated_dict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">updated_dict</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Must specify updated values as a dictionary&#39;</span><span class="p">)</span>
+        
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query</span><span class="p">,</span><span class="n">Qobj</span><span class="p">):</span>
+            <span class="n">ixs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span><span class="p">(</span><span class="n">query</span><span class="p">,</span><span class="o">**</span><span class="n">queryKWs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+            <span class="n">queryKWs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="n">ixs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span><span class="p">(</span><span class="o">**</span><span class="n">queryKWs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized query </span><span class="si">{:s}</span><span class="s1">. Must be a dict or Qobj&#39;</span><span class="p">,</span><span class="nb">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">query</span><span class="p">)))</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ixs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Query did not match any results&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ixs</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowMultipleEdit</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Query returned multiple results. Set &#39;allowMultipleEdit&#39; or change query&quot;</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="n">ixs</span><span class="p">:</span>
+            <span class="c1"># Get original item</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            
+            <span class="c1"># Allow the update to also include non DB attributes.</span>
+            <span class="c1"># The intersection will eliminate any exclude_attributes</span>
+            <span class="n">attributes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">updated_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">)</span>
+            
+            <span class="k">for</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span> <span class="c1"># Only loop over the updated attribs</span>
+                <span class="c1"># get old value</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span>
+                
+                <span class="c1"># Remove any ix matching it</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_remove</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">ix</span><span class="p">)</span>
+                
+                <span class="c1"># Get new value</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">updated_dict</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span>
+                
+                <span class="c1"># Add ix to any new value</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_append</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">ix</span><span class="p">)</span>
+                
+            <span class="c1"># Update the item</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">updated_dict</span><span class="p">)</span>
+        
+        <span class="k">return</span></div>
+        
+        
+        
+<div class="viewcode-block" id="list_dict_DB.add_attribute"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.add_attribute">[docs]</a>    <span class="k">def</span> <span class="nf">add_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attribute</span><span class="p">,</span><span class="o">*</span><span class="n">default</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an attribute to the index attributes.</span>
+
+<span class="sd">        Usage</span>
+<span class="sd">        -----</span>
+<span class="sd">        &gt;&gt;&gt; DB.add_attribute(&#39;new_attrib&#39;) # Will raise an error if *any*</span>
+<span class="sd">                                           # items don&#39;t have &#39;new_attrib&#39;</span>
+<span class="sd">        &gt;&gt;&gt; DB.add_attribute(&#39;new_attrib&#39;,default)</span>
+<span class="sd">                                           # Set any missing to the default</span>
+<span class="sd">        </span>
+<span class="sd">        If the `default` is callable, it will call it instead. (such as `list`</span>
+<span class="sd">        to add an empty list)</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_attributes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t add exclude_attributes&quot;</span><span class="p">)</span>
+        
+        <span class="n">attrib</span> <span class="o">=</span> <span class="n">attribute</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;_lookup&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+        <span class="n">set_default</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">default</span><span class="p">)</span> <span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">set_default</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="n">default</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_append</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">ix</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">KE</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">set_default</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">):</span>
+                        <span class="n">item</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">default</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">item</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">default</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Attribute </span><span class="si">{:s}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attrib</span><span class="p">))</span>
+
+                <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_append</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">ix</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="list_dict_DB.remove"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">A</span><span class="p">,</span><span class="o">**</span><span class="n">K</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove item that matches a given attribute or dict. See query() for</span>
+<span class="sd">        input specification</span>
+
+
+<span class="sd">        DB Options:</span>
+<span class="sd">        This is set at instantiation but can be changed directly</span>
+<span class="sd">        -----------</span>
+<span class="sd">        </span>
+<span class="sd">        DB.allowMultipleEdit</span>
+<span class="sd">                        - If True, this can remove multiple matching items</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ixs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span><span class="p">(</span><span class="o">*</span><span class="n">A</span><span class="p">,</span><span class="o">**</span><span class="n">K</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ixs</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowMultipleEdit</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Query returned multiple results. Set &#39;allowMultipleEdit&#39; or change query&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ixs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No matching items&#39;</span><span class="p">)</span>
+
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">ixs</span><span class="p">):</span> <span class="c1"># Must remove it from everything.</span>
+            <span class="c1"># not sure what is happening, but it seems that I need to make a copy</span>
+            <span class="c1"># since Python is doing something strange here...</span>
+
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_remove</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">ix</span><span class="p">)</span>
+                
+            <span class="c1"># Remove it from the list by setting to None. Do not reshuffle</span>
+            <span class="c1"># the indices. A None check will be performed elsewhere</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ix</span><span class="o">.</span><span class="n">difference_update</span><span class="p">([</span><span class="n">ix</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">-=</span> <span class="mi">1</span></div>
+    
+<div class="viewcode-block" id="list_dict_DB.items"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of items.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="list_dict_DB.iteritems"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.iteritems">[docs]</a>    <span class="k">def</span> <span class="nf">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return an iterator over the items.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="list_dict_DB.Qobj"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.Qobj">[docs]</a>    <span class="k">def</span> <span class="nf">Qobj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Query object already loaded with the DB</span>
+<span class="sd">        </span>
+<span class="sd">            DB.Qobj() &lt;==&gt; DB.Qobj() &lt;==&gt; Qobj(DB)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Qobj</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> </div>
+    
+<div class="viewcode-block" id="list_dict_DB.Q"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.Q">[docs]</a>    <span class="k">def</span> <span class="nf">Q</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        same as Qobj method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Qobj</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+    
+    <span class="k">def</span> <span class="nf">_convert2dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Convert objects to a regular dictionary for the sake of indexing</span>
+<span class="sd">        </span>
+<span class="sd">        Also return Qobjs untouched since they may be used in queries too</span>
+<span class="sd">        </span>
+<span class="sd">        If it not an Qobj or dict, it will try to get it&#39;s __dict__ and if </span>
+<span class="sd">        that doesn&#39;t work, will just return it</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="n">Qobj</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">obj</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span> <span class="c1"># Also accounts for OrderedDicts or ...</span>
+            <span class="k">return</span> <span class="n">obj</span>           <span class="c1"># ... anything that inherits dict</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexObjects</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="s1">&#39;__dict__&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span>
+            
+        <span class="k">return</span> <span class="n">obj</span>
+        
+    
+    <span class="k">def</span> <span class="nf">_ixs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwords</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the inde(x/ies) of matching information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;_lookup&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="c1"># It may be empty</span>
+            <span class="k">return</span> <span class="p">[]</span>
+ 
+        <span class="c1"># Make the entire kwords be lists with default of []. Edge case of</span>
+        <span class="c1"># multiple items</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">kwords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span>
+                <span class="n">kwords</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">]</span>
+        <span class="n">kwords</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span><span class="n">kwords</span><span class="p">)</span>
+        
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">Qobj</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="c1"># Empty object</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1"># handle other object types</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span><span class="n">Qobj</span><span class="p">):</span>
+                <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span> <span class="o">&amp;</span> <span class="n">arg</span> <span class="c1"># Will add these conditions. If Q is empty, will just be arg</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">items</span><span class="p">():</span> <span class="c1"># Add it rather than update in case it is already specified</span>
+                    <span class="n">kwords</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unrecognized input of type </span><span class="si">{:s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">))))</span>
+        
+        <span class="c1"># Construct a query for kwords</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">kwords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_empty</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">_makelist</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="n">Qtmp</span> <span class="o">=</span> <span class="n">Qobj</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">Qtmp</span><span class="o">.</span><span class="n">_attr</span> <span class="o">=</span> <span class="n">key</span>
+                <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Qtmp</span> <span class="o">==</span> <span class="n">val</span><span class="p">)</span>
+
+        <span class="n">ixs</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">_ixs</span>
+        <span class="c1"># Ensure one match</span>
+        <span class="k">if</span> <span class="n">ixs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="n">ixs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">ixs</span><span class="p">)</span>        
+        
+    
+    <span class="k">def</span> <span class="nf">_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return ix if it hasn&#39;t been deleted</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        
+        <span class="k">return</span> <span class="p">[</span><span class="n">ix</span><span class="p">]</span>
+    
+    <span class="k">def</span> <span class="nf">_append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attrib</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">ix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add to the lookup and update the modify time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Final check but we should be guarded from this</span>
+        <span class="k">if</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_attributes</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;BAD! Should guard against this in public methods!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot reindex an excluded attribute&#39;</span><span class="p">)</span> 
+        
+        <span class="n">valueL</span> <span class="o">=</span> <span class="n">_makelist</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">valueL</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span><span class="p">[</span><span class="n">attrib</span><span class="p">][</span><span class="n">val</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valueL</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span><span class="p">[</span><span class="n">attrib</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">_empty</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span> <span class="c1"># empty list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attrib</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">ix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove from the lookup and update the modify time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">valueL</span> <span class="o">=</span> <span class="n">_makelist</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">valueL</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span><span class="p">[</span><span class="n">attrib</span><span class="p">][</span><span class="n">val</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valueL</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span><span class="p">[</span><span class="n">attrib</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">_empty</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span> <span class="c1"># empty list</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">check_diff</span><span class="p">):</span>
+        <span class="n">check_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">check_diff</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">check_diff</span><span class="p">,</span><span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">check_diff</span><span class="p">,</span><span class="n">Qobj</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Python `in` queries should be a of {attribute:value} or Qobj&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">check_diff</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">item</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span><span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span><span class="n">Qobj</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span><span class="nb">int</span><span class="p">):</span> <span class="c1"># numbered item</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Index has been deleted&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must specify DB[{&#39;attribute&#39;:val}] or DB[index]&#39;&quot;</span><span class="p">)</span>
+    <span class="fm">__call__</span> <span class="o">=</span> <span class="n">query</span>
+    
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_i</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># Increment it but then search back</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
+    <span class="nb">next</span> <span class="o">=</span> <span class="fm">__next__</span> <span class="c1"># For compatability</span></div>
+    
+    
+<span class="k">def</span> <span class="nf">_makelist</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">input</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">input</span><span class="p">]</span> 
+
+<span class="k">class</span> <span class="nc">_emptyList</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">9999999999999</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span><span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> 
+        
+<div class="viewcode-block" id="Qobj"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.Qobj">[docs]</a><span class="k">class</span> <span class="nc">Qobj</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Query objects. This is a bit wonky. </span>
+<span class="sd">    </span>
+<span class="sd">    Calling </span>
+<span class="sd">        * Q.attribute sets attribute</span>
+<span class="sd">        * Q.attribute == val (or any other comparison) set the index of elements</span>
+<span class="sd">        * Q1 &amp; Q1 or other boolean perform set operations</span>
+<span class="sd">        </span>
+<span class="sd">    Useful Methods:</span>
+<span class="sd">        _filter : (or just `filter` if not an attribute): Apply a filter</span>
+<span class="sd">                  to the DB</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">DB</span><span class="p">,</span><span class="n">ixs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">attr</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span> <span class="o">=</span> <span class="n">DB</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">=</span> <span class="n">ixs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attr</span> <span class="o">=</span> <span class="n">attr</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        
+    
+    <span class="k">def</span> <span class="nf">_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_time</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This query object is out of date from the DB. Create a new one&#39;</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filter_func</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        If &#39;filter&#39; is NOT an attribute of the DB, this can be called </span>
+<span class="sd">        with &#39;filter&#39; instead of &#39;_filter&#39;</span>
+<span class="sd">        </span>
+<span class="sd">        Apply a filter to the data that returns True if it matches and False </span>
+<span class="sd">        otherwise</span>
+<span class="sd">        </span>
+<span class="sd">        Note that filters are O(N)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span><span class="p">()</span> <span class="c1"># Actually, these would still work but still check</span>
+        <span class="n">ixs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span> <span class="c1"># loop all</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">filter_func</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+                <span class="n">ixs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">=</span> <span class="n">ixs</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+         
+            
+    <span class="c1"># Comparisons   </span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">N</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+        <span class="n">first_set</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">_makelist</span><span class="p">(</span><span class="n">value</span><span class="p">):</span> <span class="c1"># Account for list inputs</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attr</span> <span class="o">==</span> <span class="s1">&#39;_index&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">first_set</span><span class="p">:</span>
+                    <span class="n">ixs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_index</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+                    <span class="n">first_set</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ixs</span> <span class="o">=</span> <span class="n">ixs</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_index</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">attributes</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">{:s}</span><span class="s2">&#39; is not an attribute&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attr</span><span class="p">))</span>
+                
+            <span class="n">ixs_at</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_lookup</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_attr</span><span class="p">][</span><span class="n">val</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">first_set</span><span class="p">:</span>
+                <span class="n">ixs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ixs_at</span><span class="p">)</span>
+                <span class="n">first_set</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ixs</span> <span class="o">=</span> <span class="n">ixs</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ixs_at</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">=</span> <span class="n">ixs</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+     
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_ix</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">_ixs</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span><span class="p">()</span> <span class="c1"># Actually, these would still work but still check</span>
+        <span class="n">ixs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span> <span class="c1"># loop all</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> 
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">ival</span> <span class="ow">in</span> <span class="n">_makelist</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_attr</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">ival</span> <span class="o">&lt;</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">ixs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">=</span> <span class="n">ixs</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span><span class="p">()</span> <span class="c1"># Actually, these would still work but still check</span>
+        <span class="n">ixs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span> <span class="c1"># loop all</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_attr</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">ixs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">=</span> <span class="n">ixs</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span><span class="p">()</span> <span class="c1"># Actually, these would still work but still check</span>
+        <span class="n">ixs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span> <span class="c1"># loop all</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_attr</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">ixs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">=</span> <span class="n">ixs</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="fm">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span><span class="p">()</span> <span class="c1"># Actually, these would still work but still check</span>
+        <span class="n">ixs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_list</span><span class="p">):</span> <span class="c1"># loop all</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_convert2dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_attr</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">ixs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">=</span> <span class="n">ixs</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="c1"># Logic</span>
+    <span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Q2</span><span class="p">):</span>               
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># An empty object and another will just return other</span>
+            <span class="k">return</span> <span class="n">Q2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span><span class="o">.</span><span class="n">intersection_update</span><span class="p">(</span><span class="n">Q2</span><span class="o">.</span><span class="n">_ixs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Q2</span><span class="p">):</span>               
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">Q2</span><span class="o">.</span><span class="n">_ixs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">_ix</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s1">&#39;filter&#39;</span> <span class="ow">and</span> <span class="s1">&#39;filter&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="o">.</span><span class="n">attributes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attr</span> <span class="o">=</span> <span class="n">attr</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="Qobj.copy"><a class="viewcode-back" href="../../../../qkit.core.lib.html#qkit.core.lib.list_dict_DB.Qobj.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">Qobj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DB</span><span class="p">,</span><span class="n">ixs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ixs</span><span class="p">,</span><span class="n">attr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_attr</span><span class="p">)</span>
+        <span class="c1"># Reset the time</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time</span>
+        <span class="k">return</span> <span class="n">new</span></div></div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

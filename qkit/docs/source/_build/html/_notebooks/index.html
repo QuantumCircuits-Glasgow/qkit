@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examples &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Transport measurement data analysis" href="../notebooks/IV_curve.html" />
+    <link rel="prev" title="qkit.storage package" href="../qkit.storage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">qkit</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/IV_curve.html">Transport measurement data analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/Radiall_switch_basics.html">Controller for Radiall coaxial switches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/TIP2_client_basics.html">load instrument</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#define-the-default-device-(thermometer)">define the default device (thermometer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#one-can-ask-for-the-thermometer-stages-which-have-controlling-abilities">one can ask for the thermometer stages which have controlling abilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#get-the-temperature:-different-ways">get the temperature: different ways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#get-the-resistance-of-a-thermometer">get the resistance of a thermometer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#set-a-new-control-temperature">set a new control temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#set-a-new-thermometer-and-(blocking)-wait-until-it-has-settled">set a new thermometer and (blocking) wait until it has settled</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#get-all-other-information-about-a-device">get all other information about a device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#close-the-connection-to-the-tip-server">close the connection to the tip server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html">Initializing test sample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html#Building-sequences">Building sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/data_readout_basics.html">Data readout basics i.e. for some analysis or plotting.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html">Inititialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Point-Tracking">Point Tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Anticrossing-Fit">Anticrossing Fit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/resonator_class_basics.html">Resonator class basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/spectroscopy_measurement_basics.html">Basic spectroscopy measurements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html">QiCells Sample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Measurement-Setup">Measurement Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Single-Qubit-Characterizations">Single Qubit Characterizations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#id1">Single-Qubit Characterizations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Multi-Qubit-Characterizations">Multi-Qubit Characterizations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/transport_measurements_basics.html">Example Notebook for transport measurements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#measure-1D-scan">measure 1D scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#2D-scan">2D scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#3D-scan">3D scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#measure-trace">measure trace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#stop-qkit">stop qkit</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Examples</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_notebooks/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/IV_curve.html">Transport measurement data analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/IV_curve.html#Load-qkit-transport-measurement-file">Load qkit transport measurement file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/IV_curve.html#Merge-qkit-transport-measurement-files">Merge qkit transport measurement files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/IV_curve.html#Differential-resistance">Differential resistance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/IV_curve.html#Current-and-voltage-offsets">Current and voltage offsets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/IV_curve.html#Ohmic-resistance-offset">Ohmic resistance offset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/IV_curve.html#Critical-and-retrapping-currents">Critical and retrapping currents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/IV_curve.html#Normal-state-resistance">Normal state resistance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/IV_curve.html#Switching-current-measurements">Switching current measurements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/Radiall_switch_basics.html">Controller for Radiall coaxial switches</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/Radiall_switch_basics.html#pulse-length">pulse length</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/Radiall_switch_basics.html#change-position">change position</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TIP2_client_basics.html">load instrument</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#define-the-default-device-(thermometer)">define the default device (thermometer)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#one-can-ask-for-the-thermometer-stages-which-have-controlling-abilities">one can ask for the thermometer stages which have controlling abilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#get-the-temperature:-different-ways">get the temperature: different ways</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#get-the-resistance-of-a-thermometer">get the resistance of a thermometer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#set-a-new-control-temperature">set a new control temperature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#set-a-new-thermometer-and-(blocking)-wait-until-it-has-settled">set a new thermometer and (blocking) wait until it has settled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#get-all-other-information-about-a-device">get all other information about a device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/TIP2_client_basics.html#close-the-connection-to-the-tip-server">close the connection to the tip server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html">Initializing test sample</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html#Building-sequences">Building sequences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html#The-pulse-object">The pulse object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html#Building-sequences-from-pulses:">Building sequences from pulses:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html#Of-course,-there-are-also-pre-built-sequences-for-standard-experiments,-which-you-can-find-in-the-sequence_library-class-(here-imported-as-sl).">Of course, there are also pre-built sequences for standard experiments, which you can find in the sequence_library class (here imported as sl).</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html#Currently,-this-includes-sequences-for-Rabi,-T1,-Ramsey,-spin-echo-and-spin-locking-experiments.">Currently, this includes sequences for <strong>Rabi</strong>, <strong>T1</strong>, <strong>Ramsey</strong>, <strong>spin-echo</strong> and <strong>spin-locking experiments</strong>.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html#Please-note,-that-this-plot-always-displays-the-amplitude-of-your-signal-(not-I-or-Q).">Please note, that this plot always displays the amplitude of your signal (not I or Q).</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html#We-refrained-from-displaying-the-pulses-with-their-iq_frequency-to-prevent-confusion.">We refrained from displaying the pulses with their iq_frequency to prevent confusion.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/VirtualAWG_basics.html#Similarly,-it-is-not-necessary-to-initialize-the-virtual-awg-with-a-channel-for-each-I-and-Q.-Whether-two-physical-channels-are-needed-to-generate-the-desired-output-is-determined-automatically-by-the-load-script-(see-below).">Similarly, it is <strong>not</strong> necessary to initialize the virtual awg with a channel for each I and Q. Whether two physical channels are needed to generate the desired output is determined automatically by the load script (see below).</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/data_readout_basics.html">Data readout basics i.e. for some analysis or plotting.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html">Inititialization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Loading-and-plotting-Sample-Data">Loading and plotting Sample Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Point-Tracking">Point Tracking</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Tracking-branch-one">Tracking branch one</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Tracking-branch-two">Tracking branch two</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Deleting-traces-and-points">Deleting traces and points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Anticrossing-Fit">Anticrossing Fit</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Setting-functions-and-start-parameterts">Setting functions and start parameterts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#Fitting">Fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/pointtracker_and_anticrossing_fit_basics.html#id1">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/resonator_class_basics.html">Resonator class basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/spectroscopy_measurement_basics.html">Basic spectroscopy measurements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html">QiCells Sample</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Measurement-Setup">Measurement Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Local-Oscillators">Local Oscillators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Frontend-box">Frontend box</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Side-Band-Tests">Side Band Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#TWPA">TWPA</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Single-Qubit-Characterizations">Single Qubit Characterizations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Electrical-delay-calibration-(AutoconfReadout)">Electrical delay calibration (AutoconfReadout)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Pseudo-VNA:-Find-resonator-frequency-f_\mathrm{res}">Pseudo-VNA: Find resonator frequency <span class="math notranslate nohighlight">\(f_\mathrm{res}\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Two-Tone:-Find-qubit-frequency-f_{01}">Two Tone: Find qubit frequency <span class="math notranslate nohighlight">\(f_{01}\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Recalibrate-fres">Recalibrate fres</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#id1">Single-Qubit Characterizations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Rabi">Rabi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Rabi-with-Detuning-Sweep">Rabi with Detuning Sweep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#T1">T1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#SpinEcho">SpinEcho</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Ramsey">Ramsey</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Multi-Qubit-Characterizations">Multi-Qubit Characterizations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Multi-tone-amplitude-calibration">Multi-tone amplitude calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#id2">Two Tone: Find qubit frequency <span class="math notranslate nohighlight">\(f_{01}\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Rabi:-Measure-pi-pulse-time-t_\pi">Rabi: Measure pi pulse time <span class="math notranslate nohighlight">\(t_\pi\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#id3">Rabi with Detuning Sweep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#T1:-Measure-energy-relaxation-time-T_1">T1: Measure energy relaxation time <span class="math notranslate nohighlight">\(T_1\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#SpinEcho:-Measure-decoherence-time-$T_2^-*-$">SpinEcho: Measure decoherence time $T_2^ * $</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Ramsey:-Measure-decoherence-time-T_2">Ramsey: Measure decoherence time <span class="math notranslate nohighlight">\(T_2\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/time_domain_measurement_basis.html#Interleaved:-Measure-T1,-T2,-T2-*-,-and-detuning-simultaneously">Interleaved: Measure T1, T2, T2 * , and detuning simultaneously</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/transport_measurements_basics.html">Example Notebook for transport measurements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#starting-qkit">starting qkit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#Initialize-devices">Initialize devices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#Initialize-transport-measurements">Initialize transport measurements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#measure-1D-scan">measure 1D scan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#2D-scan">2D scan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#3D-scan">3D scan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#measure-trace">measure trace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/transport_measurements_basics.html#stop-qkit">stop qkit</a></li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../qkit.storage.html" class="btn btn-neutral float-left" title="qkit.storage package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../notebooks/IV_curve.html" class="btn btn-neutral float-right" title="Transport measurement data analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
