@@ -1073,6 +1073,124 @@ class transport(object):
         self._measure()
         return
     
+    def measure_3D_discrete(self):
+        """
+        Measures a 3 dimensional set of IV curves while sweeping the bias according to the set sweep parameters and iterating all parameters x_vec in x_obj and all parameters y_vec in y_obj. The sweep over y_obj is the inner loop, for every value x_vec[i] all values y_vec are measured.
+        Every single data point is taken with the current IV Device settings.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        if self._x_set_obj is None or self._y_set_obj is None:
+            logging.error('{:s}: axes parameters not properly set'.format(__name__))
+            raise TypeError('{:s}: axes parameters not properly set'.format(__name__))
+        self._scan_dim = 3
+        ''' measurement object '''
+        self._measurement_object.measurement_func = sys._getframe().f_code.co_name
+        ''' measurement '''
+        self._measure_discrete()
+        return
+
+    def _measure_discrete(self):
+        """
+        Creates output files, measures according to IVD and sweep settings, stores data and shows them in the qviewkit
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        def _pass(arg):
+            """ dummy function that just passes, used for x, y iteration in case of 1D and 2D scan """
+            pass
+
+        ''' axis labels '''
+        _axis = {0: (self._x_name, '', ''),
+                 1: ('voltage', '', ''),
+                 2: (self._x_coordname, 'current', ''),  # or self._IV_modes[self._bias] for y
+                 3: (self._x_coordname, self._y_coordname, 'current')}
+        self._measurement_object.x_axis, self._measurement_object.y_axis, self._measurement_object.z_axis = _axis[self._scan_dim]
+        ''' prepare IV device '''
+        self._prepare_measurement_IVD()
+        ''' prepare data storage '''
+        self._prepare_measurement_file()
+        ''' prepare progress bar '''
+        self._prepare_progress_bar()
+        ''' opens qviewkit to plot measurement '''
+        if self.open_qviewkit:
+            if self._scan_dim == 0:
+                datasets = []
+            else:
+                datasets = ['views/IV']
+                if self._fit_name:
+                    for i in range(self.sweeps.get_nos()):
+                        datasets.append('analysis/{:s}_{:d}'.format(self._fit_name, i))
+                elif self._scan_dim > 1:
+                    for i in range(self.sweeps.get_nos()):
+                        datasets.append('{:s}_{:d}'.format(self._IV_modes[not self._bias].lower(), i))
+            self._qvk_process = qviewkit.plot(self._data_file.get_filepath(), datasets=datasets)  # opens IV-view by default
+        ''' measurement '''
+        sys.stdout.flush()
+        qkit.flow.start()
+        try:
+            if self._scan_dim == 0:  # single data points
+                for x_val in self._x_vec:
+                    self._hdf_x.add(x_val)
+                    self._x_func(x_val, **self._x_kwargs)
+                    for func, kwargs, lst in zip(self._y_func, self._y_kwargs, self._hdf_y):
+                        lst.add(func(**kwargs))
+                    # iterate progress bar
+                    if self.progress_bar:
+                        self._pb.iterate()
+                    time.sleep(self._x_dt)
+            elif self._scan_dim in [1, 2, 3]:  # IV curve
+                _rst_log_hdf_appnd = False  # variable to save points of log-function in 2D-matrix
+                self._rst_fit_hdf_appnd = False
+                for self.ix, (x, x_func) in enumerate([(None, _pass)] if self._scan_dim < 2 else [(x, self._x_set_obj) for x in self._x_vec]):  # loop: x_obj with parameters from x_vec if 2D or 3D else pass(None)
+                    x_func(x)
+                    time.sleep(self._x_dt)
+                    for self.iy, (y, y_func) in enumerate([(None, _pass)] if self._scan_dim < 3 else [(y, self._y_set_obj) for y in self._y_vec]):  # loop: y_obj with parameters from y_vec if 3D else pass(None)
+                        y_func(y)
+                        time.sleep(self._tdy)
+                        # log function
+                        if self.log_function != [None]:
+                            for j, f in enumerate(self.log_function):
+                                if self._scan_dim == 1:
+                                    self._data_log[j] = np.array([float(f())])  # np.asarray(f(), dtype=float)
+                                    self._hdf_log[j].append(self._data_log[j])
+                                elif self._scan_dim == 2:
+                                    self._data_log[j][self.ix] = float(f())
+                                    self._hdf_log[j].append(self._data_log[j], reset=True)
+                                elif self._scan_dim == 3:
+                                    self._data_log[j][self.ix, self.iy] = float(f())
+                                    self._hdf_log[j].append(self._data_log[j][self.ix], reset=_rst_log_hdf_appnd)
+                                    _rst_log_hdf_appnd = not bool(self.iy+1 == len(self._y_vec))
+                        # iterate sweeps and take data
+                        self._get_sweepdata_discrete()
+                    # filling of value-box by storing data in the next 2d structure after every y-loop
+                    if self._scan_dim is 3:
+                        for lst in [val for k, val in enumerate([self._hdf_I, self._hdf_V, self._hdf_dVdI]) if k < 2+int(self._dVdI)]:
+                            for val in range(self.sweeps.get_nos()):
+                                lst[val].next_matrix()
+        finally:
+            ''' end measurement '''
+            qkit.flow.end()
+            t = threading.Thread(target=qviewkit.save_plots, args=[self._data_file.get_filepath(), self._plot_comment])
+            t.start()
+            self._data_file.close_file()
+            waf.close_log_file(self._log_file)
+            self._set_IVD_status(False)
+            print('Measurement complete: {:s}'.format(self._data_file.get_filepath()))
+        return
+
     def _measure(self):
         """
         Creates output files, measures according to IVD and sweep settings, stores data and shows them in the qviewkit
@@ -1667,6 +1785,106 @@ class transport(object):
             qkit.flow.sleep()
         return
     
+    def _get_sweepdata_discrete(self):
+        """
+        Iterates sweeps of sweep class and takes data for each sweep.
+        If average is set, traces are taken <average>-fold to average and saved after each iteration
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        if self._average is None:
+            for j in range(self.sweeps.get_nos()):
+                # take data
+                if (self._IVD.get_sweep_mode()%2 == 0): #volt bias
+                    V_values, I_values = self.take_IV_discrete(vec=self.sweeps.get_sweep_discrete())
+                elif(self._IVD.get_sweep_mode()%2 == 1): #curr bias
+                    I_values, V_values = self.take_IV_discrete(vec=self.sweeps.get_sweep_discrete())
+                else:
+                    raise Exception("Wrong sweep mode defined in SMU.")
+
+                data = {self._hdf_I[j]:(I_values,),
+                        self._hdf_V[j]:(V_values,)} # tuple in oder to use *args later
+                if self._dVdI:
+                    data[self._hdf_dVdI[j]] = (self._numerical_derivative(I_values, V_values),)
+                if self._fit_func:
+                    #data[self._hdf_fit[j]] = self._fit_func(data[self._hdf_I[j]],
+                    #                                        data[self._hdf_V[j]],
+                    #                                        data[self._hdf_dVdI[j]],
+                    #                                        **self._fit_kwargs)
+                    if self._scan_dim == 1:
+                        self._data_fit[j] = float(self._fit_func(data[self._hdf_I[j]][0],
+                                                                           data[self._hdf_V[j]][0],
+                                                                           data[self._hdf_dVdI[j]][0],
+                                                                           **self._fit_kwargs))
+                        data[self._hdf_fit[j]] = (self._data_fit[j],)
+                    elif self._scan_dim == 2:
+                        self._data_fit[j][self.ix] = float(self._fit_func(data[self._hdf_I[j]][0],
+                                                                          data[self._hdf_V[j]][0],
+                                                                          data[self._hdf_dVdI[j]][0],
+                                                                          **self._fit_kwargs))
+                        data[self._hdf_fit[j]] = (self._data_fit[j], True)
+                    elif self._scan_dim == 3:
+                        self._data_fit[j][self.ix, self.iy] = float(self._fit_func(data[self._hdf_I[j]][0],
+                                                                                   data[self._hdf_V[j]][0],
+                                                                                   data[self._hdf_dVdI[j]][0],
+                                                                                   **self._fit_kwargs))
+                        data[self._hdf_fit[j]] = (self._data_fit[j][self.ix], self._rst_fit_hdf_appnd)
+                        self._rst_fit_hdf_appnd = not bool(self.iy + 1 == len(self._y_vec))
+                # save data
+                for key, val in data.items():
+                    key.append(*val)
+                # iterate progress bar
+                if self.progress_bar:
+                    self._pb.iterate(addend=self._pb_addend[self.ix] if self._landscape else 1)
+                qkit.flow.sleep()
+        else:
+            I_values, V_values = [], []
+            for i in range(self._average):
+                I_values.append([])
+                V_values.append([])
+                for j in range(self.sweeps.get_nos()):
+                    # take data
+                    if (self._IVD.get_sweep_mode()%2 == 0): #volt bias
+                        for val, lst in zip(self.take_IV_discrete(vec=self.sweeps.get_sweep_discrete()), [V_values, I_values]):
+                            lst[i].append(list(val))  # append as list in order to later use zip
+                    elif(self._IVD.get_sweep_mode()%2 == 1): #curr bias
+                        for val, lst in zip(self.take_IV_discrete(vec=self.sweeps.get_sweep_discrete()), [I_values, V_values]):
+                            lst[i].append(list(val))  # append as list in order to later use zip
+                    else:
+                        raise Exception("Wrong sweep mode defined in SMU.")
+
+                    I_values_avg, V_values_avg = np.mean(list(zip(*I_values))[j], axis=0), np.mean(list(zip(*V_values))[j], axis=0)  # use zip since np.mean cannot handle different shapes
+                    data = {self._hdf_I[j]:I_values_avg,
+                            self._hdf_V[j]:V_values_avg}
+                    if self._dVdI:
+                        data[self._hdf_dVdI[j]] = self._numerical_derivative(I_values_avg, V_values_avg)
+                    if self._fit_func:
+                        data[self._hdf_fit[j]] = self._fit_func(data[self._hdf_I[j]],
+                                                                data[self._hdf_V[j]],
+                                                                data[self._hdf_dVdI[j]],
+                                                                **self._fit_kwargs)
+                    # save data
+                    for key, val in data.items():
+                        key.append(val, reset=bool(i))  # append data series or overwrite last iteration by new averaged data
+                        key.ds.attrs['average'] = '({:d}/{:d})'.format(i+1, self._average)  # add (iteration/average) as attribute
+                        self._data_file.flush()
+                    # iterate progress bar
+                    if self.progress_bar:
+                        self._pb.iterate(addend=self._pb_addend[self.ix] if self._landscape else 1)
+            # set average attribute to number of averages
+            for j in range(self.sweeps.get_nos()):
+                for lst in [val for k, val in enumerate([self._hdf_I, self._hdf_V, self._hdf_dVdI]) if k < 2+int(self._dVdI)]:
+                    lst[j].ds.attrs['average'] = self._average
+            self._data_file.flush()
+            qkit.flow.sleep()
+        return
+
     def take_IV(self, sweep):
         """
         Takes IV and considers if landscape is set.
@@ -1742,6 +1960,7 @@ class transport(object):
             self._stops = []
             self._steps = []
             self._sleeps = []
+            self._vec = []
             self.create_iterator()
             return
         
@@ -1788,6 +2007,30 @@ class transport(object):
             self._sleeps.append(sleep)
             return
         
+        def add_sweep_discrete(self, vec, sleep=0):
+            """
+            Adds a sweep object with given parameters.
+
+            Parameters
+            ----------
+            start: float
+                Start value of the sweep.
+            stop: float
+                Stop value of the sweep.
+            step: float
+                Step value of the sweep.
+            sleep: float
+                Sleep time after whole sweep. Default is 0.
+
+            Returns
+            -------
+            None
+            """
+            self._starts.append(vec[0])
+            self._vec.append(vec)
+            self._sleeps.append(sleep)
+            return
+
         def reset_sweeps(self):
             """
             Resets sweeps.
@@ -1804,8 +2047,23 @@ class transport(object):
             self._stops = []
             self._steps = []
             self._sleeps = []
+            self._vec = []
             return
+        def get_sweep_discrete(self):
+            """
+            Gets sweep parameter.
         
+            Parameters
+            ----------
+            None
+
+            Returns
+            -------
+            sweep: tuple of floats
+                Sweep object containing start, stop, step and sleep values.
+            """
+            return (self.vec)
+
         def get_sweep(self):
             """
             Gets sweep parameter.

@@ -512,6 +512,61 @@ class Keithley_2450_gla(Instrument):
         sourceArray = [float(i) for i in sourceArray.strip("\n").split(",")]
         return sourceArray,measuredArray
               
+    def take_IV_sweep_value_in_vector(self, vec):
+        """
+        Takes IV curve with sweep parameters <sweep> in the sweep mode predefined.
+
+        Parameters
+        ----------
+        vec: vector that contains the value to set the voltage and the current to source
+
+        Returns
+        -------
+        bias_values: numpy.array(float)
+            Measured bias values.
+        sense_values: numpy.array(float)
+            Measured sense values.
+        """
+        self._visainstrument.write(":TRAC:CLE 'defbuffer1'")#first clear the buffer
+
+        sweepMode = self.get_sweep_mode()
+        bias = self.get_bias_mode()#so that we correctly write the sweep command
+        if sweepMode == 0:# VV mode
+            self._visainstrument.write(':SENS:FUNC "VOLT"')
+            print("Sweeping voltage, measuring voltage")
+        elif sweepMode == 1:# IV mode
+            self._visainstrument.write(':SENS:FUNC "VOLT"')
+            print("Sweeping current, measuring voltage")
+        elif sweepMode == 2:# VI mode
+            self._visainstrument.write(':SENS:FUNC "CURR"')
+            print("Sweeping voltage, measuring current")
+        elif sweepMode == 3:# II mode
+            self._visainstrument.write(':SENS:FUNC "CURR"')
+            print("Sweeping current, measuring current")
+        else:
+            print("Invalid sweep mode passed in")
+            return ValueError("Invalid sweep mode")
+
+        measuredArray = []
+        sourceArray = []
+        for i in vec:
+            if sweepMode == 0:
+                sourceArray.append(self.set_voltage_source(i))
+                measuredArray.append(self.get_voltage_dc())
+            elif sweepMode == 1:
+                sourceArray.append(self.set_current_source(i))
+                measuredArray.append(self.get_voltage_dc())
+            elif sweepMode == 2:
+                sourceArray.append(self.set_voltage_source(i))
+                measuredArray.append(self.get_current_dc())
+            elif sweepMode == 3:
+                sourceArray.append(self.set_current_source(i))
+                measuredArray.append(self.get_current_dc())
+
+            self._visainstrument.write("*WAI")
+
+        return sourceArray,measuredArray
+
 
 if __name__ == "__main__":
     KEITH = Keithley_2450_gla(name = "Keithley_2450_gla", address="10.22.197.8")
