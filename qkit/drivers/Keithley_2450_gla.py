@@ -527,20 +527,20 @@ class Keithley_2450_gla(Instrument):
             print("Invalid sweep parameter. Provide a 5 element array")
             return
         #setting up sweep parameters
-        numSteps = int((stop - start)/delay)+1#needed for reading out data
+        numSteps = int((stop - start)/step)+1#needed for reading out data
         sweepMode = self.get_sweep_mode()
         bias = self.get_bias_mode()#so that we correctly write the sweep command
         if sweepMode == 0:# VV mode
-            self._visainstrument.write(':SENS:FUNC VOLT')
+            self._visainstrument.write(':SENS:FUNC "VOLT"')
             print("Sweeping voltage, measuring voltage")
         elif sweepMode == 1:# IV mode
-            self._visainstrument.write(':SENS:FUNC VOLT')
+            self._visainstrument.write(':SENS:FUNC "VOLT"')
             print("Sweeping current, measuring voltage")
         elif sweepMode == 2:# VI mode
-            self._visainstrument.write(':SENS:FUNC CURR')
+            self._visainstrument.write(':SENS:FUNC "CURR"')
             print("Sweeping voltage, measuring current")
         elif sweepMode == 3:# II mode
-            self._visainstrument.write(':SENS:FUNC CURR')
+            self._visainstrument.write(':SENS:FUNC "CURR"')
             print("Sweeping current, measuring current")
         else:
             print("Invalid sweep mode passed in")
@@ -548,8 +548,9 @@ class Keithley_2450_gla(Instrument):
         self._visainstrument.write(':SOUR:SWE:{bias}:LIN:STEP {start}, {stop}, {step}, {delay}, {count}'
                                             .format(bias = bias,start = start,stop = stop, step = step, delay = delay,count = count))
         self._visainstrument.write(":INIT")
-        measuredArray:list[float] = self._visainstrument.query("TRAC: DATA? 1, {numSteps}".format(numSteps=numSteps))
-        sourceArray:list[float] = self._visainstrument.query("TRAC: DATA? 1, {numSteps}, 'defbuffer1', SOUR".format(numSteps=numSteps))
+        time.sleep(delay*count*3)#need to *3 to allow for enpugh time to fill buffers
+        measuredArray:list[str] = self._visainstrument.query("TRAC:DATA? 1, {numSteps}".format(numSteps=numSteps))
+        sourceArray:list[str] = self._visainstrument.query("TRAC:DATA? 1, {numSteps}, 'defbuffer1', SOUR".format(numSteps=numSteps))
         return sourceArray,measuredArray
               
 
