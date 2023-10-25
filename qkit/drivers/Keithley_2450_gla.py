@@ -413,12 +413,12 @@ class Keithley_2450_gla(Instrument):
             Bias mode. Meanings are 0 (current) and 1 (voltage).
         """
         biasMode:str = self.get_bias_mode()
-        if biasMode == "CURR":
+        if "CURR" in biasMode:
             return 0
-        elif biasMode == "VOLT":
+        elif "VOLT" in biasMode:
             return 1
         else:
-            raise ValueError("Unkown bias mode") 
+            raise ValueError("Unknown bias mode") 
 
     def get_sweep_channels(self):#always return 1
         """
