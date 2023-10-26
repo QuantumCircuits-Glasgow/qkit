@@ -26,6 +26,7 @@ class RS_RT2000(Instrument):
         self._visainstrument.read_termination="\n"
         self._nchannels = 4
         self.manual_trigger_delay=0
+        self.trigger_source=1
 
         if meas_channel>4 or meas_channel<1: 
             raise ValueError("Channels between 1 and {}".format(self._nchannels))
@@ -121,6 +122,14 @@ class RS_RT2000(Instrument):
         self.write("CHAN{}:STAT {}".format(self._meas_channel,status))
         return
 
+    def set_trigger_source(self, channel=1):
+        if(channel not in [1,2,3,4]):
+            raise ValueError("Channel number not between 1 and 4")
+
+        self.write("TRIG:SOUR CHAN{}".format(channel))
+        self.trigger_source=channel
+        return
+
     def clear_errors(self):
         return self.ask("SYST:ERR:ALL?")
 
@@ -196,7 +205,7 @@ class RS_RT2000(Instrument):
         return time_array
         
     def _pre_measurement(self):
-        self.write("TRIG:SOUR CHAN{}".format(self._meas_channel[0])) #source of trigger (software)
+        self.write("TRIG:SOUR CHAN{}".format(self.trigger_source)) #source of trigger (software)
         self.write("TRIG:MODE NORM") # waits for trigger to acquire waveform
         
     
@@ -209,13 +218,14 @@ class RS_RT2000(Instrument):
     def _start_measurement_manual_trigger(self):
         # Trigger is done through a signal on one of the scope channels
         self.acq_continuous() #
+        self.write("ACQ:ARES:IMM")
         sleep(0.01)
         sleep(self.manual_trigger_delay)
 
     def _post_measurement(self):
         #return back to analog channel triggering
         self.clear()
-        self.write("TRIG:SOUR CHAN{}".format(self._meas_channel[0]))
+        self.write("TRIG:SOUR CHAN{}".format(self.trigger_source))
         #self.write("TRIG:FIND")
         self.write("TRIG:MODE AUTO")
         self.write("SING")
