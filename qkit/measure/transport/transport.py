@@ -1392,6 +1392,7 @@ class transport(object):
         ''' add comment '''
         if self._comment:
             self._data_file.add_comment(self._comment)
+            logging.info(self._comment)
         return
 
     def _prepare_progress_bar(self):

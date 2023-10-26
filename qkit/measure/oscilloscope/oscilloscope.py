@@ -51,9 +51,10 @@ class scope_class(object):
         scope.start_measurement()
 
     '''
-    def __init__(self, scope_device):
+    def __init__(self, scope_device, scope_awg=None):
 
         self.scope=scope_device
+        self.awg=scope_awg #TODO: add optional awg device to synchronize the triggers
         self.has_flowcontrol_func = all(x in self.scope.get_function_names() for x in ["ready","_start_measurement"])
         self.manual_trigger_control=0
 
@@ -239,6 +240,7 @@ class scope_class(object):
 
         if self._comment:
             self._data_file.add_comment(self._comment)
+            logging.info(self._comment)
         return
 
     def _prepare_measurement_scope(self):
@@ -281,7 +283,10 @@ class scope_class(object):
         qkit.flow.start()
 
         if self.scope.ready():
-            self.scope._start_measurement()
+            if(not self.manual_trigger_control):
+                self.scope._start_measurement()
+            else:
+                self.scope._start_measurement_manual_trigger()
             x,y = self.scope.get_data()
             self._data_t.append(x[0])
             for ind,ch in enumerate(self.scope._meas_channel):

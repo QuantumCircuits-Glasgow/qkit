@@ -346,6 +346,7 @@ class spectrum(object):
 
         if self.comment:
             self._data_file.add_comment(self.comment)
+            logging.info(self.comment)
 
         if self.qviewkit_singleInstance and self.open_qviewkit and self._qvk_process:
             self._qvk_process.terminate()  # terminate an old qviewkit instance
