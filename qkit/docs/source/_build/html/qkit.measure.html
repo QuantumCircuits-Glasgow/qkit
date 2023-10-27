@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure package &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.measure.oscilloscope package" href="qkit.measure.oscilloscope.html" />
+    <link rel="prev" title="qkit.gui.qviewkit package" href="qkit.gui.qviewkit.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">qkit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">qkit.measure package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.html#module-qkit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">qkit</a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+      <li class="breadcrumb-item active">qkit.measure package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.measure.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-measure-package">
+<h1>qkit.measure package<a class="headerlink" href="#qkit-measure-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qkit.measure.oscilloscope.html">qkit.measure.oscilloscope package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.oscilloscope.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.oscilloscope.html#module-qkit.measure.oscilloscope.oscilloscope">qkit.measure.oscilloscope.oscilloscope module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class"><code class="docutils literal notranslate"><span class="pre">scope_class</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.get_comment"><code class="docutils literal notranslate"><span class="pre">scope_class.get_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.get_expname"><code class="docutils literal notranslate"><span class="pre">scope_class.get_expname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.get_filename"><code class="docutils literal notranslate"><span class="pre">scope_class.get_filename()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.measure_1D"><code class="docutils literal notranslate"><span class="pre">scope_class.measure_1D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.measure_2D"><code class="docutils literal notranslate"><span class="pre">scope_class.measure_2D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.measure_3D"><code class="docutils literal notranslate"><span class="pre">scope_class.measure_3D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_comment"><code class="docutils literal notranslate"><span class="pre">scope_class.set_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_expname"><code class="docutils literal notranslate"><span class="pre">scope_class.set_expname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_filename"><code class="docutils literal notranslate"><span class="pre">scope_class.set_filename()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_log_function"><code class="docutils literal notranslate"><span class="pre">scope_class.set_log_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_x_parameters"><code class="docutils literal notranslate"><span class="pre">scope_class.set_x_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_y_parameters"><code class="docutils literal notranslate"><span class="pre">scope_class.set_y_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.oscilloscope.html#module-qkit.measure.oscilloscope">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qkit.measure.spectroscopy.html">qkit.measure.spectroscopy package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.spectroscopy.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.spectroscopy.html#module-qkit.measure.spectroscopy.signal_spectroscopy">qkit.measure.spectroscopy.signal_spectroscopy module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum"><code class="docutils literal notranslate"><span class="pre">spectrum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.delete_fit_function"><code class="docutils literal notranslate"><span class="pre">spectrum.delete_fit_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.f_hyp"><code class="docutils literal notranslate"><span class="pre">spectrum.f_hyp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.f_lin"><code class="docutils literal notranslate"><span class="pre">spectrum.f_lin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.f_parab"><code class="docutils literal notranslate"><span class="pre">spectrum.f_parab()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.gen_fit_function"><code class="docutils literal notranslate"><span class="pre">spectrum.gen_fit_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.get_span"><code class="docutils literal notranslate"><span class="pre">spectrum.get_span()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.get_tdx"><code class="docutils literal notranslate"><span class="pre">spectrum.get_tdx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.get_tdy"><code class="docutils literal notranslate"><span class="pre">spectrum.get_tdy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.measure_1D"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_1D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.measure_2D"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_2D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.measure_3D"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_3D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.plot_fit_function"><code class="docutils literal notranslate"><span class="pre">spectrum.plot_fit_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.set_log_function"><code class="docutils literal notranslate"><span class="pre">spectrum.set_log_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.set_plot_comment"><code class="docutils literal notranslate"><span class="pre">spectrum.set_plot_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.set_span"><code class="docutils literal notranslate"><span class="pre">spectrum.set_span()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.set_tdx"><code class="docutils literal notranslate"><span class="pre">spectrum.set_tdx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.set_tdy"><code class="docutils literal notranslate"><span class="pre">spectrum.set_tdy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.set_x_parameters"><code class="docutils literal notranslate"><span class="pre">spectrum.set_x_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.signal_spectroscopy.spectrum.set_y_parameters"><code class="docutils literal notranslate"><span class="pre">spectrum.set_y_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.spectroscopy.html#module-qkit.measure.spectroscopy.spectroscopy">qkit.measure.spectroscopy.spectroscopy module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape"><code class="docutils literal notranslate"><span class="pre">Landscape</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.delete_landscape_function_xy"><code class="docutils literal notranslate"><span class="pre">Landscape.delete_landscape_function_xy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.delete_landscape_function_xz"><code class="docutils literal notranslate"><span class="pre">Landscape.delete_landscape_function_xz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.f_hyp"><code class="docutils literal notranslate"><span class="pre">Landscape.f_hyp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.f_lin"><code class="docutils literal notranslate"><span class="pre">Landscape.f_lin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.f_parab"><code class="docutils literal notranslate"><span class="pre">Landscape.f_parab()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.f_transmon"><code class="docutils literal notranslate"><span class="pre">Landscape.f_transmon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.generate_fit_function_xy"><code class="docutils literal notranslate"><span class="pre">Landscape.generate_fit_function_xy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.generate_fit_function_xz"><code class="docutils literal notranslate"><span class="pre">Landscape.generate_fit_function_xz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.get_freqpoints_xz"><code class="docutils literal notranslate"><span class="pre">Landscape.get_freqpoints_xz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.get_tracedata_xz"><code class="docutils literal notranslate"><span class="pre">Landscape.get_tracedata_xz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.get_y_span"><code class="docutils literal notranslate"><span class="pre">Landscape.get_y_span()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.get_y_span_list"><code class="docutils literal notranslate"><span class="pre">Landscape.get_y_span_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.perform_measurement_at_point"><code class="docutils literal notranslate"><span class="pre">Landscape.perform_measurement_at_point()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.plot_xy_landscape"><code class="docutils literal notranslate"><span class="pre">Landscape.plot_xy_landscape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.plot_xz_landscape"><code class="docutils literal notranslate"><span class="pre">Landscape.plot_xz_landscape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.set_y_span"><code class="docutils literal notranslate"><span class="pre">Landscape.set_y_span()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.Landscape.vna_frequency_wrapper"><code class="docutils literal notranslate"><span class="pre">Landscape.vna_frequency_wrapper()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum"><code class="docutils literal notranslate"><span class="pre">spectrum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.delete_fit_function"><code class="docutils literal notranslate"><span class="pre">spectrum.delete_fit_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.edel_correction_data"><code class="docutils literal notranslate"><span class="pre">spectrum.edel_correction_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.gen_fit_function"><code class="docutils literal notranslate"><span class="pre">spectrum.gen_fit_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.get_tdx"><code class="docutils literal notranslate"><span class="pre">spectrum.get_tdx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.get_tdy"><code class="docutils literal notranslate"><span class="pre">spectrum.get_tdy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.measure_1D"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_1D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.measure_2D"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_2D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.measure_3D"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_3D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.measure_timetrace"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_timetrace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.plot_fit_function"><code class="docutils literal notranslate"><span class="pre">spectrum.plot_fit_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.set_cw_time_measurement"><code class="docutils literal notranslate"><span class="pre">spectrum.set_cw_time_measurement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.set_log_function"><code class="docutils literal notranslate"><span class="pre">spectrum.set_log_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.set_log_function_2D"><code class="docutils literal notranslate"><span class="pre">spectrum.set_log_function_2D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.set_plot_comment"><code class="docutils literal notranslate"><span class="pre">spectrum.set_plot_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.set_resonator_fit"><code class="docutils literal notranslate"><span class="pre">spectrum.set_resonator_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.set_tdx"><code class="docutils literal notranslate"><span class="pre">spectrum.set_tdx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.set_tdy"><code class="docutils literal notranslate"><span class="pre">spectrum.set_tdy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.set_x_parameters"><code class="docutils literal notranslate"><span class="pre">spectrum.set_x_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy.spectrum.set_y_parameters"><code class="docutils literal notranslate"><span class="pre">spectrum.set_y_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.spectroscopy.html#module-qkit.measure.spectroscopy.spectroscopy_unified">qkit.measure.spectroscopy.spectroscopy_unified module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape"><code class="docutils literal notranslate"><span class="pre">Landscape</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.delete_landscape_function_xy"><code class="docutils literal notranslate"><span class="pre">Landscape.delete_landscape_function_xy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.delete_landscape_function_xz"><code class="docutils literal notranslate"><span class="pre">Landscape.delete_landscape_function_xz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.f_hyp"><code class="docutils literal notranslate"><span class="pre">Landscape.f_hyp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.f_lin"><code class="docutils literal notranslate"><span class="pre">Landscape.f_lin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.f_parab"><code class="docutils literal notranslate"><span class="pre">Landscape.f_parab()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.f_transmon"><code class="docutils literal notranslate"><span class="pre">Landscape.f_transmon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.generate_fit_function_xy"><code class="docutils literal notranslate"><span class="pre">Landscape.generate_fit_function_xy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.generate_fit_function_xz"><code class="docutils literal notranslate"><span class="pre">Landscape.generate_fit_function_xz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.get_freqpoints_xz"><code class="docutils literal notranslate"><span class="pre">Landscape.get_freqpoints_xz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.get_tracedata_xz"><code class="docutils literal notranslate"><span class="pre">Landscape.get_tracedata_xz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.get_y_span"><code class="docutils literal notranslate"><span class="pre">Landscape.get_y_span()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.get_y_span_list"><code class="docutils literal notranslate"><span class="pre">Landscape.get_y_span_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.perform_measurement_at_point"><code class="docutils literal notranslate"><span class="pre">Landscape.perform_measurement_at_point()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.plot_xy_landscape"><code class="docutils literal notranslate"><span class="pre">Landscape.plot_xy_landscape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.plot_xz_landscape"><code class="docutils literal notranslate"><span class="pre">Landscape.plot_xz_landscape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.set_y_span"><code class="docutils literal notranslate"><span class="pre">Landscape.set_y_span()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.vna_frequency_wrapper"><code class="docutils literal notranslate"><span class="pre">Landscape.vna_frequency_wrapper()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum"><code class="docutils literal notranslate"><span class="pre">spectrum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.delete_fit_function"><code class="docutils literal notranslate"><span class="pre">spectrum.delete_fit_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.gen_fit_function"><code class="docutils literal notranslate"><span class="pre">spectrum.gen_fit_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.measure_1D"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_1D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.measure_2D"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_2D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.measure_3D"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_3D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.measure_timetrace"><code class="docutils literal notranslate"><span class="pre">spectrum.measure_timetrace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.plot_fit_function"><code class="docutils literal notranslate"><span class="pre">spectrum.plot_fit_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.set_plot_comment"><code class="docutils literal notranslate"><span class="pre">spectrum.set_plot_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.set_resonator_fit"><code class="docutils literal notranslate"><span class="pre">spectrum.set_resonator_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.set_x_parameters"><code class="docutils literal notranslate"><span class="pre">spectrum.set_x_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.set_y_parameters"><code class="docutils literal notranslate"><span class="pre">spectrum.set_y_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.spectroscopy.html#module-qkit.measure.spectroscopy">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qkit.measure.timedomain.html">qkit.measure.timedomain package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html">qkit.measure.timedomain.awg package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.awg.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.awg.html#module-qkit.measure.timedomain.awg.generate_waveform">qkit.measure.timedomain.awg.generate_waveform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.awg.html#module-qkit.measure.timedomain.awg.load_awg">qkit.measure.timedomain.awg.load_awg module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.awg.html#module-qkit.measure.timedomain.awg.load_tawg">qkit.measure.timedomain.awg.load_tawg module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit-measure-timedomain-awg-tomography-module">qkit.measure.timedomain.awg.tomography module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.awg.html#module-qkit.measure.timedomain.awg">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html">qkit.measure.timedomain.quantum_machine package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-basic-qubit-experiments-module">qkit.measure.timedomain.quantum_machine.basic_qubit_experiments module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-basic-qubit-experiments-v2-module">qkit.measure.timedomain.quantum_machine.basic_qubit_experiments_V2 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#module-qkit.measure.timedomain.quantum_machine.pulses">qkit.measure.timedomain.quantum_machine.pulses module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#module-qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper">qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-qm-qubit-config-module">qkit.measure.timedomain.quantum_machine.qm_qubit_config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-qm-qubit-config-v2-module">qkit.measure.timedomain.quantum_machine.qm_qubit_config_V2 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-quantum-jump-monitoring-module">qkit.measure.timedomain.quantum_machine.quantum_jump_monitoring module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-qubit-high-temp-module">qkit.measure.timedomain.quantum_machine.qubit_high_temp module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-script-module">qkit.measure.timedomain.quantum_machine.script module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-script-pyqt-module">qkit.measure.timedomain.quantum_machine.script_pyqt module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#module-qkit.measure.timedomain.quantum_machine">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.html#module-qkit.measure.timedomain.VirtualAWG">qkit.measure.timedomain.VirtualAWG module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel"><code class="docutils literal notranslate"><span class="pre">TdChannel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.add_sequence"><code class="docutils literal notranslate"><span class="pre">TdChannel.add_sequence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.delete_sequence"><code class="docutils literal notranslate"><span class="pre">TdChannel.delete_sequence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.get_sequence"><code class="docutils literal notranslate"><span class="pre">TdChannel.get_sequence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.get_sequence_dict"><code class="docutils literal notranslate"><span class="pre">TdChannel.get_sequence_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.is_interleaved"><code class="docutils literal notranslate"><span class="pre">TdChannel.is_interleaved</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.plot"><code class="docutils literal notranslate"><span class="pre">TdChannel.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.sequence_count"><code class="docutils literal notranslate"><span class="pre">TdChannel.sequence_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.set_interleave"><code class="docutils literal notranslate"><span class="pre">TdChannel.set_interleave()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.set_sequence"><code class="docutils literal notranslate"><span class="pre">TdChannel.set_sequence()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG"><code class="docutils literal notranslate"><span class="pre">VirtualAWG</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.add_sequence"><code class="docutils literal notranslate"><span class="pre">VirtualAWG.add_sequence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.channel_count"><code class="docutils literal notranslate"><span class="pre">VirtualAWG.channel_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.delete_sequence"><code class="docutils literal notranslate"><span class="pre">VirtualAWG.delete_sequence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.get_sequence_dicts"><code class="docutils literal notranslate"><span class="pre">VirtualAWG.get_sequence_dicts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.load"><code class="docutils literal notranslate"><span class="pre">VirtualAWG.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.plot"><code class="docutils literal notranslate"><span class="pre">VirtualAWG.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.set_interleave"><code class="docutils literal notranslate"><span class="pre">VirtualAWG.set_interleave()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.set_sequence"><code class="docutils literal notranslate"><span class="pre">VirtualAWG.set_sequence()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.all_are_same"><code class="docutils literal notranslate"><span class="pre">all_are_same()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.dictify_variable_lists"><code class="docutils literal notranslate"><span class="pre">dictify_variable_lists()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.html#module-qkit.measure.timedomain.gate_func">qkit.measure.timedomain.gate_func module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.gate_func.Gate_Func"><code class="docutils literal notranslate"><span class="pre">Gate_Func</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.gate_func.Gate_Func.gate_fcn"><code class="docutils literal notranslate"><span class="pre">Gate_Func.gate_fcn()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.html#module-qkit.measure.timedomain.initialize">qkit.measure.timedomain.initialize module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.align_pulses"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.align_pulses()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.check_sidebands"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.check_sidebands()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.crop_recording_window"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.crop_recording_window()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.initialize"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.initialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.optional_params"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.optional_params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.params"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.record_averaged_trace"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.record_averaged_trace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.record_single_trace"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.record_single_trace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.set_spec_input_level"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.set_spec_input_level()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.update_qubit_mw_src"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.update_qubit_mw_src()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.update_timings"><code class="docutils literal notranslate"><span class="pre">InitializeTimeDomain.update_timings()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.html#module-qkit.measure.timedomain.measure_td">qkit.measure.timedomain.measure_td module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td"><code class="docutils literal notranslate"><span class="pre">Measure_td</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.add_qubit_state_cal"><code class="docutils literal notranslate"><span class="pre">Measure_td.add_qubit_state_cal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.measure_1D"><code class="docutils literal notranslate"><span class="pre">Measure_td.measure_1D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.measure_1D_AWG"><code class="docutils literal notranslate"><span class="pre">Measure_td.measure_1D_AWG()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.measure_1D_awg_1D_ddc_timetrace"><code class="docutils literal notranslate"><span class="pre">Measure_td.measure_1D_awg_1D_ddc_timetrace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.measure_1D_awg_ddc_timetrace"><code class="docutils literal notranslate"><span class="pre">Measure_td.measure_1D_awg_ddc_timetrace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.measure_1D_ddc_time_trace"><code class="docutils literal notranslate"><span class="pre">Measure_td.measure_1D_ddc_time_trace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.measure_2D"><code class="docutils literal notranslate"><span class="pre">Measure_td.measure_2D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.measure_2D_AWG"><code class="docutils literal notranslate"><span class="pre">Measure_td.measure_2D_AWG()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.measure_2D_ddc_time_trace"><code class="docutils literal notranslate"><span class="pre">Measure_td.measure_2D_ddc_time_trace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.measure_3D_AWG"><code class="docutils literal notranslate"><span class="pre">Measure_td.measure_3D_AWG()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.set_plot_comment"><code class="docutils literal notranslate"><span class="pre">Measure_td.set_plot_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.set_x_parameters"><code class="docutils literal notranslate"><span class="pre">Measure_td.set_x_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.set_y_parameters"><code class="docutils literal notranslate"><span class="pre">Measure_td.set_y_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.measure_td.Measure_td.set_z_parameters"><code class="docutils literal notranslate"><span class="pre">Measure_td.set_z_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.html#module-qkit.measure.timedomain.pulse_sequence">qkit.measure.timedomain.pulse_sequence module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.ParametrizedValue"><code class="docutils literal notranslate"><span class="pre">ParametrizedValue</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.ParametrizedValue.Type"><code class="docutils literal notranslate"><span class="pre">ParametrizedValue.Type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.ParametrizedValue.crop_string"><code class="docutils literal notranslate"><span class="pre">ParametrizedValue.crop_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.ParametrizedValue.is_parametrized"><code class="docutils literal notranslate"><span class="pre">ParametrizedValue.is_parametrized</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.ParametrizedValue.variables"><code class="docutils literal notranslate"><span class="pre">ParametrizedValue.variables</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.Pulse"><code class="docutils literal notranslate"><span class="pre">Pulse</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.Pulse.is_parametrized"><code class="docutils literal notranslate"><span class="pre">Pulse.is_parametrized</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.Pulse.variable_names"><code class="docutils literal notranslate"><span class="pre">Pulse.variable_names</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence"><code class="docutils literal notranslate"><span class="pre">PulseSequence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.add"><code class="docutils literal notranslate"><span class="pre">PulseSequence.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.add_readout"><code class="docutils literal notranslate"><span class="pre">PulseSequence.add_readout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.add_wait"><code class="docutils literal notranslate"><span class="pre">PulseSequence.add_wait()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.get_pulses"><code class="docutils literal notranslate"><span class="pre">PulseSequence.get_pulses()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.plot"><code class="docutils literal notranslate"><span class="pre">PulseSequence.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.pulses"><code class="docutils literal notranslate"><span class="pre">PulseSequence.pulses</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.sequence"><code class="docutils literal notranslate"><span class="pre">PulseSequence.sequence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.variable_names"><code class="docutils literal notranslate"><span class="pre">PulseSequence.variable_names</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseType"><code class="docutils literal notranslate"><span class="pre">PulseType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseType.Pulse"><code class="docutils literal notranslate"><span class="pre">PulseType.Pulse</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseType.Readout"><code class="docutils literal notranslate"><span class="pre">PulseType.Readout</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseType.Wait"><code class="docutils literal notranslate"><span class="pre">PulseType.Wait</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.Shape"><code class="docutils literal notranslate"><span class="pre">Shape</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.ShapeLibClass"><code class="docutils literal notranslate"><span class="pre">ShapeLibClass</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.html#module-qkit.measure.timedomain.sequence_library">qkit.measure.timedomain.sequence_library module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.sequence_library.rabi"><code class="docutils literal notranslate"><span class="pre">rabi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.sequence_library.ramsey"><code class="docutils literal notranslate"><span class="pre">ramsey()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.sequence_library.spinecho"><code class="docutils literal notranslate"><span class="pre">spinecho()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.sequence_library.spinlocking"><code class="docutils literal notranslate"><span class="pre">spinlocking()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.html#qkit.measure.timedomain.sequence_library.t1"><code class="docutils literal notranslate"><span class="pre">t1()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.html#module-qkit.measure.timedomain">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qkit.measure.transport.html">qkit.measure.transport package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.transport.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.transport.html#module-qkit.measure.transport.transport">qkit.measure.transport.transport module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport"><code class="docutils literal notranslate"><span class="pre">transport</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.add_sweep_4quadrants"><code class="docutils literal notranslate"><span class="pre">transport.add_sweep_4quadrants()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.add_sweep_halfswing"><code class="docutils literal notranslate"><span class="pre">transport.add_sweep_halfswing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.get_average"><code class="docutils literal notranslate"><span class="pre">transport.get_average()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.get_comment"><code class="docutils literal notranslate"><span class="pre">transport.get_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.get_dVdI"><code class="docutils literal notranslate"><span class="pre">transport.get_dVdI()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.get_expname"><code class="docutils literal notranslate"><span class="pre">transport.get_expname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.get_filename"><code class="docutils literal notranslate"><span class="pre">transport.get_filename()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.get_log_function"><code class="docutils literal notranslate"><span class="pre">transport.get_log_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.get_tdy"><code class="docutils literal notranslate"><span class="pre">transport.get_tdy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.get_view_xy"><code class="docutils literal notranslate"><span class="pre">transport.get_view_xy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.get_x_dt"><code class="docutils literal notranslate"><span class="pre">transport.get_x_dt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.measure_1D"><code class="docutils literal notranslate"><span class="pre">transport.measure_1D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.measure_2D"><code class="docutils literal notranslate"><span class="pre">transport.measure_2D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.measure_3D"><code class="docutils literal notranslate"><span class="pre">transport.measure_3D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.measure_xy"><code class="docutils literal notranslate"><span class="pre">transport.measure_xy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.reset_comment"><code class="docutils literal notranslate"><span class="pre">transport.reset_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.reset_expname"><code class="docutils literal notranslate"><span class="pre">transport.reset_expname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.reset_filename"><code class="docutils literal notranslate"><span class="pre">transport.reset_filename()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.reset_fit_IV"><code class="docutils literal notranslate"><span class="pre">transport.reset_fit_IV()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.reset_landscape"><code class="docutils literal notranslate"><span class="pre">transport.reset_landscape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.reset_log_function"><code class="docutils literal notranslate"><span class="pre">transport.reset_log_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_average"><code class="docutils literal notranslate"><span class="pre">transport.set_average()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_comment"><code class="docutils literal notranslate"><span class="pre">transport.set_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_dVdI"><code class="docutils literal notranslate"><span class="pre">transport.set_dVdI()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_expname"><code class="docutils literal notranslate"><span class="pre">transport.set_expname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_filename"><code class="docutils literal notranslate"><span class="pre">transport.set_filename()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_fit_IV"><code class="docutils literal notranslate"><span class="pre">transport.set_fit_IV()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_landscape"><code class="docutils literal notranslate"><span class="pre">transport.set_landscape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_log_function"><code class="docutils literal notranslate"><span class="pre">transport.set_log_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_plot_comment"><code class="docutils literal notranslate"><span class="pre">transport.set_plot_comment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_sample"><code class="docutils literal notranslate"><span class="pre">transport.set_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_tdy"><code class="docutils literal notranslate"><span class="pre">transport.set_tdy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_view_xy"><code class="docutils literal notranslate"><span class="pre">transport.set_view_xy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_x_dt"><code class="docutils literal notranslate"><span class="pre">transport.set_x_dt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_x_parameters"><code class="docutils literal notranslate"><span class="pre">transport.set_x_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_xy_parameters"><code class="docutils literal notranslate"><span class="pre">transport.set_xy_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.set_y_parameters"><code class="docutils literal notranslate"><span class="pre">transport.set_y_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.sweep"><code class="docutils literal notranslate"><span class="pre">transport.sweep</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html#qkit.measure.transport.transport.transport.take_IV"><code class="docutils literal notranslate"><span class="pre">transport.take_IV()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.transport.html#module-qkit.measure.transport">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-qkit.measure.json_handler">
+<span id="qkit-measure-json-handler-module"></span><h2>qkit.measure.json_handler module<a class="headerlink" href="#module-qkit.measure.json_handler" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.json_handler.QkitJSONDecoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.json_handler.</span></span><span class="sig-name descname"><span class="pre">QkitJSONDecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/json_handler.html#QkitJSONDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.json_handler.QkitJSONDecoder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">JSONDecoder</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.json_handler.QkitJSONDecoder.object_hook">
+<span class="sig-name descname"><span class="pre">object_hook</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/json_handler.html#QkitJSONDecoder.object_hook"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.json_handler.QkitJSONDecoder.object_hook" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.json_handler.QkitJSONEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.json_handler.</span></span><span class="sig-name descname"><span class="pre">QkitJSONEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipkeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_ascii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_circular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/json_handler.html#QkitJSONEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.json_handler.QkitJSONEncoder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">JSONEncoder</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.json_handler.QkitJSONEncoder.default">
+<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/json_handler.html#QkitJSONEncoder.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.json_handler.QkitJSONEncoder.default" title="Permalink to this definition"></a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.measurement_base">
+<span id="qkit-measure-measurement-base-module"></span><h2>qkit.measure.measurement_base module<a class="headerlink" href="#module-qkit.measure.measurement_base" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.measurement_base.</span></span><span class="sig-name descname"><span class="pre">MeasureBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Baseclass for measurements.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.Coordinate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Coordinate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.Coordinate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.Coordinate" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.Coordinate.create_dataset">
+<span class="sig-name descname"><span class="pre">create_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdf_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.Coordinate.create_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.Coordinate.create_dataset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.Coordinate.validate_parameters">
+<span class="sig-name descname"><span class="pre">validate_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.Coordinate.validate_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.Coordinate.validate_parameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.Data">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_over</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.Data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.Data" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.Data.create_dataset">
+<span class="sig-name descname"><span class="pre">create_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdf_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.Data.create_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.Data.create_dataset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.Data.validate_parameters">
+<span class="sig-name descname"><span class="pre">validate_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.Data.validate_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.Data.validate_parameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.add_log_function">
+<span class="sig-name descname"><span class="pre">add_log_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dtype=&lt;class</span> <span class="pre">'float'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.add_log_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.add_log_function" title="Permalink to this definition"></a></dt>
+<dd><p>A function (object) can be passed to the measurement loop which is excecuted before every x iteration
+but after executing the x_object setter in 2D measurements and before every line (but after setting
+the x value) in 3D measurements.
+The return value of the function of type float or similar is stored in a value vector in the h5 file.</p>
+<p>To add multiple log functions, execute this function multiple times.</p>
+<p>func: function object
+name: name of logging parameter appearing in h5 file
+unit: unit of logging parameter, default: ‘’
+log_dtype: h5 data type, default: float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.remove_log_function">
+<span class="sig-name descname"><span class="pre">remove_log_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.remove_log_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.remove_log_function" title="Permalink to this definition"></a></dt>
+<dd><p>Remove the index-th log function.
+If no index is given, all log functions are removed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.set_sample">
+<span class="sig-name descname"><span class="pre">set_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.set_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.set_sample" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.set_x_parameters">
+<span class="sig-name descname"><span class="pre">set_x_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.set_x_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.set_x_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Sets x-parameters for 2D and 3D scan.
+In a 3D measurement, the x-parameters will be the “outer” sweep meaning for every x value all y values are swept and for each (x,y) value the bias is swept according to the set sweep parameters.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>vec: array_likes</dt><dd><p>An N-dimensional array that contains the sweep values.</p>
+</dd>
+<dt>coordname: string</dt><dd><p>The coordinate name to be created as data series in the .h5 file.</p>
+</dd>
+<dt>set_obj: obj</dt><dd><p>An callable object to execute with vec-values.</p>
+</dd>
+<dt>unit: string</dt><dd><p>The unit name to be used in data series in the .h5 file.</p>
+</dd>
+<dt>dt: float, optional</dt><dd><p>The sleep time between x-iterations.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_base.MeasureBase.set_y_parameters">
+<span class="sig-name descname"><span class="pre">set_y_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_base.html#MeasureBase.set_y_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_base.MeasureBase.set_y_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Sets y-parameters for 2D and 3D scan.
+In a 3D measurement, the y-parameters will be the “outer” sweep meaning for every y value all y values are swept and for each (y,y) value the bias is swept according to the set sweep parameters.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>vec: array_likes</dt><dd><p>An N-dimensional array that contains the sweep values.</p>
+</dd>
+<dt>coordname: string</dt><dd><p>The coordinate name to be created as data series in the .h5 file.</p>
+</dd>
+<dt>set_obj: obj</dt><dd><p>An callable object to execute with vec-values.</p>
+</dd>
+<dt>unit: string</dt><dd><p>The unit name to be used in data series in the .h5 file.</p>
+</dd>
+<dt>dt: float, optional</dt><dd><p>The sleep time between y-iterations.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.measurement_class">
+<span id="qkit-measure-measurement-class-module"></span><h2>qkit.measure.measurement_class module<a class="headerlink" href="#module-qkit.measure.measurement_class" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.measurement_class.Measurement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.measurement_class.</span></span><span class="sig-name descname"><span class="pre">Measurement</span></span><a class="reference internal" href="_modules/qkit/measure/measurement_class.html#Measurement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_class.Measurement" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Measurement class to define general information about the specific measurement.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_class.Measurement.get_JSON">
+<span class="sig-name descname"><span class="pre">get_JSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_class.html#Measurement.get_JSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_class.Measurement.get_JSON" title="Permalink to this definition"></a></dt>
+<dd><p>Returns JSON string of all attributes. The function is mostly used for saving in .h5.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_class.Measurement.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_class.html#Measurement.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_class.Measurement.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load sample keys and entries to current sample instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_class.Measurement.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_class.html#Measurement.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_class.Measurement.save" title="Permalink to this definition"></a></dt>
+<dd><p>Save sample object in the same directory as the measurement .h5 file or in the given filepath.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_class.Measurement.update_all_instruments">
+<span class="sig-name descname"><span class="pre">update_all_instruments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_class.html#Measurement.update_all_instruments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_class.Measurement.update_all_instruments" title="Permalink to this definition"></a></dt>
+<dd><p>Updates all instruments to their parameter settings during the measurement.
+CAUTION: This can be critical for current sources, since the current value is set and not ramped!</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_class.Measurement.update_instrument">
+<span class="sig-name descname"><span class="pre">update_instrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ins_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_class.html#Measurement.update_instrument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_class.Measurement.update_instrument" title="Permalink to this definition"></a></dt>
+<dd><p>Sets all parameters of the instrument ins_name to the values used in the measurements.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.measurement_class.Measurement.write_to_hdf">
+<span class="sig-name descname"><span class="pre">write_to_hdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdf_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/measurement_class.html#Measurement.write_to_hdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.measurement_class.Measurement.write_to_hdf" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.samples_class">
+<span id="qkit-measure-samples-class-module"></span><h2>qkit.measure.samples_class module<a class="headerlink" href="#module-qkit.measure.samples_class" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.samples_class.Sample">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.samples_class.</span></span><span class="sig-name descname"><span class="pre">Sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/samples_class.html#Sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.samples_class.Sample" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Sample Class to define all values necessary to measure a sample</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.samples_class.Sample.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/samples_class.html#Sample.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.samples_class.Sample.get" title="Permalink to this definition"></a></dt>
+<dd><p>Gets an argument of the sample and returns default, if it does not exist.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.samples_class.Sample.get_all">
+<span class="sig-name descname"><span class="pre">get_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/samples_class.html#Sample.get_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.samples_class.Sample.get_all" title="Permalink to this definition"></a></dt>
+<dd><p>return all keys and entries of sample instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.samples_class.Sample.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/samples_class.html#Sample.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.samples_class.Sample.load" title="Permalink to this definition"></a></dt>
+<dd><p>load sample keys and entries to current sample instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.samples_class.Sample.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/samples_class.html#Sample.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.samples_class.Sample.save" title="Permalink to this definition"></a></dt>
+<dd><p>save sample object.
+Filename can either be:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>a full (absolute) path to the sample file or</p></li>
+<li><p>any other string that is added to the filename in the data dir</p></li>
+<li><p>None (default), the the sample object is stored in the data dir.</p></li>
+</ul>
+</div></blockquote>
+<p>returns the location of the sample file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.samples_class.Sample.set_times">
+<span class="sig-name descname"><span class="pre">set_times</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tpi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/samples_class.html#Sample.set_times"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.samples_class.Sample.set_times" title="Permalink to this definition"></a></dt>
+<dd><p>pass tpi to this function and it will update tpi as well as tpi2 = tpi/2</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.write_additional_files">
+<span id="qkit-measure-write-additional-files-module"></span><h2>qkit.measure.write_additional_files module<a class="headerlink" href="#module-qkit.measure.write_additional_files" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.write_additional_files.close_log_file">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.write_additional_files.</span></span><span class="sig-name descname"><span class="pre">close_log_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_file_handler</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/write_additional_files.html#close_log_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.write_additional_files.close_log_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.write_additional_files.get_instrument_settings">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.write_additional_files.</span></span><span class="sig-name descname"><span class="pre">get_instrument_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/write_additional_files.html#get_instrument_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.write_additional_files.get_instrument_settings" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.write_additional_files.open_log_file">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.write_additional_files.</span></span><span class="sig-name descname"><span class="pre">open_log_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/write_additional_files.html#open_log_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.write_additional_files.open_log_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-qkit.measure">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.measure" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.gui.qviewkit.html" class="btn btn-neutral float-left" title="qkit.gui.qviewkit package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.measure.oscilloscope.html" class="btn btn-neutral float-right" title="qkit.measure.oscilloscope package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

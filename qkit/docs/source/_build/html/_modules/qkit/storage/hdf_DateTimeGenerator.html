@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.storage.hdf_DateTimeGenerator &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.storage.hdf_DateTimeGenerator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.storage.hdf_DateTimeGenerator</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created 2015</span>
+
+<span class="sd">@author: hrotzing</span>
+
+<span class="sd">Modified 2017 by S1</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">qkit</span>
+
+<span class="n">alphabet</span> <span class="o">=</span> <span class="s2">&quot;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span>
+
+
+<div class="viewcode-block" id="DateTimeGenerator"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator">[docs]</a><span class="k">class</span> <span class="nc">DateTimeGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;DateTimeGenerator class to provide a timestamp for each measurement file</span>
+<span class="sd">    upon creation.</span>
+<span class="sd">    </span>
+<span class="sd">    For sorting and unique identification across multiple measurement setups</span>
+<span class="sd">    we provide a timestamp for each h5 file created with qkit. We use the unix</span>
+<span class="sd">    timestamp to get time resolution of one second which should be enough for</span>
+<span class="sd">    our needs. The integer timestamp is then converted either into a HHMMSS</span>
+<span class="sd">    representation using day and month information to create a folder, or the</span>
+<span class="sd">    timestamp gets converted using the alphabet to create a 6 digit UUID.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_unix_timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_localtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_unix_timestamp&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_localtime&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_timemark&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%H%M%S&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_localtime&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_datemark&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_localtime&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_uuid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">encode_uuid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_unix_timestamp&#39;</span><span class="p">])</span>
+    
+    <span class="c1"># call for h5 filename, qkit config gets checked for encoding procedure.</span>
+<div class="viewcode-block" id="DateTimeGenerator.new_filename"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator.new_filename">[docs]</a>    <span class="k">def</span> <span class="nf">new_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datafolder_structure&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">new_filename_v2</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="c1"># 6 digit UUID</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">new_filename_v1</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="c1"># HHMMSS representation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_folder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_relfolder&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_relpath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_relfolder&#39;</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_filename&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_filepath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_folder&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_filename&#39;</span><span class="p">])</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span></div>
+    
+<div class="viewcode-block" id="DateTimeGenerator.new_filename_v1"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator.new_filename_v1">[docs]</a>    <span class="k">def</span> <span class="nf">new_filename_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_timemark&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">+=</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Old filename with datadir/YYMMDD/HHMMSS_name/HHMMSS_name.h5&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_relfolder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_datemark&#39;</span><span class="p">],</span>
+                <span class="n">filename</span>
+        <span class="p">)</span></div>
+    
+<div class="viewcode-block" id="DateTimeGenerator.new_filename_v2"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator.new_filename_v2">[docs]</a>    <span class="k">def</span> <span class="nf">new_filename_v2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_uuid&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">+=</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;New filename with datadir/run_id/user/uuid_name/uuid_name.h5&#39;&#39;&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">returndict</span><span class="p">[</span><span class="s1">&#39;_relfolder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;run_id&#39;</span><span class="p">,</span> <span class="s1">&#39;NO_RUN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;John_Doe&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">),</span>
+                <span class="n">filename</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="encode_uuid"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_DateTimeGenerator.encode_uuid">[docs]</a><span class="k">def</span> <span class="nf">encode_uuid</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Encodes the integer unix timestamp into a 6 digit UUID using the alphabet.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        Integer-cast unix timestamp.</span>
+<span class="sd">    Return:</span>
+<span class="sd">        6 digit UUID string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if not value: value = self._unix_timestamp</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">la</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">alphabet</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">value</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="n">alphabet</span><span class="p">[</span><span class="n">value</span> <span class="o">%</span> <span class="n">la</span><span class="p">]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span> <span class="o">/</span> <span class="n">la</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="decode_uuid"><a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.hdf_DateTimeGenerator.decode_uuid">[docs]</a><span class="k">def</span> <span class="nf">decode_uuid</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decodes the 6 digit UUID back into integer unix timestamp.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        6 digit UUID string.        </span>
+<span class="sd">    Return:</span>
+<span class="sd">        Integer-cast unix timestamp.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if not string: string = self._uuid</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">multiplier</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="n">la</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">alphabet</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">string</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">alphabet</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">string</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can not decode this: </span><span class="si">{}</span><span class="s2">&lt;--&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">string</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="n">f</span> <span class="o">*</span> <span class="n">multiplier</span>
+        <span class="n">multiplier</span> <span class="o">*=</span> <span class="n">la</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">output</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

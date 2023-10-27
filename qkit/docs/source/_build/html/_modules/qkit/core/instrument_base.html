@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.core.instrument_base &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.core.instrument_base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.core.instrument_base</h1><div class="highlight"><pre>
+<span></span><span class="c1"># instrument_base.py, base class to implement instrument objects</span>
+<span class="c1"># Reinier Heeres &lt;reinier@heeres.eu&gt;, 2008</span>
+<span class="c1"># HR@KIT 2017 (converted to python3)</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">qkit</span>
+
+
+<div class="viewcode-block" id="Instrument"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument">[docs]</a><span class="k">class</span> <span class="nc">Instrument</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for instruments.</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">    Instrument.get(&lt;variable name or list&gt;)</span>
+<span class="sd">    Instrument.set(&lt;variable name or list&gt;)</span>
+
+<span class="sd">    Implement an instrument:</span>
+<span class="sd">    In __init__ call self.add_variable(&lt;name&gt;, &lt;option dict&gt;)</span>
+<span class="sd">    Implement _do_get_&lt;variable&gt; and _do_set_&lt;variable&gt; functions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+
+    <span class="n">FLAG_GET</span> <span class="o">=</span> <span class="mh">0x01</span>             <span class="c1"># Parameter is gettable</span>
+    <span class="n">FLAG_SET</span> <span class="o">=</span> <span class="mh">0x02</span>             <span class="c1"># {arameter is settable</span>
+    <span class="n">FLAG_GETSET</span> <span class="o">=</span> <span class="mh">0x03</span>          <span class="c1"># Shortcut for GET and SET</span>
+    <span class="n">FLAG_GET_AFTER_SET</span> <span class="o">=</span> <span class="mh">0x04</span>   <span class="c1"># perform a &#39;get&#39; after a &#39;set&#39;</span>
+    <span class="n">FLAG_SOFTGET</span> <span class="o">=</span> <span class="mh">0x08</span>         <span class="c1"># &#39;get&#39; operation is simulated in software,</span>
+                                <span class="c1"># e.g. an internally stored value is returned.</span>
+                                <span class="c1"># Only use for parameters that cannot be read</span>
+                                <span class="c1"># back from a device.</span>
+
+    <span class="n">RESERVED_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="k">if</span> <span class="s1">&#39;tags&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_added_methods</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_probe_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Instrument &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="Instrument.get_name"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the name of the instrument as a string</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Output: name of instrument (string)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
+    
+    <span class="k">def</span> <span class="nf">_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This function is called by the QkitJSONEncoder and should return a </span>
+<span class="sd">        dictionary that will be saved to the JSON file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span> <span class="p">:</span> <span class="s1">&#39;qkitInstrument&#39;</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">())}</span>
+        
+<div class="viewcode-block" id="Instrument.get_type"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return type of instrument as a string.&quot;&quot;&quot;</span>
+        <span class="n">modname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">modname</span></div>
+
+<div class="viewcode-block" id="Instrument.get_options"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Return instrument options.&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span></div>
+
+<div class="viewcode-block" id="Instrument.get_tags"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_tags">[docs]</a>    <span class="k">def</span> <span class="nf">get_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns array of tags</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Output: array of strings</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Instrument.add_tag"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.add_tag">[docs]</a>    <span class="k">def</span> <span class="nf">add_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add tag to the tag list</span>
+
+<span class="sd">        Input: tag (string)</span>
+<span class="sd">        Output: None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.has_tag"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.has_tag">[docs]</a>    <span class="k">def</span> <span class="nf">has_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return whether instrument has any tag in &#39;tags&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tags</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Instrument.initialize"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Currently unsupported; might be used in the future to perform</span>
+<span class="sd">        extra initialization in sub-classed Instruments.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Output: None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Instrument.remove"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Notify the instrument collection that this instrument should be</span>
+<span class="sd">        removed. Override this in a sub-classed Instrument to perform</span>
+<span class="sd">        cleanup.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Output: None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_remove_parameters</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Instrument.is_initialized"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.is_initialized">[docs]</a>    <span class="k">def</span> <span class="nf">is_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return whether Instrument is initialized.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Output: Boolean</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span></div>
+
+<div class="viewcode-block" id="Instrument.add_parameter"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.add_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">add_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Create an instrument &#39;parameter&#39; that is known by the whole</span>
+<span class="sd">        environment (gui etc).</span>
+
+<span class="sd">        This function creates the &#39;get_&lt;name&gt;&#39; and &#39;set_&lt;name&gt;&#39; wrapper</span>
+<span class="sd">        functions that will perform checks on parameters and finally call</span>
+<span class="sd">        &#39;_do_get_&lt;name&gt;&#39; and &#39;_do_set_&lt;name&gt;&#39;. The latter functions should</span>
+<span class="sd">        be implemented in the instrument driver.</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            name (string): the name of the parameter (string)</span>
+<span class="sd">            optional keywords:</span>
+<span class="sd">                type: types.FloatType, types.StringType, etc.</span>
+<span class="sd">                flags: bitwise or of Instrument.FLAG_ constants.</span>
+<span class="sd">                    If not set, FLAG_GETSET is default</span>
+<span class="sd">                channels: tuple. Automagically create channels, e.g.</span>
+<span class="sd">                    (1, 4) will make channels 1, 2, 3, 4.</span>
+<span class="sd">                minval, maxval: values for bound checking</span>
+<span class="sd">                units (string): units for this parameter</span>
+<span class="sd">                maxstep (float): maximum step size when changing parameter</span>
+<span class="sd">                stepdelay (float): delay when setting steps (in milliseconds)</span>
+<span class="sd">                tags (array): tags for this parameter</span>
+<span class="sd">                doc (string): documentation string to add to get/set functions</span>
+<span class="sd">                listen_to (list of (ins, param) tuples): list of parameters</span>
+<span class="sd">                    to watch. If any of them changes, execute a get for this</span>
+<span class="sd">                    parameter. Useful for a parameter that depends on one</span>
+<span class="sd">                    (or more) other parameters.</span>
+
+<span class="sd">        Output: None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Parameter </span><span class="si">%s</span><span class="s1"> already exists.&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESERVED_NAMES</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is a reserved name, not adding parameter&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">options</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="k">if</span> <span class="s1">&#39;flags&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="n">options</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span>
+        <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="n">options</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;tags&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="n">options</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s1">&#39;offset&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="n">options</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># If defining channels call add_parameter for each channel</span>
+        <span class="k">if</span> <span class="s1">&#39;channels&#39;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="n">minch</span><span class="p">,</span> <span class="n">maxch</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">]</span>
+                <span class="n">channels</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">minch</span><span class="p">,</span> <span class="n">maxch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">channels</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+                <span class="n">chopt</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">chopt</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">]</span>
+                <span class="n">chopt</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="n">chopt</span><span class="p">[</span><span class="s1">&#39;base_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+
+                <span class="k">if</span> <span class="s1">&#39;channel_prefix&#39;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="n">var_name</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;channel_prefix&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="n">i</span> <span class="o">+</span> <span class="n">name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="o">**</span><span class="n">chopt</span><span class="p">)</span>
+
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="n">ch</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ch</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">base_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;base_name&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span><span class="nb">bytes</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">: Offset not available for parameter with type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">options</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">value</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">name</span><span class="p">:</span><span class="n">value</span><span class="p">})</span>
+                <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Set an offset for parameter </span><span class="si">%s</span><span class="s2"> on device </span><span class="si">%s</span><span class="s2">.</span>
+<span class="s2">                The offset is added on every get and substracted on every set command.</span>
+<span class="s2">                Use e.g. set_power_offset(-20) if you add 20dB attenuation at the device.&quot;&quot;&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;set_</span><span class="si">%s</span><span class="s1">_offset&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_added_methods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;set_</span><span class="si">%s</span><span class="s1">_offset&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+    
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;get_</span><span class="si">%s</span><span class="s1">_offset&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span> <span class="k">lambda</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_added_methods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;get_</span><span class="si">%s</span><span class="s1">_offset&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">:</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">ch</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">:</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">)</span>
+
+            <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s1">&#39;Get variable </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span>
+            <span class="k">if</span> <span class="s1">&#39;doc&#39;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;doc&#39;</span><span class="p">]</span>
+
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;get_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span>  <span class="n">func</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_added_methods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;get_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+            <span class="c1"># Set function to do_get_%s or _do_get_%s, whichever is available</span>
+            <span class="c1"># (if no function specified)</span>
+            <span class="k">if</span> <span class="s1">&#39;get_func&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="s1">&#39;get_func&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;do_get_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">base_name</span><span class="p">,</span> \
+                    <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_do_get_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">base_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;get_func&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;get_func&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__doc__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;get_func&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__doc__</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="s1">&#39;get_func&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_not_implemented</span><span class="p">(</span><span class="n">base_name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_not_implemented</span><span class="p">(</span><span class="n">base_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SOFTGET</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">:</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">ch</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">:</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">)</span>
+
+            <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s1">&#39;Get variable </span><span class="si">%s</span><span class="s1"> (internal stored value)&#39;</span> <span class="o">%</span> <span class="n">name</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;get_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span>  <span class="n">func</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_added_methods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;get_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SET</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">ch</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="o">**</span><span class="n">lopts</span><span class="p">)</span>
+
+            <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s1">&#39;Set variable </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span>
+            <span class="k">if</span> <span class="s1">&#39;doc&#39;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;doc&#39;</span><span class="p">]</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;set_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_added_methods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;set_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+            <span class="c1"># Set function to do_set_%s or _do_set_%s, whichever is available</span>
+            <span class="c1"># (if no function specified)</span>
+            <span class="k">if</span> <span class="s1">&#39;set_func&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="s1">&#39;set_func&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;do_set_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">base_name</span><span class="p">,</span> \
+                    <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_do_set_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">base_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;set_func&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;set_func&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__doc__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;set_func&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__doc__</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="s1">&#39;set_func&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_set_not_implemented</span><span class="p">(</span><span class="n">base_name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_not_implemented</span><span class="p">(</span><span class="n">base_name</span><span class="p">)</span>
+
+<span class="c1">#        setattr(self, name,</span>
+<span class="c1">#            property(lambda: self.get(name), lambda x: self.set(name, x)))</span>
+
+        <span class="k">if</span> <span class="s1">&#39;listen_to&#39;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="n">insset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+            <span class="n">inshids</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">ins</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span> <span class="ow">in</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;listen_to&#39;</span><span class="p">]:</span>
+                <span class="n">inshids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ins</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;changed&#39;</span><span class="p">,</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_listen_parameter_changed_cb</span><span class="p">,</span>
+                        <span class="n">param</span><span class="p">,</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;get_func&#39;</span><span class="p">]))</span>
+            <span class="n">options</span><span class="p">[</span><span class="s1">&#39;listed_hids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inshids</span>
+
+        <span class="k">if</span> <span class="s1">&#39;group&#39;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">g</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_groups</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_groups</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_groups</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_remove_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Remove remaining references to bound methods so that the Instrument</span>
+<span class="sd">        object can be garbage collected.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">opts</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;get_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;set_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+                    <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Instrument.remove_parameter"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.remove_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">remove_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;get_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;set_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
+
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Instrument.has_parameter"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.has_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">has_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return whether instrument has a parameter called &#39;name&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.get_parameter_options"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_parameter_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return list of options for paramter.</span>
+
+<span class="sd">        Input: name (string)</span>
+<span class="sd">        Output: dictionary of options</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Instrument.get_shared_parameter_options"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_shared_parameter_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_shared_parameter_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return list of options for paramter.</span>
+
+<span class="sd">        Input: name (string)</span>
+<span class="sd">        Output: dictionary of options</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;get_func&#39;</span><span class="p">,</span> <span class="s1">&#39;set_func&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">options</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">options</span> <span class="ow">and</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+                <span class="n">options</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">options</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Instrument.set_parameter_options"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.set_parameter_options">[docs]</a>    <span class="k">def</span> <span class="nf">set_parameter_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Change parameter options.</span>
+
+<span class="sd">        Input:  name of parameter (string)</span>
+<span class="sd">        Ouput:  None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Parameter </span><span class="si">%s</span><span class="s1"> not defined&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="Instrument.get_parameter_tags"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_parameter_tags">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return tags for parameter &#39;name&#39;.</span>
+
+<span class="sd">        Input:  name of parameter (string)</span>
+<span class="sd">        Ouput:  array of tags</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Instrument.add_parameter_tag"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.add_parameter_tag">[docs]</a>    <span class="k">def</span> <span class="nf">add_parameter_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add tag to list of tags for parameter &#39;name&#39;.</span>
+
+<span class="sd">        Input:  (1) name of parameter (string)</span>
+<span class="sd">                (2) tag (string)</span>
+<span class="sd">        Ouput:  None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.set_parameter_bounds"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.set_parameter_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">set_parameter_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Change the bounds for a parameter.</span>
+
+<span class="sd">        Input:  (1) name of parameter (string)</span>
+<span class="sd">                (2) minimum value</span>
+<span class="sd">                (3) maximum value</span>
+<span class="sd">        Output: None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_parameter_options</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="n">maxval</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.set_channel_bounds"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.set_channel_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">set_channel_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Change the bounds for a channel.</span>
+
+<span class="sd">        Input:  (1) name of parameter (string)</span>
+<span class="sd">                (2) channel number (int)</span>
+<span class="sd">                (3) minimum value</span>
+<span class="sd">                (4) maximum value</span>
+<span class="sd">        Output: None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter_options</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;channel_prefix&#39;</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+            <span class="n">var_name</span> <span class="o">=</span> <span class="n">opts</span><span class="p">[</span><span class="s1">&#39;channel_prefix&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="n">channel</span> <span class="o">+</span> <span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_parameter_options</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="n">maxval</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.set_parameter_rate"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.set_parameter_rate">[docs]</a>    <span class="k">def</span> <span class="nf">set_parameter_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">,</span> <span class="n">stepdelay</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Change the rate properties for a channel.</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            stepsize (float): the maximum step size</span>
+<span class="sd">            stepdelay (float): the delay after each step</span>
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_parameter_options</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">maxstep</span><span class="o">=</span><span class="n">stepsize</span><span class="p">,</span> <span class="n">stepdelay</span><span class="o">=</span><span class="n">stepdelay</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.get_parameter_names"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of parameter names.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Output: all the paramter names (list of strings)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Instrument.get_parameters"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the parameter dictionary.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Ouput: Dictionary, keys are parameter names, values are the options.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span></div>
+
+<div class="viewcode-block" id="Instrument.get_shared_parameters"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_shared_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_shared_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the parameter dictionary, with non-shareable items stripped.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Ouput: Dictionary, keys are parameter names, values are the options.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shared_parameter_options</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">params</span></div>
+
+<div class="viewcode-block" id="Instrument.get_parameter_groups"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_parameter_groups">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return a dictionary with parameter group name -&gt; group members.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_groups</span></div>
+    
+    <span class="k">def</span> <span class="nf">_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">sign</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span><span class="o">+</span><span class="n">sign</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">_get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Private wrapper function to get a value.</span>
+
+<span class="sd">        Input:  (1) name of parameter (string)</span>
+<span class="sd">                (2) query the instrument or return stored value (Boolean)</span>
+<span class="sd">                (3) optional list of extra options</span>
+<span class="sd">        Output: value of parameter (whatever type the instrument driver returns)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Could not retrieve options for parameter </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="n">p</span> <span class="ow">and</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span>
+
+        <span class="n">flags</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span> <span class="ow">or</span> <span class="n">flags</span> <span class="o">&amp;</span> <span class="mi">8</span><span class="p">:</span> <span class="c1">#self.FLAG_SOFTGET:</span>
+            <span class="k">if</span> <span class="s1">&#39;value&#39;</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]),</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">query</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">flags</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">:</span> <span class="c1">#Instrument.FLAG_GET, not gettable</span>
+                    <span class="k">return</span> <span class="kc">None</span> 
+                <span class="c1"># if this value is not stored but gettable, don&#39;t throw an error but just get it.</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2"> value not cached. I try getting it with query=True.&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Trying to access cached value </span><span class="si">%s</span><span class="s1">, but none available&#39;</span><span class="o">%</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check this here; getting of cached values should work</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">flags</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">:</span> <span class="c1">#Instrument.FLAG_GET:</span>
+            <span class="k">if</span> <span class="n">query</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Instrument </span><span class="si">%s</span><span class="s1"> does not support getting of </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">func</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;get_func&#39;</span><span class="p">]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">p</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">bytes</span> <span class="ow">or</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+                    <span class="k">pass</span>
+                <span class="k">elif</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">](</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Unable to cast value &quot;</span><span class="si">%s</span><span class="s1">&quot; to </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Instrument.get"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get one or more Instrument parameter values.</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            name (string or list/tuple of strings): name of parameter(s)</span>
+<span class="sd">            query (bool): whether to query the instrument or return the</span>
+<span class="sd">                last stored value</span>
+<span class="sd">            fast (bool): legacy from qtlab</span>
+<span class="sd">            kwargs: Optional keyword args that will be passed on.</span>
+
+<span class="sd">        Output: Single value, or dictionary of parameter -&gt; values</span>
+<span class="sd">                Type is whatever the instrument driver returns.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="Instrument.get_threaded"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_threaded">[docs]</a>    <span class="k">def</span> <span class="nf">get_threaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Using threading functions is not supported. Redirecting to normal get&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="n">_CONVERT_MAP</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nb">int</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="nb">float</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="nb">bytes</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="nb">bool</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="nb">tuple</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+            <span class="nb">list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_convert_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">ttype</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">bool</span> <span class="ow">and</span> \
+                <span class="n">ttype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Setting a boolean, but that is not the expected type&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ttype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_CONVERT_MAP</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported type </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ttype</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_CONVERT_MAP</span><span class="p">[</span><span class="n">ttype</span><span class="p">]</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Conversion of </span><span class="si">%r</span><span class="s1"> to type </span><span class="si">%s</span><span class="s1"> failed&#39;</span><span class="p">,</span><span class="n">value</span><span class="p">,</span> <span class="n">ttype</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">_set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Private wrapper function to set a value.</span>
+
+<span class="sd">        Input:  (1) name of parameter (string)</span>
+<span class="sd">                (2) value of parameter (whatever type the parameter supports).</span>
+<span class="sd">                    Type casting is performed if necessary.</span>
+<span class="sd">                (3) Optional keyword args that will be passed on.</span>
+<span class="sd">        Output: Value returned by the _do_set_&lt;name&gt; function,</span>
+<span class="sd">                or result of get in FLAG_GET_AFTER_SET specified.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter </span><span class="si">%s</span><span class="s2"> not known&quot;</span><span class="o">%</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_SET</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Instrument does not support setting of </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="n">p</span> <span class="ow">and</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span>
+
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s1">&#39;minval&#39;</span> <span class="ow">in</span> <span class="n">p</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;minval&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">InstrumentBoundsError</span><span class="p">(</span><span class="s1">&#39;Cannot set </span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1"> to </span><span class="si">%g</span><span class="s1">: With offset </span><span class="si">%g</span><span class="s1">, </span><span class="si">%s</span><span class="s1"> at </span><span class="si">%s</span><span class="s1"> would be </span><span class="si">%g</span><span class="s1">, which is too small (Minimum: &#39;</span>
+                                                             <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">],</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span><span class="n">value</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;maxval&#39;</span><span class="p">]))</span>
+            <span class="k">raise</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">InstrumentBoundsError</span><span class="p">(</span><span class="s1">&#39;Cannot set </span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">: value too small (Minimum: </span><span class="si">%g</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span><span class="n">value</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;minval&#39;</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="s1">&#39;maxval&#39;</span> <span class="ow">in</span> <span class="n">p</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;maxval&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">InstrumentBoundsError</span><span class="p">(</span><span class="s1">&#39;Cannot set </span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1"> to </span><span class="si">%g</span><span class="s1">: With offset </span><span class="si">%g</span><span class="s1">, </span><span class="si">%s</span><span class="s1"> at </span><span class="si">%s</span><span class="s1"> would be </span><span class="si">%g</span><span class="s1">, which is too large (Maximum: &#39;</span>
+                                                             <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">name</span><span class="p">],</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span><span class="n">value</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;maxval&#39;</span><span class="p">]))</span>
+            <span class="k">raise</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">InstrumentBoundsError</span><span class="p">(</span><span class="s1">&#39;Cannot set </span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">: value too large (Maximum: </span><span class="si">%g</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;maxval&#39;</span><span class="p">]))</span>
+
+        <span class="n">func</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;set_func&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;maxstep&#39;</span> <span class="ow">in</span> <span class="n">p</span> <span class="ow">and</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;maxstep&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">curval</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">curval</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Current value not available, ignoring maxstep&#39;</span><span class="p">)</span>
+                <span class="n">curval</span> <span class="o">=</span> <span class="n">value</span> <span class="o">+</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;maxstep&#39;</span><span class="p">]</span>
+
+            <span class="n">sign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="n">curval</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">curval</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;maxstep&#39;</span><span class="p">])):</span>
+                <span class="n">func</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># execute the set function</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;stepdelay&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
+
+        <span class="n">func</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># execute the set function to get the final value</span>
+
+        <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">FLAG_GET_AFTER_SET</span><span class="p">:</span>
+            <span class="n">newvalue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">newvalue</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">: actual value (</span><span class="si">%s</span><span class="s2">) differs from set value (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">newvalue</span><span class="p">,</span><span class="n">value</span><span class="p">))</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">newvalue</span>
+
+        <span class="n">p</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="Instrument.set"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set one or more Instrument parameter values.</span>
+
+<span class="sd">        Checks whether the Instrument is locked and checks value bounds,</span>
+<span class="sd">        if specified by minval / maxval.</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            name (string or dict): which parameter to set, or dictionary of</span>
+<span class="sd">                parameter -&gt; value</span>
+<span class="sd">            value (any): the value to set</span>
+<span class="sd">            fast (bool): if True perform as fast as possible, e.g. don&#39;t</span>
+<span class="sd">                emit a signal to update the GUI.</span>
+<span class="sd">            kwargs: Optional keyword args that will be passed on.</span>
+
+<span class="sd">        Output: True or False whether the operation succeeded.</span>
+<span class="sd">                For multiple sets return False if any of the parameters failed.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">changed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">changed</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="Instrument.get_argspec_dict"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_argspec_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_argspec_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">varargs</span><span class="o">=</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">keywords</span><span class="o">=</span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">defaults</span><span class="o">=</span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Instrument.add_function"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.add_function">[docs]</a>    <span class="k">def</span> <span class="nf">add_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Inform the Instrument wrapper class to expose a function.</span>
+
+<span class="sd">        Input:  (1) name of function (string)</span>
+<span class="sd">                (2) dictionary of extra options</span>
+<span class="sd">        Output: None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Instrument does not implement function </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;__doc__&#39;</span><span class="p">):</span>
+            <span class="n">options</span><span class="p">[</span><span class="s1">&#39;doc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;__doc__&#39;</span><span class="p">)</span>
+
+        <span class="n">options</span><span class="p">[</span><span class="s1">&#39;argspec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_argspec_dict</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span></div>
+
+<div class="viewcode-block" id="Instrument.get_function_options"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_function_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_function_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return options for an Instrument function.</span>
+
+<span class="sd">        Input:  name of function (string)</span>
+<span class="sd">        Output: dictionary of options for function &#39;name&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Instrument.get_function_parameters"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_function_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_function_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return info about parameters for function.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;parameters&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span><span class="p">[</span><span class="n">name</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;parameters&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Instrument.get_function_names"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_function_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_function_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the list of exposed Instrument function names.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Output: list of function names (list of strings)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Instrument.get_functions"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.get_functions">[docs]</a>    <span class="k">def</span> <span class="nf">get_functions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the exposed functions dictionary.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Ouput: Dictionary, keys are function  names, values are the options.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span></div>
+
+<div class="viewcode-block" id="Instrument.call"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funcname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Call the exposed function &#39;funcname&#39;.</span>
+
+<span class="sd">        Input:  (1) function name (string)</span>
+<span class="sd">                (2) Optional keyword args that will be passed on.</span>
+<span class="sd">        Output: None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funcname</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.reload"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.Instrument.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reloads the instrument. Make sure to only use the new instance</span>
+<span class="sd">        of the instrument, which is returned here!</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+<span class="sd">        Output:</span>
+<span class="sd">            New instance of instrument</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No warranty on reloads. Make sure to re-assign the instrument as </span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">.reload()&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_not_implemented</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Get not implemented for </span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="n">Instrument</span><span class="o">.</span><span class="n">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">name</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_set_not_implemented</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Set not implemented for </span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="n">Instrument</span><span class="o">.</span><span class="n">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">name</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_listen_parameter_changed_cb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">changed</span><span class="p">,</span><span class="n">listen_param</span><span class="p">,</span> <span class="n">update_func</span><span class="p">):</span>
+        <span class="c1"># ToDo this has to be correctly implemented!</span>
+        <span class="c1"># Cross-related parameters are probably a good thing to have</span>
+        <span class="c1"># i.e. one parameter is &quot;getted&quot; if another one is set</span>
+        <span class="k">if</span> <span class="n">listen_param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">changed</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">update_func</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="InvalidInstrument"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.InvalidInstrument">[docs]</a><span class="k">class</span> <span class="nc">InvalidInstrument</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Placeholder class for instruments that fail to load, mainly to support</span>
+<span class="sd">    reloading.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">instype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instype</span> <span class="o">=</span> <span class="n">instype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="InvalidInstrument.get_type"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.InvalidInstrument.get_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instype</span></div>
+
+<div class="viewcode-block" id="InvalidInstrument.get_create_kwargs"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.InvalidInstrument.get_create_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">get_create_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span></div></div>
+
+<div class="viewcode-block" id="GPIBInstrument"><a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_base.GPIBInstrument">[docs]</a><span class="k">class</span> <span class="nc">GPIBInstrument</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;lockclass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;GPIB&#39;</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

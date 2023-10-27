@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.analysis.circle_fit package &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.analysis.circle_fit.circle_fit_2019 package" href="qkit.analysis.circle_fit.circle_fit_2019.html" />
+    <link rel="prev" title="qkit.analysis package" href="qkit.analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">qkit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.html#module-qkit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">qkit</a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.analysis.html">qkit.analysis package</a></li>
+      <li class="breadcrumb-item active">qkit.analysis.circle_fit package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.analysis.circle_fit.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-analysis-circle-fit-package">
+<h1>qkit.analysis.circle_fit package<a class="headerlink" href="#qkit-analysis-circle-fit-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html">qkit.analysis.circle_fit.circle_fit_2019 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#module-qkit.analysis.circle_fit.circle_fit_2019.circuit">qkit.analysis.circle_fit.circle_fit_2019.circuit module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.circuit"><code class="docutils literal notranslate"><span class="pre">circuit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.circuit.Sij"><code class="docutils literal notranslate"><span class="pre">circuit.Sij()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.circuit.autofit"><code class="docutils literal notranslate"><span class="pre">circuit.autofit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.circuit.calc_fano_range"><code class="docutils literal notranslate"><span class="pre">circuit.calc_fano_range()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.circuit.phase_centered"><code class="docutils literal notranslate"><span class="pre">circuit.phase_centered()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.circuit.plotall"><code class="docutils literal notranslate"><span class="pre">circuit.plotall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.circuit.plotcalibrateddata"><code class="docutils literal notranslate"><span class="pre">circuit.plotcalibrateddata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.circuit.plotrawdata"><code class="docutils literal notranslate"><span class="pre">circuit.plotrawdata()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.notch_port"><code class="docutils literal notranslate"><span class="pre">notch_port</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.notch_port.n_ports"><code class="docutils literal notranslate"><span class="pre">notch_port.n_ports</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.reflection_port"><code class="docutils literal notranslate"><span class="pre">reflection_port</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#qkit.analysis.circle_fit.circle_fit_2019.circuit.reflection_port.n_ports"><code class="docutils literal notranslate"><span class="pre">reflection_port.n_ports</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_2019.html#module-qkit.analysis.circle_fit.circle_fit_2019">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html">qkit.analysis.circle_fit.circle_fit_classic package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#module-qkit.analysis.circle_fit.circle_fit_classic.calibration">qkit.analysis.circle_fit.circle_fit_classic.calibration module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration"><code class="docutils literal notranslate"><span class="pre">calibration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.baseline_func_amp"><code class="docutils literal notranslate"><span class="pre">calibration.baseline_func_amp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.baseline_func_phase"><code class="docutils literal notranslate"><span class="pre">calibration.baseline_func_phase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.fit_baseline_amp"><code class="docutils literal notranslate"><span class="pre">calibration.fit_baseline_amp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.fit_baseline_phase"><code class="docutils literal notranslate"><span class="pre">calibration.fit_baseline_phase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_amplitude"><code class="docutils literal notranslate"><span class="pre">calibration.normalize_amplitude()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_by_func"><code class="docutils literal notranslate"><span class="pre">calibration.normalize_by_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_phase"><code class="docutils literal notranslate"><span class="pre">calibration.normalize_phase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_zdata"><code class="docutils literal notranslate"><span class="pre">calibration.normalize_zdata()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#module-qkit.analysis.circle_fit.circle_fit_classic.circlefit">qkit.analysis.circle_fit.circle_fit_classic.circlefit module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circlefit.circlefit"><code class="docutils literal notranslate"><span class="pre">circlefit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#module-qkit.analysis.circle_fit.circle_fit_classic.circuit">qkit.analysis.circle_fit.circle_fit_classic.circuit module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.batch_processing"><code class="docutils literal notranslate"><span class="pre">batch_processing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.batch_processing.autofit"><code class="docutils literal notranslate"><span class="pre">batch_processing.autofit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.coupled_resonators"><code class="docutils literal notranslate"><span class="pre">coupled_resonators</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port"><code class="docutils literal notranslate"><span class="pre">notch_port</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.autofit"><code class="docutils literal notranslate"><span class="pre">notch_port.autofit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.circlefit"><code class="docutils literal notranslate"><span class="pre">notch_port.circlefit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.do_calibration"><code class="docutils literal notranslate"><span class="pre">notch_port.do_calibration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.do_normalization"><code class="docutils literal notranslate"><span class="pre">notch_port.do_normalization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_delay"><code class="docutils literal notranslate"><span class="pre">notch_port.get_delay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_photons_in_resonator"><code class="docutils literal notranslate"><span class="pre">notch_port.get_photons_in_resonator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_single_photon_limit"><code class="docutils literal notranslate"><span class="pre">notch_port.get_single_photon_limit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port"><code class="docutils literal notranslate"><span class="pre">reflection_port</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.autofit"><code class="docutils literal notranslate"><span class="pre">reflection_port.autofit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.circlefit"><code class="docutils literal notranslate"><span class="pre">reflection_port.circlefit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.do_calibration"><code class="docutils literal notranslate"><span class="pre">reflection_port.do_calibration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.do_normalization"><code class="docutils literal notranslate"><span class="pre">reflection_port.do_normalization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_delay"><code class="docutils literal notranslate"><span class="pre">reflection_port.get_delay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_photons_in_resonator"><code class="docutils literal notranslate"><span class="pre">reflection_port.get_photons_in_resonator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_single_photon_limit"><code class="docutils literal notranslate"><span class="pre">reflection_port.get_single_photon_limit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator"><code class="docutils literal notranslate"><span class="pre">resonator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.add_port"><code class="docutils literal notranslate"><span class="pre">resonator.add_port()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.add_transm_meas"><code class="docutils literal notranslate"><span class="pre">resonator.add_transm_meas()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.delete_port"><code class="docutils literal notranslate"><span class="pre">resonator.delete_port()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_Qi"><code class="docutils literal notranslate"><span class="pre">resonator.get_Qi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_photons_in_resonator"><code class="docutils literal notranslate"><span class="pre">resonator.get_photons_in_resonator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_single_photon_limit"><code class="docutils literal notranslate"><span class="pre">resonator.get_single_photon_limit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.transmission_port"><code class="docutils literal notranslate"><span class="pre">transmission_port</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.transmission_port.fit"><code class="docutils literal notranslate"><span class="pre">transmission_port.fit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#module-qkit.analysis.circle_fit.circle_fit_classic.utilities">qkit.analysis.circle_fit.circle_fit_classic.utilities module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.Watt2dBm"><code class="docutils literal notranslate"><span class="pre">Watt2dBm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.dBm2Watt"><code class="docutils literal notranslate"><span class="pre">dBm2Watt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting"><code class="docutils literal notranslate"><span class="pre">plotting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting.plotall"><code class="docutils literal notranslate"><span class="pre">plotting.plotall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting.plotcalibrateddata"><code class="docutils literal notranslate"><span class="pre">plotting.plotcalibrateddata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting.plotrawdata"><code class="docutils literal notranslate"><span class="pre">plotting.plotrawdata()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load"><code class="docutils literal notranslate"><span class="pre">save_load</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_data"><code class="docutils literal notranslate"><span class="pre">save_load.add_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_fromhdf"><code class="docutils literal notranslate"><span class="pre">save_load.add_fromhdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_froms2p"><code class="docutils literal notranslate"><span class="pre">save_load.add_froms2p()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_fromtxt"><code class="docutils literal notranslate"><span class="pre">save_load.add_fromtxt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.cut_data"><code class="docutils literal notranslate"><span class="pre">save_load.cut_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.save_fitresults"><code class="docutils literal notranslate"><span class="pre">save_load.save_fitresults()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.circle_fit.circle_fit_classic.html#module-qkit.analysis.circle_fit.circle_fit_classic">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-qkit.analysis.circle_fit">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.analysis.circle_fit" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.analysis.html" class="btn btn-neutral float-left" title="qkit.analysis package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.analysis.circle_fit.circle_fit_2019.html" class="btn btn-neutral float-right" title="qkit.analysis.circle_fit.circle_fit_2019 package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

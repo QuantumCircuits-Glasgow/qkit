@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.Keithley_2450 &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.Keithley_2450</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.Keithley_2450</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Basic Keysight 2450 driver for Keysight 2450 voltage/current source</span>
+<span class="c1"># adapted from Yokogawa GS210 driver, Dennis Rieger @KIT 09/2019</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span> <span class="nn">qkit.core.instrument_base</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">qkit</span> <span class="kn">import</span> <span class="n">visa</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<div class="viewcode-block" id="Keithley_2450"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450">[docs]</a><span class="k">class</span> <span class="nc">Keithley_2450</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is the driver for the Keysight 2450 multi channel source measure unit</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">    Initialize with</span>
+<span class="sd">    &lt;name&gt; = instruments.create(&#39;&lt;name&gt;&#39;, &#39;Keysight_2450&#39;, address=&#39;&lt;GBIP address&gt;&#39;,</span>
+<span class="sd">        reset=&lt;bool&gt;)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initializes the Keysight 2450, and communicates with the wrapper.</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            name (string)    : name of the instrument</span>
+<span class="sd">            address (string) : GPIB address</span>
+<span class="sd">            reset (bool)     : resets to default values</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Initialize wrapper functions</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Initializing instrument Keysight 2450&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Add some global constants</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="c1">#self._numchs = 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ramp_wait_time</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span> <span class="o">=</span> <span class="n">visa</span><span class="o">.</span><span class="n">instrument</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span>
+        
+        <span class="c1">#self._visainstrument.write(&#39;:SYST:REM&#39;)</span>
+        
+
+        <span class="c1"># Add parameters to wrapper</span>
+        
+<span class="c1">#        self.add_parameter(&#39;operation_mode&#39;,</span>
+<span class="c1">#            flags=Instrument.FLAG_SET,</span>
+<span class="c1">#            type=str, units=&#39;&#39;)</span>
+<span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;source_mode&#39;</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<span class="c1">#        self.add_parameter(&#39;source_range&#39;,</span>
+<span class="c1">#            flags=Instrument.FLAG_GETSET ,</span>
+<span class="c1">#            units=&#39;&#39;, type=str)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span> <span class="p">,</span>
+            <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">,</span> 
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># self.add_parameter(&#39;voltage_protection&#39;, </span>
+            <span class="c1"># flags=Instrument.FLAG_GETSET | Instrument.FLAG_GET_AFTER_SET,</span>
+            <span class="c1"># type=float, units=&#39;V&#39;)</span>
+
+        <span class="c1"># self.add_parameter(&#39;current_protection&#39;, </span>
+            <span class="c1"># flags=Instrument.FLAG_GETSET | Instrument.FLAG_GET_AFTER_SET,</span>
+            <span class="c1"># type=float, units=&#39;A&#39;)</span>
+            
+        <span class="c1"># self.add_parameter(&#39;4W&#39;,</span>
+            <span class="c1"># flags=Instrument.FLAG_GETSET ,</span>
+            <span class="c1"># units=&#39;&#39;, type=str)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;ramp_wait_time&#39;</span><span class="p">,</span> 
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
+          
+
+
+
+        <span class="c1"># Add functions to wrapper</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_all&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_defaults&#39;</span><span class="p">)</span>
+
+
+        
+        <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">()</span>
+            
+
+<span class="c1"># functions</span>
+<div class="viewcode-block" id="Keithley_2450.reset"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>     
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Resets instrument to default values</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+<span class="sd">    </span>
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Resetting instrument&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;*RST&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span></div>
+      
+<div class="viewcode-block" id="Keithley_2450.get_all"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.get_all">[docs]</a>    <span class="k">def</span> <span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reads all relevant parameters from instrument</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Get all relevant data from device&#39;</span><span class="p">)</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source_mode&#39;</span><span class="p">)</span>
+        <span class="c1"># # self.get(&#39;source_range&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span>
+        <span class="c1"># # self.get(&#39;voltage_protection&#39;)</span>
+        <span class="c1"># # self.get(&#39;current_protection&#39;)</span>
+        <span class="c1"># # self.get(&#39;4W&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ramp_wait_time&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keithley_2450.set_defaults"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.set_defaults">[docs]</a>    <span class="k">def</span> <span class="nf">set_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set to driver defaults:</span>
+<span class="sd">        Operation mode is set to remote</span>
+<span class="sd">        Source range is +-10 mA</span>
+<span class="sd">        Source mode is current mode</span>
+<span class="sd">        output remains unchanged</span>
+<span class="sd">        voltage protection (max. value) is 500 mV</span>
+<span class="sd">        current protection (max. value) is 10 mA</span>
+<span class="sd">        The measuring mode is set to 2-wire sense</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># # self.set(&#39;operation_mode&#39;, &#39;REM&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;source_mode&#39;</span><span class="p">,</span> <span class="s1">&#39;curr&#39;</span><span class="p">)</span>
+        <span class="c1"># # self.set(&#39;source_range&#39;, &#39;10mA&#39;)</span>
+        <span class="c1"># # self.set(&#39;output&#39;, &#39;off&#39;)</span>
+        <span class="c1"># # self.set(&#39;voltage_protection&#39;, &#39;0.5&#39;)</span>
+        <span class="c1"># # self.set(&#39;current_protection&#39;, &#39;0.01&#39;)</span>
+        <span class="c1"># # self.set(&#39;4W&#39;, &#39;off&#39;)</span>
+        <span class="c1"># # self.set(&#39;slope_time&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ramp_wait_time</span> <span class="o">=</span> <span class="mf">0.5</span></div>
+        
+ <span class="c1"># parameters</span>
+ 
+<span class="c1">#    def do_set_operation_mode(self, mode):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Set operation mode.</span>
+<span class="c1">#        &#39;&#39;&#39;    </span>
+<span class="c1">#        if mode in [&#39;REM&#39;,&#39;LOC&#39;]:</span>
+<span class="c1">#            logging.debug(&#39;Set mode to %s mode&#39;, mode)</span>
+<span class="c1">#            self._visainstrument.write(&#39;:SYST:%s&#39; % mode)</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            logging.error(&#39;invalid mode %s&#39; % mode)</span>
+ 
+<div class="viewcode-block" id="Keithley_2450.do_set_source_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.do_set_source_mode">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_source_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set source mode to current regime.</span>
+<span class="sd">        &#39;&#39;&#39;</span>    
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;curr&#39;</span><span class="p">,</span><span class="s1">&#39;volt&#39;</span><span class="p">]:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set mode to </span><span class="si">%s</span><span class="s1"> mode&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;SOUR:FUNC:MODE &quot;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid mode </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Keithley_2450.do_get_source_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.do_get_source_mode">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_source_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get source mode </span>
+<span class="sd">        </span>
+<span class="sd">        Input:</span>
+<span class="sd">            channel (int) : </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Get source mode&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;SOUR:FUNC:MODE?&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+        
+            
+            
+<span class="c1">#    def do_set_source_range(self, val):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        sets source range: </span>
+<span class="c1">#            determines the min and max values and the resolution</span>
+<span class="c1">#            - 1 mA  --&gt; +- 1.2 mA  resolution 10 nA (+-30 V load Voltage)</span>
+<span class="c1">#            - 10 mA  --&gt; +- 12 mA  resolution 100 nA (+-30 V load Voltage)</span>
+<span class="c1">#            - 100 mA --&gt; +- 120 mA  resolution 1 umA (+-30 V load Voltage)</span>
+<span class="c1">#            - 200 mA --&gt; +- 200 mA  resolution 1 umA (+-30 V load Voltage)</span>
+<span class="c1">#            </span>
+<span class="c1">#            - 10 mV  --&gt; +- 12 mV  resolution 100 nA (---)</span>
+<span class="c1">#            - 100 mV  --&gt; +- 120 mV  resolution 1 umA (---)</span>
+<span class="c1">#            - 1 V  --&gt; +- 1.2 mV  resolution 1 umA (+-200 mA load Current)</span>
+<span class="c1">#            - 10 V  --&gt; +- 12 mV  resolution 1 umA (+-200 mA load Current)</span>
+<span class="c1">#            - 30 mV  --&gt; +- 32 mV  resolution 1 umA (+-200 mA load Current)</span>
+<span class="c1">#</span>
+<span class="c1">#         </span>
+<span class="c1">#        Input:</span>
+<span class="c1">#            val (string)  : Value + Unit </span>
+<span class="c1">#            example: 10mA</span>
+<span class="c1">#</span>
+<span class="c1">#        Output:</span>
+<span class="c1">#</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Set source range to %s&#39; % val)</span>
+<span class="c1">#        self._set_func_par_value(&#39;sour&#39;, &#39;rang&#39;, val)</span>
+<span class="c1">#</span>
+<span class="c1">#            </span>
+<span class="c1">#    def do_get_source_range(self):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Get source range </span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get source range&#39;)</span>
+<span class="c1">#        </span>
+<span class="c1">#        return self._get_func_par(&#39;sour&#39;, &#39;rang&#39;)</span>
+<span class="c1">#        </span>
+<div class="viewcode-block" id="Keithley_2450.do_set_output"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.do_set_output">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets outputs of channels in &quot;on&quot; or &quot;off&quot; position.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;off&quot;</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set output to off&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:OUTP OFF&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;on&quot;</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set output to on&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:OUTP ON&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Invalid value </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="Keithley_2450.do_get_output"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.do_get_output">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets output state</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Get status of output&#39;</span><span class="p">)</span>
+        <span class="c1">#ans=self._get_func_par(&#39;outp&#39;,&#39;stat&#39;)</span>
+        <span class="n">ans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;:outp?&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">ans</span><span class="o">==</span><span class="s1">&#39;zero&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;off&quot;</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">ans</span><span class="p">):</span>
+            <span class="c1"># print(&#39;Attention: Output is set on; Be careful!&#39;)      #warning if output is on! No fast current changes if coil is attached</span>
+            <span class="k">return</span> <span class="s2">&quot;on&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;off&quot;</span></div>
+        
+<div class="viewcode-block" id="Keithley_2450.do_set_level"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.do_set_level">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set measuring level</span>
+<span class="sd">        If source mode is &#39;curr&#39; values are in [A]</span>
+<span class="sd">        If source mode is &#39;volt&#39; values are in [V]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set measuring level&#39;</span><span class="p">)</span>
+        <span class="c1">#if self.get(&#39;output&#39;, query = False) == &#39;off&#39;:</span>
+        <span class="c1">#    self.set(&#39;output&#39;, &#39;on&#39;)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source_mode&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;CURR&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SOUR:CURR </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;VOLT&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SOUR:VOLT </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Keithley_2450.do_get_level"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.do_get_level">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets source output level</span>
+<span class="sd">        If source mode is &#39;curr&#39; values are in [A]</span>
+<span class="sd">        If source mode is &#39;volt&#39; values are in [V]       </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Get measuring level&#39;</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source_mode&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;CURR&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;:SOUR:CURR?&#39;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;VOLT&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;:SOUR:VOLT?&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;error&#39;</span></div>
+        
+        
+    <span class="c1"># def do_set_voltage_protection(self, val):</span>
+        <span class="c1"># &#39;&#39;&#39;</span>
+        <span class="c1"># Sets voltage protection value</span>
+        <span class="c1"># &#39;&#39;&#39;</span>
+        <span class="c1"># logging.debug(&#39;Set voltage protection value&#39;)</span>
+        <span class="c1"># self._visainstrument.write(&#39;:SENS:VOLT:PROT %s&#39; % val)</span>
+        
+    <span class="c1"># def do_get_voltage_protection(self):</span>
+        <span class="c1"># &#39;&#39;&#39;</span>
+        <span class="c1"># Gets voltage protection value</span>
+        <span class="c1"># &#39;&#39;&#39;                </span>
+        <span class="c1"># logging.debug(&#39;Get voltage protection value&#39;)</span>
+        <span class="c1"># return float(self._visainstrument.ask(&#39;:SENS:VOLT:PROT?&#39;))</span>
+        
+    <span class="c1"># def do_set_current_protection(self, val):</span>
+        <span class="c1"># &#39;&#39;&#39;</span>
+        <span class="c1"># Sets current protection value</span>
+        <span class="c1"># &#39;&#39;&#39;</span>
+        <span class="c1"># logging.debug(&#39;Set current protection value&#39;)</span>
+        <span class="c1"># self._visainstrument.write(&#39;:SENS:CURR:PROT %s&#39; % val)</span>
+        
+    <span class="c1"># def do_get_current_protection(self):</span>
+        <span class="c1"># &#39;&#39;&#39;</span>
+        <span class="c1"># Gets current protection value</span>
+        <span class="c1"># &#39;&#39;&#39;                </span>
+        <span class="c1"># logging.debug(&#39;Get current protection value&#39;)</span>
+        <span class="c1"># return float(self._visainstrument.ask(&#39;:SENS:CURR:PROT?&#39;))</span>
+        
+        
+    <span class="c1"># def do_set_4W(self, val):</span>
+        <span class="c1"># &#39;&#39;&#39;</span>
+        <span class="c1"># Sets measurement mode to 4-wire or 2-wire mode.</span>
+        <span class="c1"># Value should be on or off. </span>
+        <span class="c1"># &quot;On&quot; devotes to 4-wire mode. &quot;Off&quot; devotes to 2-wire mode.</span>
+        <span class="c1"># In the instrument appropriate command is &quot;:sens:rem on/off&quot;</span>
+        <span class="c1"># &#39;&#39;&#39;</span>
+        <span class="c1"># if val in [&#39;on&#39;,&#39;off&#39;]:</span>
+            <span class="c1"># logging.debug(&#39;Set 4W to %s&#39; % val)</span>
+            <span class="c1"># ans = self._visainstrument.write(&quot;:SENS:REM %s&quot; % val)</span>
+        <span class="c1"># else:</span>
+            <span class="c1"># logging.error(&#39;Invalid value %s&#39; % val)</span>
+
+    <span class="c1"># def do_get_4W(self):</span>
+        <span class="c1"># &#39;&#39;&#39;</span>
+        <span class="c1"># Gets measurement mode</span>
+        <span class="c1"># &#39;&#39;&#39;</span>
+        <span class="c1"># logging.debug(&#39;Get 4-wire measurement mode&#39;)</span>
+        <span class="c1"># ans = self._visainstrument.ask(&quot;:SENS:REM?&quot;)</span>
+        
+        <span class="c1"># if int(ans):</span>
+            <span class="c1"># return &#39;on&#39;</span>
+        <span class="c1"># else:</span>
+            <span class="c1"># return &#39;off&#39;</span>
+            
+<div class="viewcode-block" id="Keithley_2450.do_get_ramp_wait_time"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.do_get_ramp_wait_time">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_ramp_wait_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get ramp time: Parameter is used for a current ramp and determines the waiting time </span>
+<span class="sd">        between two subsequent steps.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Get ramp time&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ramp_wait_time</span></div>
+
+<div class="viewcode-block" id="Keithley_2450.do_set_ramp_wait_time"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.do_set_ramp_wait_time">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_ramp_wait_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get ramp time: Parameter is used for a current ramp and determines the waiting time </span>
+<span class="sd">        between two subsequent steps.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set ramp time to </span><span class="si">%s</span><span class="s1"> s&#39;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ramp_wait_time</span> <span class="o">=</span> <span class="n">va</span></div>
+        
+        
+<div class="viewcode-block" id="Keithley_2450.ramp_current"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450.Keithley_2450.ramp_current">[docs]</a>    <span class="k">def</span> <span class="nf">ramp_current</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span>  <span class="n">wait_time</span><span class="p">,</span> <span class="n">showvalue</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outp</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Ramps the current starting from the actual value to a target value</span>
+<span class="sd">        Attention: all values are given in mA</span>
+<span class="sd">        &#39;step&#39; determines the step size</span>
+<span class="sd">        &#39;wait&#39; determines the sleep time after every step</span>
+<span class="sd">        &#39;outp&#39; determines if the output is on (True) or off (False) during the ramp</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">()</span>
+        
+        
+        <span class="k">if</span> <span class="n">outp</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;off&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;Attention: Output is off! If desired please turn on output manually and repeat operation&#39;</span>  
+            <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;on&#39;</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Start current ramp from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1"> with output on&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">target</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Invalid output mode&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;on&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;Attention: Output is on! If desired please turn off output manually and repeat operation&#39;</span>
+            <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;off&#39;</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Start current ramp from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1"> with output off&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">target</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Invalid output mode&#39;</span><span class="p">)</span>
+                
+        <span class="k">if</span><span class="p">(</span><span class="n">target</span> <span class="o">&lt;</span> <span class="n">start</span><span class="p">):</span> <span class="n">step</span> <span class="o">=</span> <span class="o">-</span><span class="n">step</span>
+        <span class="k">elif</span> <span class="n">target</span> <span class="o">==</span> <span class="n">start</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;Target value </span><span class="si">{}</span><span class="s1"> mA already reached!&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target</span><span class="o">*</span><span class="mf">1e3</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">step</span><span class="p">)[</span><span class="mi">1</span><span class="p">:],</span> <span class="p">[</span><span class="n">target</span><span class="p">])</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">showvalue</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> mA&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span><span class="o">*</span><span class="mf">1e3</span><span class="p">)),</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_level</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">showvalue</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span> 
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> mA&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span><span class="o">*</span><span class="mf">1e3</span><span class="p">)),</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">wait_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">showvalue</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">()</span></div></div>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#    def do_get_value(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Gets measured value</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get measured value&#39;)</span>
+<span class="c1">#        return float(self._visainstrument.ask(&#39;:chan%d:fetc?&#39; % channel))</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

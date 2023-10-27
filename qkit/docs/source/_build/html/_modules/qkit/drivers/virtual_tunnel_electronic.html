@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.virtual_tunnel_electronic &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.virtual_tunnel_electronic</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.virtual_tunnel_electronic</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Keithley.py driver for Keithley 2636A multi channel source measure unit</span>
+<span class="c1"># Micha Wildermuth, micha.wildermuth@kit.edu 2017</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">import</span> <span class="nn">qkit</span>
+<span class="kn">from</span> <span class="nn">qkit.core.instrument_base</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="virtual_tunnel_electronic"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic">[docs]</a><span class="k">class</span> <span class="nc">virtual_tunnel_electronic</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the virtual driver for the home made tunnel electronic combined with a Multi Channel Source Measure Unit &lt;SMU&gt;. I.a. it allows the external usage of voltage controlled current sources or transimpedance amplifiers</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">    Initialize with</span>
+<span class="sd">    &lt;name&gt; = qkit.instruments.create(&#39;&lt;name&gt;&#39;, &#39;virtual_tunnel_electronic&#39;, SMU=&lt;SMU&gt;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">SMU</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes VISA communication with the instrument Yokogawa GS820.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: string</span>
+<span class="sd">            Name of the instrument (driver).</span>
+<span class="sd">        SMU: qkit.instrument</span>
+<span class="sd">            Multi channel source measure unit.</span>
+<span class="sd">        reset: bool, optional</span>
+<span class="sd">            Resets the instrument to default conditions.. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import qkit</span>
+<span class="sd">        QKIT configuration initialized -&gt; available as qkit.cfg[...]</span>
+
+<span class="sd">        &gt;&gt;&gt; qkit.start()</span>
+<span class="sd">        Starting QKIT framework ... -&gt; qkit.core.startup</span>
+<span class="sd">        Loading module ... S10_logging.py</span>
+<span class="sd">        Loading module ... S12_lockfile.py</span>
+<span class="sd">        Loading module ... S14_setup_directories.py</span>
+<span class="sd">        Loading module ... S20_check_for_updates.py</span>
+<span class="sd">        Loading module ... S25_info_service.py</span>
+<span class="sd">        Loading module ... S30_qkit_start.py</span>
+<span class="sd">        Loading module ... S65_load_RI_service.py</span>
+<span class="sd">        Loading module ... S70_load_visa.py</span>
+<span class="sd">        Loading module ... S80_load_file_service.py</span>
+<span class="sd">        Loading module ... S85_init_measurement.py</span>
+<span class="sd">        Loading module ... S98_started.py</span>
+<span class="sd">        Loading module ... S99_init_user.py</span>
+
+<span class="sd">        &gt;&gt;&gt; SMU = qkit.instruments.create(&#39;SMU&#39;, &#39;Keithley&#39;, address=&#39;TCPIP0::00.00.000.00::INSTR&#39;, reset=True)</span>
+<span class="sd">        &gt;&gt;&gt; IVD = qkit.instruments.create(&#39;IVD&#39;, &#39;virtual_tunnel_electronic&#39;, SMU=SMU)</span>
+<span class="sd">        Initialized the file info database (qkit.fid) in 0.000 seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="vm">__name__</span>
+        <span class="c1"># create instrument</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;: Initializing instrument virtual tunnel electronic&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;virtual&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instruments</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">get_instruments</span><span class="p">()</span>
+        <span class="c1"># Source Measure Unit (SMU)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span> <span class="o">=</span> <span class="n">SMU</span>
+        <span class="c1"># external measurement setup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_BW</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># bandwidth of prefilter (only for get_all and setting file)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dAdV</span> <span class="o">=</span> <span class="mf">2e-6</span>  <span class="c1"># for external current bias</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_amp</span> <span class="o">=</span> <span class="mf">1e3</span>  <span class="c1"># for external voltage amplifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tau_amp</span> <span class="o">=</span> <span class="mf">100e-3</span>  <span class="c1"># time constant of amplifier (only for get_all and setting file)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dVdA</span> <span class="o">=</span> <span class="mf">1e8</span>  <span class="c1"># for external voltage bias</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Vdiv</span> <span class="o">=</span> <span class="mf">1e3</span>  <span class="c1"># for external voltage divider</span>
+        <span class="c1"># internal variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># VV-mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_modes</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;VV-mode&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;IV-mode&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;VI-mode&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># current bias</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_modes</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;current bias&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;voltage bias&#39;</span><span class="p">}</span>
+        <span class="c1"># dict of defaults values: defaults[&lt;pseudo_bias_mode&gt;][&lt;parameter&gt;][&lt;value&gt;]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dAdV&#39;</span><span class="p">:</span> <span class="mf">2e-6</span><span class="p">,</span>
+                              <span class="s1">&#39;amp&#39;</span><span class="p">:</span> <span class="mf">1e3</span><span class="p">},</span>
+                          <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dVdA&#39;</span><span class="p">:</span> <span class="mf">1e8</span><span class="p">,</span>
+                              <span class="s1">&#39;Vdiv&#39;</span><span class="p">:</span> <span class="mf">1e3</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_str</span> <span class="o">=</span> <span class="s1">&#39;default parameters&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_defaults_docstring</span><span class="p">()</span>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_BW"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_BW">[docs]</a>    <span class="k">def</span> <span class="nf">set_BW</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the internal variable for the bandwidth of an external filter to &lt;val&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Bandwidth of external filter (in Hz). Default is None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_BW</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_BW"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_BW">[docs]</a>    <span class="k">def</span> <span class="nf">get_BW</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the internal variable for the bandwidth of an external filter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Bandwidth of external filter (in Hz). Default is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BW</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_dAdV"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_dAdV">[docs]</a>    <span class="k">def</span> <span class="nf">set_dAdV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the internal variable for the voltage-current conversion factor to &lt;val&gt;.</span>
+<span class="sd">        This is used for the current bias if the currents to apply are generated by means of an external voltage controlled current source.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Voltage-current conversion factor (in A/V). Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dAdV</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_dAdV"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_dAdV">[docs]</a>    <span class="k">def</span> <span class="nf">get_dAdV</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the internal variable for the voltage-current conversion factor.</span>
+<span class="sd">        This is used for the current bias if the currents to apply are generated by means of an external voltage controlled current source.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Voltage-current conversion factor (in A/V).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dAdV</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_amp"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_amp">[docs]</a>    <span class="k">def</span> <span class="nf">set_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the internal variable for the pre-amplification factor to &lt;val&gt;.</span>
+<span class="sd">        This is used in the current bias if the measured voltages are amplified by means of an external pre-amplifier.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Pre-amplification factor. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_amp</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_amp"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_amp">[docs]</a>    <span class="k">def</span> <span class="nf">get_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the internal variable for the pre-amplification factor.</span>
+<span class="sd">        This is used in the current bias if the measured voltages are amplified by means of an external pre-amplifier.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Pre-amplification factor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_amp</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_tau_amp"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_tau_amp">[docs]</a>    <span class="k">def</span> <span class="nf">set_tau_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">100e-3</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the internal variable for the pre-amplifiers lowpass filters time constant to &lt;val&gt;.</span>
+<span class="sd">        This is used in the current bias if the measured voltages are amplified by means of an external pre-amplifier whose feedback includes a RC element to lowpass filter the signal.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Pre-amplifiers time constant (τ=2πRC in s). Default is 100e-3.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tau_amp</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_tau_amp"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_tau_amp">[docs]</a>    <span class="k">def</span> <span class="nf">get_tau_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the internal variable for the pre-amplifiers lowpass filters time constant.</span>
+<span class="sd">        This is used in the current bias if the measured voltages are amplified by means of an external pre-amplifier whose feedback includes a RC element to lowpass filter the signal.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Pre-amplifiers time constant (τ=2πRC in s).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau_amp</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_dVdA"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_dVdA">[docs]</a>    <span class="k">def</span> <span class="nf">set_dVdA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the internal variable for the current-voltage conversion to &lt;val&gt;.</span>
+<span class="sd">        This is used for the voltage bias if the measured currents are converted to voltages by means of an external transimpedance amplifier.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Current-voltage conversion factor (in V/A). Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dVdA</span> <span class="o">=</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_dVdA"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_dVdA">[docs]</a>    <span class="k">def</span> <span class="nf">get_dVdA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the internal variable for the current-voltage conversion.</span>
+<span class="sd">        This is used for the voltage bias if the measured currents are converted to voltages by means of an external transimpedance amplifier.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Current-voltage conversion factor (in V/A).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dVdA</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_Vdiv"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_Vdiv">[docs]</a>    <span class="k">def</span> <span class="nf">set_Vdiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the internal variable for the voltage division factor to &lt;val&gt;.</span>
+<span class="sd">        This is used for the voltage bias if the input voltage is divided by means of an external voltage divider.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Voltage division factor. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Vdiv</span> <span class="o">=</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_Vdiv"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_Vdiv">[docs]</a>    <span class="k">def</span> <span class="nf">get_Vdiv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the internal variable for the voltage division factor.</span>
+<span class="sd">        This is used for the voltage bias if the input voltage is divided by means of an external voltage divider.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Voltage division factor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Vdiv</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_measurement_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_measurement_mode">[docs]</a>    <span class="k">def</span> <span class="nf">set_measurement_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets measurement mode (wiring system) of channel &lt;channel&gt; to &lt;mode&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            State of the measurement sense mode. Must be 0 (2-wire), 1 (4-wire) or 3 (calibration).</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_measurement_mode</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_measurement_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_measurement_mode">[docs]</a>    <span class="k">def</span> <span class="nf">get_measurement_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets measurement mode (wiring system) &lt;mode&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            State of the measurement sense mode. Meanings are 0 (2-wire), 1 (4-wire) and 3 (calibration).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_measurement_mode</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_bias_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_bias_mode">[docs]</a>    <span class="k">def</span> <span class="nf">set_bias_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets bias mode &lt;mode&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            Bias mode. Meanings are 0 (current) and 1 (voltage).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_bias_mode</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_bias_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_bias_mode">[docs]</a>    <span class="k">def</span> <span class="nf">get_bias_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets sense mode of channel &lt;channel&gt; to mode &lt;mode&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            Sense mode. Must be 0 (current), 1 (voltage), 2 (resistance) or 3 (power).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_bias_mode</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_sense_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_sense_mode">[docs]</a>    <span class="k">def</span> <span class="nf">set_sense_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets sense mode of channel &lt;channel&gt; to mode &lt;mode&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            Sense mode. Must be 0 (current), 1 (voltage), 2 (resistance) or 3 (power).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_sense_mode</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_sense_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_sense_mode">[docs]</a>    <span class="k">def</span> <span class="nf">get_sense_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets sense mode &lt;mode&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            Sense mode. Meanings are 0 (current), 1 (voltage), 2 (resistance) and 3 (power).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sense_mode</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_bias_range"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_bias_range">[docs]</a>    <span class="k">def</span> <span class="nf">set_bias_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets bias range of channel &lt;channel&gt; to &lt;val&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Bias range. Possible values are -1 (auto), for currents 100pA, 1nA, 10nA, 100nA, 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, 1 A, 1.5A and for voltages 200mV, 2V, 20V, 200V.</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_bias_range</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_bias_range"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_bias_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_bias_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets bias mode &lt;val&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Bias range. Possible values for currents are 100pA, 1nA, 10nA, 100nA, 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, 1 A, 1.5A and for voltages 200mV, 2V, 20V, 200V.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_bias_range</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_sense_range"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_sense_range">[docs]</a>    <span class="k">def</span> <span class="nf">set_sense_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets sense range of channel &lt;channel&gt; to &lt;val&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Sense range. Possible values are -1 (auto), for currents 100pA, 1nA, 10nA |100nA, 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, 1 A, 1.5A and for voltages 200mV, 2V, 20V, 200V.</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_sense_range</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_sense_range"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_sense_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_sense_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets sense mode &lt;val&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Sense range. Possible values are -1 (auto), for currents 100pA, 1nA, 10nA |100nA, 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, 1 A, 1.5A and for voltages 200mV, 2V, 20V, 200V.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sense_range</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_bias_delay"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_bias_delay">[docs]</a>    <span class="k">def</span> <span class="nf">set_bias_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets bias delay of channel &lt;channel&gt; to &lt;val&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Bias delay with respect to the bias trigger. Possible values are -1 (auto), 0 (off) or positive numbers.</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_bias_delay</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_bias_delay"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_bias_delay">[docs]</a>    <span class="k">def</span> <span class="nf">get_bias_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets bias delay &lt;val&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Bias delay with respect to the bias trigger.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_bias_delay</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_sense_delay"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_sense_delay">[docs]</a>    <span class="k">def</span> <span class="nf">set_sense_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets sense delay of channel &lt;channel&gt; to &lt;val&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Sense delay with respect to the sense trigger. Possible values are -1 (auto), 0 (off) or positive numbers.</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+<span class="sd">        factor: float, optional</span>
+<span class="sd">            Multiplier to the delays if auto delay is used (for Keithley 2636A only). Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_sense_delay</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_sense_delay"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_sense_delay">[docs]</a>    <span class="k">def</span> <span class="nf">get_sense_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets sense delay &lt;val&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Sense delay with respect to the sense trigger.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sense_delay</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_sense_average"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_sense_average">[docs]</a>    <span class="k">def</span> <span class="nf">set_sense_average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets sense average of channel &lt;channel&gt; to &lt;val&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: int</span>
+<span class="sd">            Number of measured readings that are required to yield one filtered measurement. Must be in [1, 100].</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+<span class="sd">        mode: str</span>
+<span class="sd">            Type of filter used for measurements when the measurement filter is enabled (for Keithley 2636A only). Possible values are 0 (moving average) | 1 (repeat average) | 2 (median). Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_sense_average</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_sense_average"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_sense_average">[docs]</a>    <span class="k">def</span> <span class="nf">get_sense_average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets sense average status &lt;status&gt;, value &lt;val&gt; and mode &lt;mode&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        status: bool</span>
+<span class="sd">            Status if the measurement filter is enabled.</span>
+<span class="sd">        val: int</span>
+<span class="sd">            Number of measured readings that are required to yield one filtered measurement.</span>
+<span class="sd">        mode: str, optional</span>
+<span class="sd">            Type of filter used for measurements when the measurement filter is enabled. Measnings are 0 (moving average) | 1 (repeat average) | 2 (median).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sense_average</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_plc"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_plc">[docs]</a>    <span class="k">def</span> <span class="nf">set_plc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets power line cycle (PLC) to &lt;val&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        plc: int</span>
+<span class="sd">            Power line frequency setting used for NPLC calculations. Possible values are -1 (auto) | 50 | 60.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_plc</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_plc"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_plc">[docs]</a>    <span class="k">def</span> <span class="nf">get_plc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets power line cycle (PLC) &lt;val&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        plc: int</span>
+<span class="sd">            Power line frequency setting used for NPLC calculations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_plc</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_sense_nplc"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_sense_nplc">[docs]</a>    <span class="k">def</span> <span class="nf">set_sense_nplc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets sense nplc (number of power line cycle) of channel &lt;channel&gt; with the &lt;val&gt;-fold of one power line cycle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Integration aperture for measurements. Possible values depend on the used SMU.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_sense_nplc</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_sense_nplc"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_sense_nplc">[docs]</a>    <span class="k">def</span> <span class="nf">get_sense_nplc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets sense nplc (number of power line cycle) &lt;val&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Integration aperture for measurements.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sense_nplc</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_sense_autozero"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_sense_autozero">[docs]</a>    <span class="k">def</span> <span class="nf">set_sense_autozero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets autozero of channel &lt;channel&gt; to &lt;val&gt;. Note that &quot;on&quot; means that the internal zero point is measured for each measurement, wherefore the measurement takes approximately twice as long as when the auto zero function is &quot;off&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+<span class="sd">        val: int</span>
+<span class="sd">            Status of the internal reference measurements (autozero) of the source-measure unit. Possible values are 0 (off), 1 (on) or 2 (once).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_sense_autozero</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_sense_autozero"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_sense_autozero">[docs]</a>    <span class="k">def</span> <span class="nf">get_sense_autozero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets sense autozero &lt;val&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: int</span>
+<span class="sd">            Status of the internal reference measurements (autozero) of the source-measure unit. Meanings are 0 (off), 1 (on) and 2 (once).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sense_autozero</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_status"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_status">[docs]</a>    <span class="k">def</span> <span class="nf">set_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets output status of channel &lt;channel&gt; to &lt;status&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        status: int</span>
+<span class="sd">            Output status. Possible values are 0 (off), 1 (on) or 2 (high Z).</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_status"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets output status &lt;status&gt; of channel &lt;channel&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        status: int</span>
+<span class="sd">            Output status. Meanings are 0 (off), 1 (on) and 2 (high Z).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_status</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_sweep_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_sweep_mode">[docs]</a>    <span class="k">def</span> <span class="nf">set_sweep_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">channels</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets an variable to decide weather</span>
+<span class="sd">         * voltage is both applied and measured (VV-mode),</span>
+<span class="sd">         * current is applied and voltage is measured (IV-mode) or</span>
+<span class="sd">         * voltage is applied and current is measured (VI-mode)</span>
+<span class="sd">        and channels &lt;channels&gt; that are used during sweeps.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            Sweep mode denoting bias and sense modes. Possible values are 0 (VV-mode), 1 (IV-mode) or 2 (VI-mode). Default is 1</span>
+<span class="sd">        channels: int or tuple(int)</span>
+<span class="sd">            Number of channel of usage. Must be 1 or 2 for IV-mode and VI-mode or a tuple containing both channels for VV-mode (1st argument as bias channel and 2nd argument as sense channel).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">default_channels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)}</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Set sweep channels to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">default_channels</span><span class="p">[</span><span class="n">mode</span><span class="p">]))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span> <span class="o">=</span> <span class="n">default_channels</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">_sweep_channels</span> <span class="o">=</span> <span class="n">default_channels</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Set sweep channels to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channels</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span> <span class="o">=</span> <span class="n">channels</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">_sweep_channels</span> <span class="o">=</span> <span class="n">channels</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Set sweep mode to </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">mode</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">=</span> <span class="n">mode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_sweep_mode</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set sweep mode to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">mode</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set sweep mode to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">mode</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_sweep_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_sweep_mode">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweep_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets an internal variable &lt;mode&gt; to decide weather</span>
+<span class="sd">         * voltage is both applied and measured (VV-mode),</span>
+<span class="sd">         * current is applied and voltage is measured (IV-mode) or</span>
+<span class="sd">         * voltage is applied and current is measured (VI-mode).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            Sweep mode denoting bias and sense modes. Meanings are 0 (VV-mode), 1 (IV-mode) or 2 (VI-mode).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_sweep_channels"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_sweep_channels">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweep_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets channels &lt;channels&gt; that are used during sweeps. In the IV and VI sweep mode one channel requires for biasing and sensing, whereas two channels are returned in the VV sweep mode (1st as bias and 2nd as sense channel).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        channels: int or tuple(int)</span>
+<span class="sd">            Number of channel of usage. Meanings are 1 or 2 for IV-mode and VI-mode or a tuple containing both channels for VV-mode (1st argument as bias channel and 2nd argument as sense channel).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sweep_channels</span><span class="p">():</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: sweep channels of </span><span class="si">{:s}</span><span class="s1"> and </span><span class="si">{:s}</span><span class="s1"> do not coincide: </span><span class="si">{:s}</span><span class="s1"> and </span><span class="si">{:s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                                                                              <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                                                                              <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                                                                                              <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sweep_channels</span><span class="p">()))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: sweep channels of </span><span class="si">{:s}</span><span class="s1"> and </span><span class="si">{:s}</span><span class="s1"> do not coincide: </span><span class="si">{:s}</span><span class="s1"> and </span><span class="si">{:s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                                                                              <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                                                                              <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                                                                                              <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sweep_channels</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_pseudo_bias_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_pseudo_bias_mode">[docs]</a>    <span class="k">def</span> <span class="nf">set_pseudo_bias_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets an internal variable according to the external measurement setup that proviedes an effective bias to &lt;mode&gt;.</span>
+<span class="sd">         * For the current bias the exernal setup includes</span>
+<span class="sd">            * a voltage-controlled current source to generate the bias currents and</span>
+<span class="sd">            * a voltage pre-amplifier to amplify the measured voltages.</span>
+<span class="sd">         * For the voltage bias the exernal setup includes</span>
+<span class="sd">            * a voltage divider to reduce the bias voltages and</span>
+<span class="sd">            * a transimpedance amplifier that converts the measured currents to voltages.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            Pseudo bias mode denoting current and voltage bias. Possible values are 0 (current bias) and 1 (voltage bias).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Set pseudo bias mode to </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">mode</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span> <span class="o">=</span> <span class="n">mode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__set_defaults_docstring</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set pseudo bias mode to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">mode</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set pseudo bias mode to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">mode</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_pseudo_bias_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_pseudo_bias_mode">[docs]</a>    <span class="k">def</span> <span class="nf">get_pseudo_bias_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets an internal variable according to the external measurement setup that proviedes an effective bias.</span>
+<span class="sd">         * For the current bias the exernal setup includes</span>
+<span class="sd">            * a voltage-controlled current source to generate the bias currents and</span>
+<span class="sd">            * a voltage pre-amplifier to amplify the measured voltages.</span>
+<span class="sd">         * For the voltage bias the exernal setup includes</span>
+<span class="sd">            * a voltage divider to reduce the bias voltages and</span>
+<span class="sd">            * a transimpedance amplifier that converts the measured currents to voltages.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            Pseudo bias mode denoting current and voltage bias. Possible values are 0 (current bias) and 1 (voltage bias).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_sweep_bias"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_sweep_bias">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweep_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the real bias mode as combination of &lt;self._sweep_mode&gt; and &lt;self._pseudo_bias_mode&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mode: int</span>
+<span class="sd">            Bias mode. Meanings are 0 (current) and 1 (voltage).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># attribute **kwargs needed for identical call as in SMUs (which need channels)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sweep_mode</span><span class="p">():</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: sweep mode of </span><span class="si">{:s}</span><span class="s1"> and </span><span class="si">{:s}</span><span class="s1"> do not coincide: </span><span class="si">{:s}</span><span class="s1"> and </span><span class="si">{:s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_modes</span><span class="p">[</span>
+                                                                                              <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span><span class="p">],</span>
+                                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_modes</span><span class="p">[</span>
+                                                                                              <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sweep_mode</span><span class="p">()]))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: sweep mode of </span><span class="si">{:s}</span><span class="s1"> and </span><span class="si">{:s}</span><span class="s1"> do not coincide: </span><span class="si">{:s}</span><span class="s1"> and </span><span class="si">{:s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_modes</span><span class="p">[</span>
+                                                                                              <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span><span class="p">],</span>
+                                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_modes</span><span class="p">[</span>
+                                                                                              <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sweep_mode</span><span class="p">()]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># 0 (current bias) | 1 (voltage bias)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_voltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_voltage">[docs]</a>    <span class="k">def</span> <span class="nf">set_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets bias voltage value of channel &lt;channel&gt; to &lt;val&gt;.</span>
+<span class="sd">        This can only be set in the effective voltage bias mode, defined by &lt;self.sweep_mode&gt; and &lt;self.pseudo_bias_mode&gt;, and considers an external voltage divider &lt;self._Vdiv&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Bias voltage value.</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># 0 (VV mode)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 0 (current bias)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set voltage value of channel </span><span class="si">{!s}</span><span class="s1"> in the current bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set voltage value of channel </span><span class="si">{!s}</span><span class="s1"> in the current bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 1 (voltage bias)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_bias_value</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Vdiv</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># 1 (IV mode)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set voltage value of channel </span><span class="si">{!s}</span><span class="s1"> in the current bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set voltage value of channel </span><span class="si">{!s}</span><span class="s1"> in the current bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># 2 (VI-mode)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_bias_value</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_voltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_voltage">[docs]</a>    <span class="k">def</span> <span class="nf">get_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets voltage value of channel &lt;channel&gt; taking tunnel settings of the electronic into account (&lt;sweep_mode&gt;, &lt;pseudo_bias_mode&gt;)</span>
+
+<span class="sd">        Gets bias or sense voltage value of channel &lt;channel&gt;.</span>
+<span class="sd">        This depends on the effective bias mode, defined by &lt;self.sweep_mode&gt; and &lt;self.pseudo_bias_mode&gt;, and considers the external pre-amplifier &lt;self._amp&gt; (current bias) and the external voltage divider &lt;self._Vdiv&gt; (voltage bias).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Bias or sense voltage value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># 0 (VV mode)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 0 (current bias)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sense_value</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_amp</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 1 (voltage bias)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_bias_value</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Vdiv</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># 1 (IV mode)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sense_value</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># 2 (VI-mode)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_bias_value</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_current"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_current">[docs]</a>    <span class="k">def</span> <span class="nf">set_current</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets bias current value of channel &lt;channel&gt; to &lt;val&gt;.</span>
+<span class="sd">        This can only be set in the effective current bias mode, defined by &lt;self.sweep_mode&gt; and &lt;self.pseudo_bias_mode&gt;, and considers an external voltage-controlled current source &lt;self._dAdV&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Bias current value.</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># 0 (VV mode)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 0 (current bias)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_bias_value</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dAdV</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 1 (voltage bias)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set current value of channel </span><span class="si">{!s}</span><span class="s1"> in the voltage bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set current value of channel </span><span class="si">{!s}</span><span class="s1"> in the voltage bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># 1 (IV mode)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_bias_value</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># 2 (VI-mode)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set current value of channel </span><span class="si">{!s}</span><span class="s1"> in the voltage bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set current value of channel </span><span class="si">{!s}</span><span class="s1"> in the voltage bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_current"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_current">[docs]</a>    <span class="k">def</span> <span class="nf">get_current</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets current value of channel &lt;channel&gt; taking tunnel settings of the electronic into account (&lt;sweep_mode&gt;, &lt;pseudo_bias_mode&gt;)</span>
+
+<span class="sd">        Gets bias or sense current value of channel &lt;channel&gt;.</span>
+<span class="sd">        This depends on the effective bias mode, defined by &lt;self.sweep_mode&gt; and &lt;self.pseudo_bias_mode&gt;, and considers the external voltage-controlled current source &lt;self._dAdV&gt; (current bias) and the external transimpedance amplifier &lt;self._dVdA&gt; (voltage bias).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Bias or sense current value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># 0 (VV mode)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 0 (current bias)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_bias_value</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dAdV</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 1 (voltage bias)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sense_value</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dVdA</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># 1 (IV mode)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_bias_value</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># 2 (VI-mode)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_sense_value</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.ramp_voltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.ramp_voltage">[docs]</a>    <span class="k">def</span> <span class="nf">ramp_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">step_time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ramps voltage of channel &lt;channel&gt; from recent value to stop value &lt;stop&gt; with step size &lt;step&gt; and step time &lt;step_time&gt; according to bias_mode.</span>
+<span class="sd">        This can only be set in the effective voltage bias mode, defined by &lt;self.sweep_mode&gt; and &lt;self.pseudo_bias_mode&gt;, and considers an external voltage divider &lt;self._Vdiv&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        stop: float</span>
+<span class="sd">            Stop voltage value</span>
+<span class="sd">        step: float</span>
+<span class="sd">            Step voltage size.</span>
+<span class="sd">        step_time: float</span>
+<span class="sd">            Sleep time between voltage staircase ramp.</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 for SMUs with only one channel and 1 or 2 for SMUs with two channels. Default is 1. (default)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># 0 (VV mode)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 0 (current bias)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set voltage value of channel </span><span class="si">{!s}</span><span class="s1"> in the current bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set voltage value of channel </span><span class="si">{!s}</span><span class="s1"> in the current bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 1 (voltage bias)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">ramp_bias</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="n">stop</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Vdiv</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Vdiv</span><span class="p">,</span> <span class="n">step_time</span><span class="o">=</span><span class="n">step_time</span><span class="p">,</span>
+                                           <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># 1 (IV mode)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set voltage value of channel </span><span class="si">{!s}</span><span class="s1"> in the current bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set voltage value of channel </span><span class="si">{!s}</span><span class="s1"> in the current bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># 2 (VI-mode)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">ramp_bias</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">step_time</span><span class="o">=</span><span class="n">step_time</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.ramp_current"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.ramp_current">[docs]</a>    <span class="k">def</span> <span class="nf">ramp_current</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">step_time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ramps current of channel &lt;channel&gt; from recent value to stop value &lt;stop&gt; with step size &lt;step&gt; and step time &lt;step_time&gt; according to bias_mode.</span>
+<span class="sd">        This can only be set in the effective current bias mode, defined by &lt;self.sweep_mode&gt; and &lt;self.pseudo_bias_mode&gt;, and considers an external voltage-controlled current source &lt;self._dAdV&gt;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        stop: float</span>
+<span class="sd">            Stop voltage value</span>
+<span class="sd">        step: float</span>
+<span class="sd">            Step voltage size.</span>
+<span class="sd">        step_time: float</span>
+<span class="sd">            Sleep time between voltage staircase ramp.</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 for SMUs with only one channel and 1 or 2 for SMUs with two channels. Default is 1. (default)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># 0 (VV mode)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 0 (current bias)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">ramp_bias</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="n">stop</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dAdV</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dAdV</span><span class="p">,</span> <span class="n">step_time</span><span class="o">=</span><span class="n">step_time</span><span class="p">,</span>
+                                           <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 1 (voltage bias)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set current value of channel </span><span class="si">{!s}</span><span class="s1"> in the voltage bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set current value of channel </span><span class="si">{!s}</span><span class="s1"> in the voltage bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># 1 (IV mode)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">ramp_bias</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">step_time</span><span class="o">=</span><span class="n">step_time</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># 2 (VI-mode)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set current value of channel </span><span class="si">{!s}</span><span class="s1"> in the voltage bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set current value of channel </span><span class="si">{!s}</span><span class="s1"> in the voltage bias&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_sweep_parameters"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_sweep_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_sweep_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets sweep parameters &lt;sweep&gt; and prepares instrument for the set sweep mode.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sweep: array_likes of floats</span>
+<span class="sd">            Sweep range containing start, stop and step size (e.g. sweep object using qkit.measure.transport.transport.sweep class)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span><span class="p">:</span>  <span class="c1"># 0 (VV-mode)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 0 (current bias)</span>
+                <span class="n">sweep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sweep</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dAdV</span>
+                <span class="n">sweep</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sweep</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="c1"># alternative: self._sweep = np.array((lambda a: [a[0], a[1], np.abs(a[-1])])(sweep)).astype(float)/self._dAdV</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 0 (voltage bias)</span>
+                <span class="n">sweep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sweep</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Vdiv</span>
+                <span class="n">sweep</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sweep</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_sweep_parameters</span><span class="p">(</span><span class="n">sweep</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_tracedata"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_tracedata">[docs]</a>    <span class="k">def</span> <span class="nf">get_tracedata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Starts bias sweep with already set parameters and gets trace data of bias &lt;bias_values&gt; and sense &lt;sense_values&gt; in the set sweep mode.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bias_values: numpy.array(float)</span>
+<span class="sd">            Measured bias values.</span>
+<span class="sd">        sense_values: numpy.array(float)</span>
+<span class="sd">            Measured sense values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bias_values</span><span class="p">,</span> <span class="n">sense_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_tracedata</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># IV-mode</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 0 (current bias)</span>
+                <span class="n">I_values</span> <span class="o">=</span> <span class="n">bias_values</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dAdV</span>
+                <span class="n">V_values</span> <span class="o">=</span> <span class="n">sense_values</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_amp</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 1 (voltage bias)</span>
+                <span class="n">V_values</span> <span class="o">=</span> <span class="n">bias_values</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Vdiv</span>
+                <span class="n">I_values</span> <span class="o">=</span> <span class="n">sense_values</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dVdA</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># IV-mode</span>
+            <span class="n">I_values</span> <span class="o">=</span> <span class="n">bias_values</span>
+            <span class="n">V_values</span> <span class="o">=</span> <span class="n">sense_values</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># VI-mode</span>
+            <span class="n">V_values</span> <span class="o">=</span> <span class="n">bias_values</span>
+            <span class="n">I_values</span> <span class="o">=</span> <span class="n">sense_values</span>
+        <span class="k">return</span> <span class="n">I_values</span><span class="p">,</span> <span class="n">V_values</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.take_IV"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.take_IV">[docs]</a>    <span class="k">def</span> <span class="nf">take_IV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes IV curve with sweep parameters &lt;sweep&gt; in set sweep mode.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sweep: array_likes of floats</span>
+<span class="sd">            Sweep range containing start, stop and step size (e.g. sweep object using qkit.measure.transport.transport.sweep class)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bias_values: numpy.array(float)</span>
+<span class="sd">            Measured bias values.</span>
+<span class="sd">        sense_values: numpy.array(float)</span>
+<span class="sd">            Measured sense values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_sweep_parameters</span><span class="p">(</span><span class="n">sweep</span><span class="o">=</span><span class="n">sweep</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tracedata</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.set_defaults"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.set_defaults">[docs]</a>    <span class="k">def</span> <span class="nf">set_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pseudo_bias_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">SMU</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sweep_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets default settings for different pseudo bias modes &lt;pseudo_bias_mode&gt; and optional of the used source measure unit &lt;SMU&gt; of channel &lt;channel&gt;, too. Actual settings are:</span>
+<span class="sd">        default parameters</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pseudo_bias_mode: int</span>
+<span class="sd">            Pseudo bias mode denoting current and voltage bias. Possible values are None (before used &lt;self._sweep_mode&gt;), 0 (current bias) and 1 (voltage bias). Default is None.</span>
+<span class="sd">        SMU: bool</span>
+<span class="sd">            Source measure unit. Default is True.</span>
+<span class="sd">        sweep_mode: int</span>
+<span class="sd">            Sweep mode denoting bias and sense modes. Possible values are None (before used &lt;self._sweep_mode&gt;), 0 (VV-mode), 1 (IV-mode) or 2 (VI-mode). Default is 1</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># distinguish different pseudo bias modes</span>
+        <span class="k">if</span> <span class="n">pseudo_bias_mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_pseudo_bias_mode</span><span class="p">(</span><span class="n">pseudo_bias_mode</span><span class="p">)</span>
+        <span class="c1"># set values</span>
+        <span class="k">for</span> <span class="n">key_parameter</span><span class="p">,</span> <span class="n">val_parameter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;self.set_</span><span class="si">{:s}</span><span class="s1">(val=</span><span class="si">{!s}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key_parameter</span><span class="p">,</span> <span class="n">val_parameter</span><span class="p">))</span>
+        <span class="c1"># set defaults of SMU according to sweep_mode</span>
+        <span class="k">if</span> <span class="n">SMU</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sweep_mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_sweep_mode</span><span class="p">(</span><span class="n">sweep_mode</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">sweep_mode</span><span class="o">=</span><span class="n">sweep_mode</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__set_defaults_docstring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets docstring of &quot;set_defaults&quot; method with actual default settings.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="s1">&#39;pseudo bias mode: </span><span class="si">{:d}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="si">{:s}</span><span class="s1">: </span><span class="si">{:1.2e}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key_parameter</span><span class="p">,</span> <span class="n">val_parameter</span><span class="p">)</span> <span class="k">for</span> <span class="n">key_parameter</span><span class="p">,</span> <span class="n">val_parameter</span> <span class="ow">in</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_defaults</span><span class="o">.</span><span class="vm">__func__</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_defaults</span><span class="o">.</span><span class="vm">__func__</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_default_str</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_str</span> <span class="o">=</span> <span class="n">new</span>
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_all"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_all">[docs]</a>    <span class="k">def</span> <span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SMU</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints all settings of channel &lt;channel&gt; and optional of the used source measure unit &lt;SMU&gt;, too.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        SMU: bool</span>
+<span class="sd">            Source measure unit. Default is True.</span>
+<span class="sd">        channel: int</span>
+<span class="sd">            Number of channel of interest. Must be 1 or 2. Default is 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;: Get all&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_BW</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;bandwidth          = </span><span class="si">{:1.0e}</span><span class="s1">Hz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_BW</span><span class="p">()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dAdV               = </span><span class="si">{:1.0e}</span><span class="s1">A/V&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dAdV</span><span class="p">()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;amp factor         = </span><span class="si">{:1.0e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_amp</span><span class="p">()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;amp time constant  = </span><span class="si">{:1.0e}</span><span class="s1">s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tau_amp</span><span class="p">()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dVdA               = </span><span class="si">{:1.0e}</span><span class="s1">V/A&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dVdA</span><span class="p">()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;voltage divider    = </span><span class="si">{:1.0e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_Vdiv</span><span class="p">()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sweep mode         = </span><span class="si">{:d}</span><span class="s1"> (</span><span class="si">{:s}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_modes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sweep_mode</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;pseudo bias mode   = </span><span class="si">{:d}</span><span class="s1"> (</span><span class="si">{:s}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">,</span>
+                                                        <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_modes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">SMU</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">get_all</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.reset"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SMU</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets internal variables for external tunnel electronic to default conditions and optional of the used source measure unit &lt;SMU&gt;, too.</span>
+<span class="sd">        Resets the instrument or a single channel to .</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        SMU: bool</span>
+<span class="sd">            Source measure unit. Default is True.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_BW</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_dAdV</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_amp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_tau_amp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_dVdA</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_Vdiv</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">SMU</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_SMU</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get_parameters"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a parameter list &lt;parlist&gt; of measurement specific setting parameters.</span>
+<span class="sd">        Needed for .set-file in &#39;write_additional_files&#39;, if qt parameters are not used.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        parlist: dict</span>
+<span class="sd">            Parameter names as keys, corresponding channels of interest as values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parlist</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;measurement_mode&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                   <span class="s1">&#39;bias_mode&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                   <span class="s1">&#39;sense_mode&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                   <span class="s1">&#39;bias_range&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                   <span class="s1">&#39;sense_range&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                   <span class="s1">&#39;bias_delay&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                   <span class="s1">&#39;sense_delay&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                   <span class="s1">&#39;sense_average&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                   <span class="s1">&#39;plc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">],</span>
+                   <span class="s1">&#39;sense_nplc&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span><span class="p">,</span>
+                   <span class="s1">&#39;sweep_mode&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">],</span>
+                   <span class="s1">&#39;pseudo_bias_mode&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">],</span>
+                   <span class="s1">&#39;BW&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">]}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 0 (current bias)</span>
+            <span class="n">parlist</span><span class="p">[</span><span class="s1">&#39;dAdV&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+            <span class="n">parlist</span><span class="p">[</span><span class="s1">&#39;amp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+            <span class="n">parlist</span><span class="p">[</span><span class="s1">&#39;current&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudo_bias_mode</span><span class="p">:</span>  <span class="c1"># 1 (voltage bias)</span>
+            <span class="n">parlist</span><span class="p">[</span><span class="s1">&#39;dVdA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+            <span class="n">parlist</span><span class="p">[</span><span class="s1">&#39;Vdiv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+            <span class="n">parlist</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_channels</span>
+        <span class="k">return</span> <span class="n">parlist</span></div>
+
+<div class="viewcode-block" id="virtual_tunnel_electronic.get"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_tunnel_electronic.virtual_tunnel_electronic.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the current parameter &lt;param&gt; by evaluation &#39;get_&#39;+&lt;param&gt; and corresponding channel if needed</span>
+<span class="sd">        In combination with &lt;self.get_parameters&gt; above.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param: str</span>
+<span class="sd">            Parameter of interest.</span>
+<span class="sd">        channels: array_likes</span>
+<span class="sd">            Number of channels of interest. Must be in {1, 2} for channel specific parameters or None for channel independant (global) parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        parlist: dict</span>
+<span class="sd">            Parameter names as keys, values of corresponding channels as values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">channels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;channels&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">channels</span> <span class="o">!=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;map(lambda channel, self=self: self.get_</span><span class="si">{:s}</span><span class="s1">(channel=channel), [</span><span class="si">{:s}</span><span class="s1">])&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">channels</span><span class="p">)))))</span>
+            <span class="c1">#return tuple([eval(&#39;self.get_{:s}(channel={!s})&#39;.format(param, channel)) for channel in channels])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;map(lambda channel, self=self: self.get_</span><span class="si">{:s}</span><span class="s1">(), [None])&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="p">)))</span></div></div>
+            <span class="c1">#return eval(&#39;self.get_{:s}()&#39;.format(param))</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.EA_PS9360 &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.EA_PS9360</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.EA_PS9360</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Electroautomatic_PS9000.py driver for Electroautomatic_PS9000 source measure unit</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span> <span class="nn">qkit.core.instrument_base</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">qkit</span> <span class="kn">import</span> <span class="n">visa</span>
+<span class="kn">from</span> <span class="nn">qkit.gui.notebook.Progress_Bar</span> <span class="kn">import</span> <span class="n">Progress_Bar</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="EA_PS9360"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360">[docs]</a><span class="k">class</span> <span class="nc">EA_PS9360</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+    <span class="n">sleep_time</span> <span class="o">=</span> <span class="mf">1e-4</span>
+    <span class="n">error_codes</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;No error&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">100</span><span class="p">:</span> <span class="s2">&quot;Command error&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">102</span><span class="p">:</span> <span class="s2">&quot;Syntax error&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">108</span><span class="p">:</span> <span class="s2">&quot;Parameter not allowed&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">200</span><span class="p">:</span> <span class="s2">&quot;Execution error&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">201</span><span class="p">:</span> <span class="s2">&quot;Invalid while in local&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">220</span><span class="p">:</span> <span class="s2">&quot;Parameter error&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">221</span><span class="p">:</span> <span class="s2">&quot;Settings conflict&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">222</span><span class="p">:</span> <span class="s2">&quot;Data out of range&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">223</span><span class="p">:</span> <span class="s2">&quot;Too much data&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">224</span><span class="p">:</span> <span class="s2">&quot;Illegal parameter value&quot;</span><span class="p">,</span>
+                   <span class="o">-</span><span class="mi">999</span><span class="p">:</span> <span class="s2">&quot;Safety OVP&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        creates the &quot;driver object&quot; of the EA_PS9360 current source</span>
+<span class="sd">        :param name: name of the device in qkit</span>
+<span class="sd">        :param address: &quot;TCPIP0::10.22.197.93::5028::SOCKET&quot;</span>
+<span class="sd">        :param reset: bool device reset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="vm">__name__</span>
+        <span class="c1"># Start VISA communication</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;: Initializing instrument EA_PS900&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span> <span class="o">=</span> <span class="n">visa</span><span class="o">.</span><span class="n">instrument</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">,</span> <span class="n">read_termination</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">write_termination</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;bias_voltage&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;bias_current&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;measure_voltage&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;measure_current&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_remote_control&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;ramp_voltage&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;ramp_current&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_remote_control</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sends a visa command &lt;cmd&gt;, waits until &quot;operation complete&quot; and raises eventual errors of the device.</span>
+<span class="sd">        -------</span>
+<span class="sd">        none</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="c1"># TODO:self._raise_error()</span>
+
+    <span class="k">def</span> <span class="nf">_ask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sends a visa command &lt;cmd&gt;, waits until &quot;operation complete&quot;, raises eventual errors of the device and</span>
+<span class="sd">        returns the read answer &lt;ans&gt;.</span>
+
+<span class="sd">        parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cmd: str</span>
+<span class="sd">            command that is send to the instrument via pyvisa and ni-visa backend.</span>
+
+<span class="sd">        returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        answer: str</span>
+<span class="sd">            answer that is returned at query after the sent &lt;cmd&gt;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;?&#39;</span> <span class="ow">in</span> <span class="n">cmd</span><span class="p">:</span>
+            <span class="n">ans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">?&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="c1"># TODO: self._raise_error()</span>
+        <span class="k">return</span> <span class="n">ans</span>
+
+<div class="viewcode-block" id="EA_PS9360.set_remote_control"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.set_remote_control">[docs]</a>    <span class="k">def</span> <span class="nf">set_remote_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        remote control needs to be activated to change device parameters</span>
+<span class="sd">        status: 1 activated, 0 deactivated (local mode)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s2">&quot;SYST:LOCK </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">status</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.do_set_bias_voltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.do_set_bias_voltage">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_bias_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bias_voltage</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets the bias (output) voltage of the current source</span>
+<span class="sd">        :param bias_voltage: float</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s2">&quot;source:voltage </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bias_voltage</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.do_get_bias_voltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.do_get_bias_voltage">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_bias_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s2">&quot;source:voltage?&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.do_set_bias_current"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.do_set_bias_current">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_bias_current</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bias_current</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets the bias (output) current</span>
+<span class="sd">        :param bias_current: bias current value (float)</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s2">&quot;source:current </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bias_current</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.do_get_bias_current"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.do_get_bias_current">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_bias_current</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns the (previously) set bias current</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s2">&quot;source:current?&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.do_set_power"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.do_set_power">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">power</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets the output power (limit) of the device. (Voltage or current can have lower limits)</span>
+<span class="sd">        power: (float) power limit in Watts</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s2">&quot;source:power </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">power</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.do_get_power"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.do_get_power">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets the output power (limit) of the device. (Voltage or current can have lower limits)</span>
+<span class="sd">        power: (float) power limit in Watts</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s2">&quot;source:power?&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.do_get_measure_voltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.do_get_measure_voltage">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_measure_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns the measured voltage</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s2">&quot;meas:voltage?&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.do_get_measure_current"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.do_get_measure_current">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_measure_current</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns the measured current</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s2">&quot;meas:current?&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.do_set_output"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.do_set_output">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        turns output on/off</span>
+<span class="sd">        :param status: on (1) off (0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s2">&quot;output </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">status</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.do_get_output"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.do_get_output">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        gets the output state of the device</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s2">&quot;output?&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;ON&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;OFF&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wrong response&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.ramp_current"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.ramp_current">[docs]</a>    <span class="k">def</span> <span class="nf">ramp_current</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current</span><span class="p">,</span> <span class="n">ramp_rate</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ramps the bias current to a specified value with the specified ramp_rate.</span>
+<span class="sd">        current: float, end current</span>
+<span class="sd">        ramp_rate: float, change of voltage per second</span>
+<span class="sd">        progress_bar: bool, weather the progress_bar should be displayed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_get_measure_current</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">current</span><span class="o">-</span><span class="n">start_current</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">ramp_rate</span><span class="p">):</span>
+            <span class="n">ramp_rate</span> <span class="o">*=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">current_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start_current</span><span class="p">,</span> <span class="n">current</span><span class="p">,</span> <span class="mf">0.1</span><span class="o">*</span><span class="n">ramp_rate</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">progress_bar</span><span class="p">:</span>
+            <span class="n">pb</span> <span class="o">=</span> <span class="n">Progress_Bar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">current_values</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">current_values</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">do_set_bias_current</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">progress_bar</span><span class="p">:</span>
+                <span class="n">pb</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.ramp_voltage"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.ramp_voltage">[docs]</a>    <span class="k">def</span> <span class="nf">ramp_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">voltage</span><span class="p">,</span> <span class="n">ramp_rate</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ramps the bias voltage to a specified value with the specified ramp_rate.</span>
+<span class="sd">        Keep in mind the defined current limit</span>
+<span class="sd">        voltage: float, end voltage</span>
+<span class="sd">        ramp_rate: float, change of voltage per second</span>
+<span class="sd">        progress_bar: bool, weather the progress_bar should be displayed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_voltage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_get_measure_voltage</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">voltage</span><span class="o">-</span><span class="n">start_voltage</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">ramp_rate</span><span class="p">):</span>
+            <span class="n">ramp_rate</span> <span class="o">*=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">voltage_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start_voltage</span><span class="p">,</span> <span class="n">voltage</span><span class="p">,</span> <span class="mf">0.1</span><span class="o">*</span><span class="n">ramp_rate</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">progress_bar</span><span class="p">:</span>
+            <span class="n">pb</span> <span class="o">=</span> <span class="n">Progress_Bar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">voltage_values</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">voltage_values</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">do_set_bias_voltage</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">progress_bar</span><span class="p">:</span>
+                <span class="n">pb</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.reset"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        resets the device</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;*RST&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.get_error"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.get_error">[docs]</a>    <span class="k">def</span> <span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        gets the errors from the device</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ask</span><span class="p">(</span><span class="s2">&quot;system:error:all?&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EA_PS9360.release_remote_lock"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.EA_PS9360.EA_PS9360.release_remote_lock">[docs]</a>    <span class="k">def</span> <span class="nf">release_remote_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        releases the remote lock of the device so that it can be used locally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_remote_control</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

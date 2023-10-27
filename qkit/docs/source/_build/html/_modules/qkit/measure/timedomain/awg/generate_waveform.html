@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.timedomain.awg.generate_waveform &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.measure.timedomain.awg.generate_waveform</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.measure.timedomain.awg.generate_waveform</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">generate_waveform.py</span>
+<span class="sd">M. Jerger, S. Probst, A. Schneider (04/2015), J. Braumueller (04/2016)</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1">#import os.path</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">qkit</span>
+<span class="k">if</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">(</span><span class="s2">&quot;scipy&quot;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">scipy.special</span>
+
+<span class="c1"># creates dummy objects to have everything well-defined.</span>
+<span class="c1">#global sample</span>
+<span class="c1">#sample = type(&#39;Sample&#39;, (object,),{  &#39;exc_T&#39; : 1e-6 , &#39;tpi&#39; : 2e-9 , &#39;tpi2&#39; : 1e-9, &#39;clock&#39; : 1e9   })</span>
+
+<span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float16</span> <span class="c1">#you can change this via gwf.dtype to anything you want</span>
+
+<div class="viewcode-block" id="compensate"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.compensate">[docs]</a><span class="k">def</span> <span class="nf">compensate</span><span class="p">(</span><span class="n">wfm</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function that translates a given (analog) waveform wfm into a waveform wfc that needs to be programmed to the AWG</span>
+<span class="sd">    to effectively obtain the waveform wfm after the bias T.</span>
+<span class="sd">    This compensation is required due to the finite time constant of the bias Ts capacitor. The time constant in seconds </span>
+<span class="sd">    is passed to the function as gamma.</span>
+<span class="sd">    Credits to A. Schneider</span>
+<span class="sd">    </span>
+<span class="sd">    Inputs:</span>
+<span class="sd">        - wfm: original waveform to be compensated</span>
+<span class="sd">        - gamma: bias T time constant in seconds</span>
+<span class="sd">        - sample: sample object form which the function reads the AWG clock</span>
+<span class="sd">    Outputs:</span>
+<span class="sd">        - wfc: corrected waveform to be loaded to the AWG</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">wfc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">wfm</span><span class="p">)</span>
+    <span class="n">dif</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">wfm</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">wfm</span><span class="p">)):</span>
+        <span class="n">wfc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">wfc</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">wfm</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">clock</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span><span class="o">+</span><span class="n">dif</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">wfc</span></div>
+
+
+<div class="viewcode-block" id="erf"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.erf">[docs]</a><span class="k">def</span> <span class="nf">erf</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="n">attack</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">position</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        create an erf-shaped envelope function</span>
+<span class="sd">        erf(\pm 2) is almost 0/1, erf(\pm 1) is ~15/85%</span>
+<span class="sd">        </span>
+<span class="sd">        Input:</span>
+<span class="sd">            tstart, tstop - erf(-2) times</span>
+<span class="sd">            attack, decay - attack/decay times</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">(</span><span class="s2">&quot;scipy&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;scipy not available. scipy is needed for erf.&#39;</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">length</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1">#automatically correct overlap only when position argument not explicitly given</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+            <span class="n">position</span> <span class="o">-=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">pulse</span><span class="o">&gt;</span><span class="n">position</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : pulse does not fit into waveform&#39;</span><span class="p">)</span>
+        
+    <span class="n">sample_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="p">(</span><span class="n">position</span><span class="o">-</span><span class="n">pulse</span><span class="p">))</span>
+    <span class="n">sample_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="n">position</span><span class="p">)</span>
+    <span class="n">sample_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">length</span><span class="o">*</span><span class="n">clock</span><span class="p">))</span>
+    <span class="n">wfm</span> <span class="o">=</span> <span class="n">low</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">sample_length</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">attack</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">attack</span> <span class="o">&lt;</span> <span class="mf">2.</span><span class="o">/</span><span class="n">clock</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : attack too small compared to AWG sample frequency, setting to </span><span class="si">%.4g</span><span class="s1"> s&#39;</span><span class="o">%</span><span class="p">(</span><span class="mf">2.</span><span class="o">/</span><span class="n">clock</span><span class="p">))</span>
+            <span class="n">attack</span> <span class="o">=</span> <span class="mf">2.</span><span class="o">/</span><span class="n">clock</span>
+        <span class="n">nAttack</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="n">attack</span><span class="p">)</span>
+        <span class="n">sAttack</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nAttack</span><span class="p">)))</span>
+        <span class="n">wfm</span><span class="p">[</span><span class="n">sample_start</span><span class="p">:</span><span class="n">sample_start</span><span class="o">+</span><span class="n">nAttack</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sAttack</span> <span class="o">*</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nAttack</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">decay</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">decay</span> <span class="o">&lt;</span> <span class="mf">2.</span><span class="o">/</span><span class="n">clock</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : decay too small compared to AWG sample frequency, setting to </span><span class="si">%.4g</span><span class="s1"> s&#39;</span><span class="o">%</span><span class="p">(</span><span class="mf">2.</span><span class="o">/</span><span class="n">clock</span><span class="p">))</span>
+            <span class="n">decay</span> <span class="o">=</span> <span class="mf">2.</span><span class="o">/</span><span class="n">clock</span>
+        <span class="n">nDecay</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="n">decay</span><span class="p">)</span>
+        <span class="n">sDecay</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">nDecay</span><span class="p">)))</span>
+        <span class="n">wfm</span><span class="p">[</span><span class="n">sample_end</span><span class="o">-</span><span class="n">nDecay</span><span class="p">:</span><span class="n">sample_end</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sDecay</span> <span class="o">*</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nDecay</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">wfm</span><span class="p">[</span><span class="n">sample_start</span><span class="o">+</span><span class="n">nAttack</span><span class="p">:</span><span class="n">sample_end</span><span class="o">-</span><span class="n">nDecay</span><span class="p">]</span> <span class="o">=</span> <span class="n">high</span>
+    <span class="k">return</span> <span class="n">wfm</span></div>
+    
+<div class="viewcode-block" id="exp"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.exp">[docs]</a><span class="k">def</span> <span class="nf">exp</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">position</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    create and exponential decaying waveform</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1">#automatically correct overlap only when position argument not explicitly given</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+            <span class="n">position</span> <span class="o">-=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+    <span class="n">sample_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span><span class="o">*</span><span class="n">clock</span><span class="p">))</span>
+    <span class="n">wfm</span> <span class="o">=</span> <span class="n">low</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">sample_length</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">sample_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="p">(</span><span class="n">position</span><span class="o">-</span><span class="n">pulse</span><span class="p">))</span>
+    <span class="n">sample_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="n">position</span><span class="p">)</span>
+    
+    <span class="n">wfm</span><span class="p">[</span><span class="n">sample_start</span><span class="p">:</span><span class="n">sample_end</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sample_end</span><span class="o">-</span><span class="n">sample_start</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">decay</span><span class="o">*</span><span class="n">clock</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wfm</span></div>
+    
+<div class="viewcode-block" id="triangle"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.triangle">[docs]</a><span class="k">def</span> <span class="nf">triangle</span><span class="p">(</span><span class="n">attack</span><span class="p">,</span> <span class="n">decay</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">position</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        create a pulse with triangular shape</span>
+<span class="sd">        </span>
+<span class="sd">        Input:</span>
+<span class="sd">            attack, decay - attack and decay times in sec</span>
+<span class="sd">            length - length of the comlete resulting waveform in sec</span>
+<span class="sd">            position - position of the end of the pulse</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">length</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1">#automatically correct overlap only when position argument not explicitly given</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+            <span class="n">position</span> <span class="o">-=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+    <span class="n">sample_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="p">(</span><span class="n">position</span><span class="o">-</span><span class="n">attack</span><span class="o">-</span><span class="n">decay</span><span class="p">))</span>
+    <span class="n">sample_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="n">position</span><span class="p">)</span>
+    <span class="n">sample_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">length</span><span class="o">*</span><span class="n">clock</span><span class="p">))</span>
+    <span class="n">sample_attack</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">attack</span><span class="o">*</span><span class="n">clock</span><span class="p">))</span> 
+    <span class="n">sample_decay</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">decay</span><span class="o">*</span><span class="n">clock</span><span class="p">))</span>
+    <span class="n">wfm</span> <span class="o">=</span> <span class="n">low</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">sample_length</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">wfm</span><span class="p">[</span><span class="n">sample_start</span><span class="p">:</span><span class="n">sample_start</span><span class="o">+</span><span class="n">sample_attack</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">sample_attack</span><span class="p">)</span>
+    <span class="n">wfm</span><span class="p">[</span><span class="n">sample_start</span><span class="o">+</span><span class="n">sample_attack</span><span class="p">:</span><span class="n">sample_end</span><span class="o">-</span><span class="n">sample_decay</span><span class="p">]</span> <span class="o">=</span> <span class="n">high</span>
+    <span class="n">wfm</span><span class="p">[</span><span class="n">sample_end</span><span class="o">-</span><span class="n">sample_decay</span><span class="p">:</span><span class="n">sample_end</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">high</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">sample_decay</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wfm</span></div>
+
+<div class="viewcode-block" id="square"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.square">[docs]</a><span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">position</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">adddelay</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        generate waveform corresponding to a dc pulse</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            pulse - pulse duration in seconds</span>
+<span class="sd">            length - length of the generated waveform</span>
+<span class="sd">            position - time instant of the end of the pulse</span>
+<span class="sd">            low - pulse &#39;off&#39; sample value</span>
+<span class="sd">            high - pulse &#39;on&#39; sample value</span>
+<span class="sd">            clock - sample rate of the DAC</span>
+<span class="sd">        Output:</span>
+<span class="sd">            float array of samples</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span><span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">length</span><span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1">#automatically correct overlap only when position argument not explicitly given</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+            <span class="n">position</span> <span class="o">-=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">pulse</span><span class="o">&gt;</span><span class="n">position</span><span class="p">):</span> <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : pulse does not fit into waveform&#39;</span><span class="p">)</span>
+    <span class="n">sample_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="p">(</span><span class="n">position</span><span class="o">-</span><span class="n">pulse</span><span class="o">-</span><span class="n">adddelay</span><span class="p">))</span>
+    <span class="n">sample_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="p">(</span><span class="n">position</span><span class="o">-</span><span class="n">adddelay</span><span class="p">))</span>
+    <span class="n">sample_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">length</span><span class="o">*</span><span class="n">clock</span><span class="p">)</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span> <span class="c1">#Ensures that the number of samples is divisible by 4 @andre20150615</span>
+    <span class="c1">#sample_length = int(np.ceil(length*clock)) #old definition</span>
+    <span class="n">wfm</span> <span class="o">=</span> <span class="n">low</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">sample_length</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">sample_start</span> <span class="o">&lt;</span> <span class="n">sample_end</span><span class="p">):</span> <span class="n">wfm</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_start</span><span class="p">)]</span> <span class="o">=</span> <span class="n">high</span> <span class="o">+</span> <span class="p">(</span><span class="n">low</span><span class="o">-</span><span class="n">high</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sample_start</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_start</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">freq</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span> <span class="n">wfm</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">sample_start</span><span class="p">)):</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_end</span><span class="p">)]</span> <span class="o">=</span> <span class="n">high</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_end</span><span class="p">)</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">sample_start</span><span class="p">))):</span>
+            <span class="n">wfm</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">sample_start</span><span class="p">))]</span> <span class="o">=</span> <span class="n">high</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">freq</span><span class="o">/</span><span class="n">clock</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">sample_end</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">sample_end</span><span class="p">)):</span> <span class="n">wfm</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_end</span><span class="p">)]</span> <span class="o">=</span> <span class="n">low</span> <span class="o">+</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sample_end</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_end</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">wfm</span></div>
+    
+    
+<div class="viewcode-block" id="gauss"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.gauss">[docs]</a><span class="k">def</span> <span class="nf">gauss</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">position</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        generate waveform corresponding to a dc gauss pulse</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            pulse - pulse duration in seconds</span>
+<span class="sd">            length - length of the generated waveform</span>
+<span class="sd">            position - time instant of the end of the pulse</span>
+<span class="sd">            low - pulse &#39;off&#39; sample value</span>
+<span class="sd">            high - pulse &#39;on&#39; sample value</span>
+<span class="sd">            clock - sample rate of the DAC</span>
+<span class="sd">        Output:</span>
+<span class="sd">            float array of samples</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span><span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> 
+        <span class="n">length</span><span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span>
+        <span class="n">sample_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">length</span><span class="o">*</span><span class="n">clock</span><span class="p">)</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sample_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length</span><span class="o">*</span><span class="n">clock</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1">#automatically correct overlap only when position argument not explicitly given</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+            <span class="n">position</span> <span class="o">-=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">pulse</span><span class="o">&gt;</span><span class="n">position</span><span class="p">):</span> <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : pulse does not fit into waveform&#39;</span><span class="p">)</span>
+    <span class="n">sample_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="p">(</span><span class="n">position</span><span class="o">-</span><span class="n">pulse</span><span class="p">))</span>
+    <span class="n">sample_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clock</span><span class="o">*</span><span class="n">position</span><span class="p">)</span>
+    
+    <span class="n">wfm</span> <span class="o">=</span> <span class="n">low</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">sample_length</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">sample_start</span> <span class="o">&lt;</span> <span class="n">sample_end</span><span class="p">):</span> <span class="n">wfm</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_start</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.</span><span class="c1">#high + (low-high)*(sample_start-int(sample_start))</span>
+    <span class="c1">#wfm[int(np.ceil(sample_start)):int(sample_end)] = high</span>
+    <span class="n">pulsesamples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_end</span><span class="p">)</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_start</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pulsesamples</span><span class="p">):</span>
+        <span class="n">wfm</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">sample_start</span><span class="p">)</span><span class="o">+</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">high</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">pulsesamples</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="p">(</span><span class="n">pulsesamples</span><span class="o">/</span><span class="mf">5.</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">sample_end</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">sample_end</span><span class="p">)):</span> <span class="n">wfm</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_end</span><span class="p">)]</span> <span class="o">=</span> <span class="n">low</span> <span class="o">+</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sample_end</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_end</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">wfm</span></div>
+
+<div class="viewcode-block" id="arb_function"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.arb_function">[docs]</a><span class="k">def</span> <span class="nf">arb_function</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">pulse</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">position</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        generate arbitrary waveform pulse</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            function - function called</span>
+<span class="sd">            pulse - duration of the signal</span>
+<span class="sd">            position - time instant of the end of the signal</span>
+<span class="sd">            length - duration of the waveform</span>
+<span class="sd">            clock - sample rate of the DAC</span>
+<span class="sd">        Output:</span>
+<span class="sd">            float array of samples</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span><span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">length</span><span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1">#automatically correct overlap only when position argument not explicitly given</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+            <span class="n">position</span> <span class="o">-=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">pulse</span><span class="o">&gt;</span><span class="n">position</span><span class="p">):</span> <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : pulse does not fit into waveform&#39;</span><span class="p">)</span>
+    <span class="n">sample_start</span> <span class="o">=</span> <span class="n">clock</span><span class="o">*</span><span class="p">(</span><span class="n">position</span><span class="o">-</span><span class="n">pulse</span><span class="p">)</span>
+    <span class="n">sample_end</span> <span class="o">=</span> <span class="n">clock</span><span class="o">*</span><span class="n">position</span>
+    <span class="n">sample_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">length</span><span class="o">*</span><span class="n">clock</span><span class="p">))</span>
+
+    <span class="n">wfm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">sample_length</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="n">clock</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_end</span><span class="o">-</span><span class="n">sample_start</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">wfm</span><span class="p">[</span><span class="n">sample_start</span><span class="p">:</span><span class="n">sample_end</span><span class="p">]</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wfm</span></div>
+
+    
+<div class="viewcode-block" id="t1"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.t1">[docs]</a><span class="k">def</span> <span class="nf">t1</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        generate waveform with one pi pulse and delay after</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            delay - time delay after pi pulse</span>
+<span class="sd">            sample object</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            float array of samples</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">length</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+        <span class="n">delay</span> <span class="o">+=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">delay</span><span class="o">+</span><span class="n">sample</span><span class="o">.</span><span class="n">tpi</span> <span class="o">&gt;</span> <span class="n">length</span><span class="p">):</span> <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : pulse does not fit into waveform&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">DRAG_amplitude</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">wfm</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">tpi</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">length</span><span class="o">-</span><span class="n">delay</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wfm</span> <span class="o">=</span> <span class="n">drag</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">tpi</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">length</span><span class="o">-</span><span class="n">delay</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span>
+    <span class="n">wfm</span> <span class="o">=</span> <span class="n">wfm</span> <span class="o">*</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span> <span class="o">+</span> <span class="n">low</span>
+    <span class="k">return</span> <span class="n">wfm</span></div>
+    
+    
+<div class="viewcode-block" id="ramsey"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.ramsey">[docs]</a><span class="k">def</span> <span class="nf">ramsey</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">pi2_pulse</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">position</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        generate waveform with two pi/2 pulses and delay in-between</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            delay - time delay between the pi/2 pulses</span>
+<span class="sd">            pi2_pulse - length of a pi/2 pulse</span>
+<span class="sd">            (see awg_pulse for rest)</span>
+<span class="sd">        Output:</span>
+<span class="sd">            float array of samples</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">length</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1">#automatically correct overlap only when position argument not explicitly given</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+            <span class="n">position</span> <span class="o">-=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">DRAG_amplitude</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">pi2_pulse</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">pi2_pulse</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">tpi2</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">delay</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">pi2_pulse</span><span class="o">&gt;</span><span class="n">position</span><span class="p">):</span> <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : ramsey pulses do not fit into waveform&#39;</span><span class="p">)</span>
+        <span class="n">wfm</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span>
+        <span class="n">wfm</span> <span class="o">+=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span>  <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="o">-</span><span class="n">delay</span><span class="o">-</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span>
+    
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">pi2_pulse</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">pi2_pulse</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">tpi2</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">delay</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">pi2_pulse</span><span class="o">&gt;</span><span class="n">position</span><span class="p">):</span> <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : ramsey pulses do not fit into waveform&#39;</span><span class="p">)</span>
+        <span class="n">wfm</span> <span class="o">=</span> <span class="n">drag</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span>
+        <span class="n">wfm</span> <span class="o">+=</span> <span class="n">drag</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="p">,</span>  <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="o">-</span><span class="n">delay</span><span class="o">-</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span>
+    
+    <span class="n">wfm</span> <span class="o">=</span> <span class="n">wfm</span> <span class="o">*</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span> <span class="o">+</span> <span class="n">low</span>
+    <span class="k">return</span> <span class="n">wfm</span></div>
+
+
+<div class="viewcode-block" id="spinecho"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.spinecho">[docs]</a><span class="k">def</span> <span class="nf">spinecho</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">pi2_pulse</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pi_pulse</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">position</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">readoutpulse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">adddelay</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="n">DRAG_amplitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        generate waveform with two pi/2 pulses at the ends and a number n of echo (pi) pulses in between</span>
+<span class="sd">        pi2 - delay/(n/2) - pi - delay/n - pi - ... - pi - delay/(n/2) - [pi2, if readoutpulse]</span>
+<span class="sd">        </span>
+<span class="sd">        Phase shift included to perform CPMG-Measurements,</span>
+<span class="sd">        DRAG included</span>
+<span class="sd">        Sequence for n&gt;1 fixed: between pi2 and pi is delay/(n/2) @TW20160907</span>
+<span class="sd">        </span>
+<span class="sd">        pulse - pulse duration in seconds</span>
+<span class="sd">        length - length of the generated waveform</span>
+<span class="sd">        position - time instant of the end of the pulse</span>
+<span class="sd">        low - pulse &#39;off&#39; sample value</span>
+<span class="sd">        high - pulse &#39;on&#39; sample value</span>
+<span class="sd">        clock - sample rate of the DAC</span>
+<span class="sd">        phase - phase shift between pi2 and pi pulses in rad</span>
+<span class="sd">        DRAG_amplitude - if not None, DRAG-Pulses are used</span>
+<span class="sd">        </span>
+<span class="sd">        waveforms are contructed from right to left</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span><span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">length</span><span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1">#automatically correct overlap only when position argument not explicitly given</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+            <span class="n">position</span> <span class="o">-=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">pi2_pulse</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">pi2_pulse</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">tpi2</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">pi_pulse</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">pi_pulse</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">tpi</span>
+  
+    <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">adddelay</span><span class="o">+</span><span class="n">delay</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">pi2_pulse</span><span class="o">+</span><span class="n">n</span><span class="o">*</span><span class="n">pi_pulse</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">round</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span> <span class="c1"># round bc of floating points arethmetic</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : sequence does not fit into waveform. delay is the sum of the waiting times in between the pi pulses&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">DRAG_amplitude</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">readoutpulse</span><span class="p">:</span>   <span class="c1">#last pi/2 pulse</span>
+            <span class="n">wfm</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#add pi/2 pulse</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">wfm</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">clock</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#create space (low) of the length of a pi/2 pulse</span>
+        <span class="k">for</span> <span class="n">ni</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>   <span class="c1">#add pi pulses</span>
+            <span class="n">wfm</span> <span class="o">+=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span> <span class="o">-</span> <span class="n">pi2_pulse</span> <span class="o">-</span> <span class="n">ni</span><span class="o">*</span><span class="n">pi_pulse</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="n">delay</span><span class="o">/</span><span class="n">n</span><span class="o">*</span><span class="n">ni</span> <span class="o">-</span> <span class="n">adddelay</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">phase</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span>
+        <span class="n">wfm</span> <span class="o">+=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span> <span class="o">-</span> <span class="n">pi2_pulse</span> <span class="o">-</span> <span class="n">n</span><span class="o">*</span><span class="n">pi_pulse</span> <span class="o">-</span> <span class="n">delay</span> <span class="o">-</span> <span class="n">adddelay</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#pi/2 pulse</span>
+        <span class="n">wfm</span> <span class="o">=</span> <span class="n">wfm</span> <span class="o">*</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span> <span class="o">+</span> <span class="nb">complex</span><span class="p">(</span><span class="n">low</span><span class="p">,</span><span class="n">low</span><span class="p">)</span>   <span class="c1">#adjust offset</span>
+        <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">wfm</span> <span class="o">=</span> <span class="n">wfm</span><span class="o">.</span><span class="n">real</span> <span class="c1"># to avoid conversion error messages</span>
+        
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">readoutpulse</span><span class="p">:</span>   <span class="c1">#last pi/2 pulse</span>
+            <span class="n">wfm</span> <span class="o">=</span> <span class="n">drag</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#add pi/2 pulse</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">wfm</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">clock</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#create space (low) of the length of a pi/2 pulse</span>
+        <span class="k">for</span> <span class="n">ni</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>   <span class="c1">#add pi pulses</span>
+            <span class="n">wfm</span> <span class="o">+=</span> <span class="n">drag</span><span class="p">(</span><span class="n">pi_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span> <span class="o">-</span> <span class="n">pi2_pulse</span> <span class="o">-</span> <span class="n">ni</span><span class="o">*</span><span class="n">pi_pulse</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="n">delay</span><span class="o">/</span><span class="n">n</span><span class="o">*</span><span class="n">ni</span> <span class="o">-</span> <span class="n">adddelay</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">phase</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span>
+        <span class="n">wfm</span> <span class="o">+=</span> <span class="n">drag</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span> <span class="o">-</span> <span class="n">pi2_pulse</span> <span class="o">-</span> <span class="n">n</span><span class="o">*</span><span class="n">pi_pulse</span> <span class="o">-</span> <span class="n">delay</span> <span class="o">-</span> <span class="n">adddelay</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#pi/2 pulse</span>
+        <span class="n">wfm</span> <span class="o">=</span> <span class="n">wfm</span> <span class="o">*</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span> <span class="o">+</span> <span class="nb">complex</span><span class="p">(</span><span class="n">low</span><span class="p">,</span><span class="n">low</span><span class="p">)</span>   <span class="c1">#adjust offset</span>
+    
+    <span class="k">return</span> <span class="n">wfm</span></div>
+    
+<div class="viewcode-block" id="udd"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.udd">[docs]</a><span class="k">def</span> <span class="nf">udd</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">pi2_pulse</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pi_pulse</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">position</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">readoutpulse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">adddelay</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">):</span> 
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        generate waveform with two pi/2 pulses at the ends and a number n of (pi) pulses in between</span>
+<span class="sd">        where the position of the j-th pulse is defined by sin^2[(pi*j)/(2N+2)]  @TW20160908</span>
+<span class="sd">       </span>
+<span class="sd">        pulse - pulse duration in seconds</span>
+<span class="sd">        length - length of the generated waveform</span>
+<span class="sd">        position - time instant of the end of the pulse</span>
+<span class="sd">        low - pulse &#39;off&#39; sample value</span>
+<span class="sd">        high - pulse &#39;on&#39; sample value</span>
+<span class="sd">        clock - sample rate of the DAC</span>
+<span class="sd">        phase - phase shift between pi2 and pi pulses</span>
+<span class="sd">        DRAG_amplitude - if not None, DRAG-Pulses are used</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span><span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">length</span><span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1">#automatically correct overlap only when position argument not explicitly given</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+            <span class="n">position</span> <span class="o">-=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">pi2_pulse</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">pi2_pulse</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">tpi2</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">pi_pulse</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">pi_pulse</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">tpi</span>   
+    
+    <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">adddelay</span><span class="o">+</span><span class="n">delay</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">pi2_pulse</span><span class="o">+</span><span class="n">n</span><span class="o">*</span><span class="n">pi_pulse</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">round</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : sequence does not fit into waveform. delay is the sum of the waiting times in between the pi pulses&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">DRAG_amplitude</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">readoutpulse</span><span class="p">:</span>   <span class="c1">#last pi/2 pulse</span>
+            <span class="n">wfm</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#add pi/2 pulse</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">wfm</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">clock</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#create space (low) of the length of a pi/2 pulse</span>
+        <span class="k">for</span> <span class="n">ni</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>   <span class="c1">#add pi pulses</span>
+            <span class="n">wfm</span> <span class="o">+=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span> <span class="o">-</span> <span class="p">(</span><span class="n">delay</span><span class="o">+</span><span class="n">n</span><span class="o">*</span><span class="n">pi_pulse</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">ni</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="o">+</span><span class="mi">2</span><span class="p">)))</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">adddelay</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">phase</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span> <span class="c1"># no pi2_pulse subtracted because equation yields position of center</span>
+        <span class="n">wfm</span> <span class="o">+=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span> <span class="o">-</span> <span class="n">pi2_pulse</span> <span class="o">-</span> <span class="n">n</span><span class="o">*</span><span class="n">pi_pulse</span> <span class="o">-</span> <span class="n">delay</span> <span class="o">-</span> <span class="n">adddelay</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#pi/2 pulse</span>
+        <span class="n">wfm</span> <span class="o">=</span> <span class="n">wfm</span> <span class="o">*</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span> <span class="o">+</span> <span class="nb">complex</span><span class="p">(</span><span class="n">low</span><span class="p">,</span><span class="n">low</span><span class="p">)</span>   <span class="c1">#adjust offset</span>
+        <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">wfm</span> <span class="o">=</span> <span class="n">wfm</span><span class="o">.</span><span class="n">real</span> <span class="c1"># to avoid conversion error messages</span>
+    
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">readoutpulse</span><span class="p">:</span>   <span class="c1">#last pi/2 pulse</span>
+            <span class="n">wfm</span> <span class="o">=</span> <span class="n">drag</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#add pi/2 pulse</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">wfm</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">clock</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#create space (low) of the length of a pi/2 pulse</span>
+        <span class="k">for</span> <span class="n">ni</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>   <span class="c1">#add pi pulses</span>
+            <span class="n">wfm</span> <span class="o">+=</span> <span class="n">drag</span><span class="p">(</span><span class="n">pi_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span> <span class="o">-</span> <span class="p">(</span><span class="n">delay</span><span class="o">+</span><span class="n">n</span><span class="o">*</span><span class="n">pi_pulse</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">ni</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="o">+</span><span class="mi">2</span><span class="p">)))</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">adddelay</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">phase</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span>
+        <span class="n">wfm</span> <span class="o">+=</span> <span class="n">drag</span><span class="p">(</span><span class="n">pi2_pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">DRAG_amplitude</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">position</span> <span class="o">-</span> <span class="n">pi2_pulse</span> <span class="o">-</span> <span class="n">n</span><span class="o">*</span><span class="n">pi_pulse</span> <span class="o">-</span> <span class="n">delay</span> <span class="o">-</span> <span class="n">adddelay</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">clock</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">)</span>   <span class="c1">#pi/2 pulse</span>
+        <span class="n">wfm</span> <span class="o">=</span> <span class="n">wfm</span> <span class="o">*</span> <span class="p">(</span><span class="n">high</span><span class="o">-</span><span class="n">low</span><span class="p">)</span> <span class="o">+</span> <span class="nb">complex</span><span class="p">(</span><span class="n">low</span><span class="p">,</span><span class="n">low</span><span class="p">)</span>   <span class="c1">#adjust offset</span>
+    <span class="k">return</span> <span class="n">wfm</span></div>
+
+
+<div class="viewcode-block" id="drag"><a class="viewcode-back" href="../../../../../qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.drag">[docs]</a><span class="k">def</span> <span class="nf">drag</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        if pulses are short, DRAG helps to reduce the gate error.</span>
+<span class="sd">        Pulseshape on I is gussian and on Q is the derivative of I times an experimentally determined amplitude</span>
+<span class="sd">    </span>
+<span class="sd">        pulse - pulse duration in seconds</span>
+<span class="sd">        amplitude - experimentally determined amplitude</span>
+<span class="sd">        length - length of the generated waveform</span>
+<span class="sd">        position - time instant of the end of the pulse</span>
+<span class="sd">        clock - sample rate of the DAC        </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">clock</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">clock</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">clock</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span> <span class="n">length</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">exc_T</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1">#automatically correct overlap only when position argument not explicitly given</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;overlap&#39;</span><span class="p">):</span>   <span class="c1">#if overlap exists in sample object</span>
+            <span class="n">position</span> <span class="o">-=</span> <span class="n">sample</span><span class="o">.</span><span class="n">overlap</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;overlap attribute not found in sample object&#39;</span><span class="p">)</span>
+    <span class="n">wfm</span> <span class="o">=</span> <span class="n">gauss</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">length</span><span class="o">*</span><span class="mf">1e9</span><span class="p">)</span><span class="o">/</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">gauss</span><span class="p">(</span><span class="n">pulse</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">length</span><span class="o">*</span><span class="mf">1e9</span><span class="p">)</span><span class="o">/</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">)</span><span class="o">*</span><span class="n">amplitude</span><span class="p">),[</span><span class="mi">0</span><span class="p">]])</span> <span class="c1"># actual pulse</span>
+    <span class="n">wfm</span><span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="n">position</span><span class="o">-</span><span class="n">pulse</span><span class="p">)</span><span class="o">*</span><span class="n">clock</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span><span class="nb">int</span><span class="p">((</span><span class="n">position</span><span class="o">-</span><span class="n">pulse</span><span class="p">)</span><span class="o">*</span><span class="n">clock</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span><span class="o">=</span><span class="n">wfm</span><span class="o">.</span><span class="n">real</span><span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="n">position</span><span class="o">-</span><span class="n">pulse</span><span class="p">)</span><span class="o">*</span><span class="n">clock</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span><span class="nb">int</span><span class="p">((</span><span class="n">position</span><span class="o">-</span><span class="n">pulse</span><span class="p">)</span><span class="o">*</span><span class="n">clock</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="c1"># for smooth derivative</span>
+    <span class="n">wfm</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">position</span><span class="o">*</span><span class="n">clock</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">position</span><span class="o">*</span><span class="n">clock</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span><span class="o">=</span> <span class="n">wfm</span><span class="o">.</span><span class="n">real</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">position</span><span class="o">*</span><span class="n">clock</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">position</span><span class="o">*</span><span class="n">clock</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> 
+    
+    <span class="k">return</span> <span class="n">wfm</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

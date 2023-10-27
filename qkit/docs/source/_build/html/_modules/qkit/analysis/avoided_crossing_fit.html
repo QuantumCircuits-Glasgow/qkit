@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.analysis.avoided_crossing_fit &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.analysis.avoided_crossing_fit</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.analysis.avoided_crossing_fit</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Filename: avoided_crossing_fit.py</span>
+<span class="c1"># Alexander Stehli &lt;alexander.stehli@kit.edu&gt;, 05/2017</span>
+<span class="c1"># Updates: 05/2017</span>
+<span class="c1"># Extraction of coupling strenghts from avoided level crossings.</span>
+
+<span class="c1"># Import and usage:</span>
+<span class="c1">#    See Notebook.</span>
+<span class="c1"># For further information see doc strings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="k">as</span> <span class="nn">so</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+
+<div class="viewcode-block" id="ACF"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF">[docs]</a><span class="k">class</span> <span class="nc">ACF</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Avoided crossing fit class (AS@KIT 2017):</span>
+<span class="sd">    Useful for extracting the coupling strenght from avoided level crossings between an arbirary number of functions.</span>
+<span class="sd">    </span>
+<span class="sd">        Attributes:</span>
+<span class="sd">            set_xdata:     Set x-data for the fit.</span>
+<span class="sd">            set_ydata:     Set y-data for the fit.</span>
+<span class="sd">            set_functions: Set functions of the undressed/uncoupled systems. You can also define functions by yourself.</span>
+<span class="sd">                           Here it is important, that the function input is formatted as: New_fct(x, par1, par2, ...)</span>
+<span class="sd">            set_init_pars: Set initial parameters for the fit (not necessary for an anticrossing between two curves).</span>
+<span class="sd">            set_all:       Set all afore mentioned variables.</span>
+
+<span class="sd">            fit:            Perform fit and generate results attribute. The latter stores the fit results and corresponding errors (least squares).</span>
+<span class="sd">            plot_init_pars: Plot xy-input coupled modes for the initial parameters. This can be useful for finding good starting values.</span>
+<span class="sd">            plot_results:   Plot xy-input and fit results.</span>
+<span class="sd">            crossing_fct:   Calculates the energy levels of a coupled system of an arbirary number of modes (assuming transverse/XX-coupling of the modes).</span>
+<span class="sd">            print_results:  Print fit results (crudely formatted).</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xdata</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ydata</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p0</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_pars</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov_mat</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="c1"># Small library of inbuilt functions:      </span>
+<div class="viewcode-block" id="ACF.constant_line"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.constant_line">[docs]</a>    <span class="k">def</span> <span class="nf">constant_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A constant line.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: x-value (allows for the output of arrays)</span>
+<span class="sd">            a: return value</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            An array with same length as x and value: a</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">*</span> <span class="n">x</span></div>
+    
+<div class="viewcode-block" id="ACF.straight_line"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.straight_line">[docs]</a>    <span class="k">def</span> <span class="nf">straight_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A straight line with slope a and offset b.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: x-value</span>
+<span class="sd">            a: Slope</span>
+<span class="sd">            b: Offset in y-direction</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            An array with same length as x and return value: a * x + b</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">b</span></div>
+    
+<div class="viewcode-block" id="ACF.parabola"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.parabola">[docs]</a>    <span class="k">def</span> <span class="nf">parabola</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A parabola with curvature a around x = b with offset c.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: x value</span>
+<span class="sd">            a: second derivative / 2</span>
+<span class="sd">            b: Offset in x-direction</span>
+<span class="sd">            c: Offset in y-direction</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An array with same length as x and return value: a*(x - b)**2 + c</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">c</span></div>
+
+<div class="viewcode-block" id="ACF.hyperbola"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.hyperbola">[docs]</a>    <span class="k">def</span> <span class="nf">hyperbola</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A hyperbola around x = b with offset c.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: x value</span>
+<span class="sd">            a:</span>
+<span class="sd">            b: Offset in x-direction</span>
+<span class="sd">            c: Offset in y-direction</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An array with same length as x and return value: a*(x - b)**2 + c</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">c</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="ACF.transmon_f01"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.transmon_f01">[docs]</a>    <span class="k">def</span> <span class="nf">transmon_f01</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">w0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">I_ext</span><span class="p">,</span> <span class="n">djj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dispersion of a tunable transmon qubit with junction asymmetry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x:     x-value</span>
+<span class="sd">            w0:    Maximum qubit frequency without detuning.</span>
+<span class="sd">            L:     Oscillation period in current/x-value.</span>
+<span class="sd">            I_ext: Offset current/x offset.</span>
+<span class="sd">            djj:   Josephson junction asymmetry (Ic1 - Ic2)/(Ic1 + Ic2)</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Primal transition frequency of a transmon qubit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span>  <span class="n">w0</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">L</span><span class="o">*</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">I_ext</span><span class="p">)))</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">djj</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">L</span><span class="o">*</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">I_ext</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">.5</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span></div>
+    
+
+<div class="viewcode-block" id="ACF.set_xdata"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.set_xdata">[docs]</a>    <span class="k">def</span> <span class="nf">set_xdata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set x-datasets for the fit.</span>
+<span class="sd">        x-arrays should be ordered by eigenvalue of the y-arrays (ascending order).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x-arrays of the undressed modes (at least 2).</span>
+<span class="sd">            A list of arrays is also allowed as input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlen</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;At least 2 x-arrays required.&quot;</span><span class="p">)</span>
+        <span class="k">return</span></div>
+    
+<div class="viewcode-block" id="ACF.set_ydata"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.set_ydata">[docs]</a>    <span class="k">def</span> <span class="nf">set_ydata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set y-datasets for the fit.</span>
+<span class="sd">        y-arrays should be ordered by eigenvalue (ascending order).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            y-arrays of the undressed modes (at least 2).</span>
+<span class="sd">            A list of arrays is also allowed as input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ydata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ylen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ydata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ylen</span> <span class="o">&lt;=</span><span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;At least 2 y-arrays required.&quot;</span><span class="p">)</span>
+        <span class="k">return</span></div>
+    
+<div class="viewcode-block" id="ACF.set_functions"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.set_functions">[docs]</a>    <span class="k">def</span> <span class="nf">set_functions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set functions for the fit.</span>
+<span class="sd">        Each function should describe one of the undressed modes (i.e. without interaction/level repelling).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            functions of the undressed modes (at least 2). </span>
+<span class="sd">            A list of functions is also allowed as input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;At least 2 functions are required.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="c1"># Check if functions are callable. </span>
+        <span class="c1"># Determine number and name of free parameters of each function.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span> <span class="o">=</span> <span class="p">[]</span>    <span class="c1"># List of number of each functions parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_names</span> <span class="o">=</span> <span class="p">[]</span>   <span class="c1"># List of names of each functions parameters</span>
+        <span class="k">for</span> <span class="n">fct</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">fct</span><span class="p">):</span>
+                <span class="n">par_names</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getargspec</span><span class="p">(</span><span class="n">fct</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Remove self as fct argument if function is from acf class</span>
+                    <span class="n">par_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;self&quot;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Remove x as fct argument</span>
+                    <span class="n">par_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;In &quot;</span> <span class="o">+</span> <span class="n">fct</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: No x argument found. Please rename axis variable to x.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par_names</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">par_names</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;At least one function is not callable.&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="c1"># Increase number of parameters by number of coupling coefficients</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+        
+        <span class="k">return</span></div>
+    
+<div class="viewcode-block" id="ACF.set_init_pars"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.set_init_pars">[docs]</a>    <span class="k">def</span> <span class="nf">set_init_pars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set initial parameters for the fit.</span>
+<span class="sd">        Order should be: parameter1 of fct1, par2 fct1, ..., g12, g13, ...</span>
+<span class="sd">        If the number of input parameters is insuffcient they are later on set to 1.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            List of initial parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p0len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">)</span>
+        <span class="k">return</span></div>
+    
+<div class="viewcode-block" id="ACF.set_all"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.set_all">[docs]</a>    <span class="k">def</span> <span class="nf">set_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">p0</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set initial parameters for the fit.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x:  x-datasets for the fit (at least 2 arrays, can be entered as a list).</span>
+<span class="sd">                x-arrays should be ordered by eigenvalue (ascending order).</span>
+<span class="sd">            y:  y-datasets for the fit (at least 2 arrays, can be entered as a list).</span>
+<span class="sd">                y-arrays should be ordered by eigenvalue (ascending order).</span>
+<span class="sd">            f:  functions for the fit (at least 2, can be entered as a list). </span>
+<span class="sd">                Each function should describe one of the undressed modes (i.e. without interaction/level repelling). </span>
+<span class="sd">                By default, functions are set to constant_line and straight_line.</span>
+<span class="sd">            p0: Initial parameters for the fit. Order should be: parameter1 of fct1, par2 fct1, ..., g12, g13, .. </span>
+<span class="sd">                If no initial parameters are given all values are set to 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_xdata</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_ydata</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">f</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_functions</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Default functions set to constant_line and straight_line.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_functions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">straight_line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p0</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_init_pars</span><span class="p">(</span><span class="n">p0</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validity_check</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_p0</span><span class="p">()</span>
+        <span class="k">return</span></div>
+    
+    <span class="k">def</span> <span class="nf">_list_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wraps input for x-data, y-data, functions and init_pars in a list.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            List or touple.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            List of input arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Wrong input format.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="k">def</span> <span class="nf">_validity_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if input (x-data, y-data, functions) is valid, i.e. have the same dimension/length.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Bool for validity of the input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="mi">1</span>
+        
+        <span class="c1"># Check if parameters have been set.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xdata</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No xdata found. Use set_xdata for input.&quot;</span><span class="p">)</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ydata</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No ydata found. Use set_ydata for input.&quot;</span><span class="p">)</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No input functions found...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;constant_line and straight_line set as default.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_functions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constant_line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">straight_line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Check if the three lists are of the same length.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlen</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ylen</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of x- (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlen</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)  and y-arrays (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ylen</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) is incompatible.&quot;</span><span class="p">)</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlen</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of x-arrays (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlen</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) and number of functions (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) is incompatible.&quot;</span><span class="p">)</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ylen</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of y-arrays (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ylen</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) and number of functions (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) is incompatible.&quot;</span><span class="p">)</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">valid</span>
+        
+        <span class="c1"># Check if pairs of x- and y-arrays in xdata and ydata have the same length.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlen</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ydata</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;In xdata/ydata: Elements &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span><span class="s2">&quot; do not have the same lengths (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ydata</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span><span class="p">)</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span>
+                
+        <span class="k">return</span> <span class="n">valid</span>
+    
+    <span class="k">def</span> <span class="nf">_check_p0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if initial parameters p0 have the correct format.</span>
+<span class="sd">        For an insufficent number of parameters the remaining ones are set to 1.</span>
+<span class="sd">        If p0 is too long it is truncated to the necessary length.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p0_reset</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># If p0 is not set, set all values to 1.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="p">))</span>
+            <span class="n">p0_reset</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No initial parameters given. Setting all values to 1.&quot;</span><span class="p">)</span>
+        <span class="c1"># If number of initial parameters is to small/large -&gt; cut/append.</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p0len</span> <span class="o">&lt;</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">int</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p0len</span><span class="p">))</span>
+            <span class="n">p0_reset</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Not enough initial parameters. Filling up with 1.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p0len</span> <span class="o">&gt;</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="p">))]</span>
+            <span class="n">p0_reset</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;To many initial parameters given. Cutting off redundant values.&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">p0_reset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_p0len</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New initial parameters:</span><span class="se">\n</span><span class="s2"> p0 = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">))</span>
+        <span class="k">return</span>
+    
+    <span class="k">def</span> <span class="nf">_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Atempts to order the pairs of x-y-arrays by eigenvalue (ascending order).</span>
+<span class="sd">        Sorting is necessary for the fit to converge properly.</span>
+<span class="sd">        Here this is achieved by sorting according to the mean value of the y-datasets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Sort ydata by mean value.</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ydata</span><span class="p">])</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">xdata</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">)[</span><span class="n">indices</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ydata</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ydata</span><span class="p">)[</span><span class="n">indices</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">indices</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Changing order of x- and y-data respectively...</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    
+    <span class="k">def</span> <span class="nf">_reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reshape pars into a list of parameters, as is accepted by crossing_fct.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pars: Parameters to be reshaped.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            List of parameters, the i&#39;th element contains the fit parameters of function i.</span>
+<span class="sd">            The last element of fit_pars contains the values for the coupling strenghts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pars_new</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">fct_par_num</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="p">:</span>
+            <span class="n">pars_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pars</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">fct_par_num</span><span class="p">])</span>
+            <span class="n">pars</span> <span class="o">=</span> <span class="n">pars</span><span class="p">[</span><span class="n">fct_par_num</span><span class="p">:]</span>
+            
+        <span class="k">return</span> <span class="n">pars_new</span>
+    
+    <span class="k">def</span> <span class="nf">_generate_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a list which contains the results and errors for all parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Generate list of function indices and parameter names</span>
+        <span class="n">fct_ind</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">fit_pars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_pars</span><span class="p">)</span>
+        <span class="n">par_names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_names</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">fct_ind</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">fct_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">fct_ind</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">):</span>
+                <span class="n">fct_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fct_ind</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">par_names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par_names</span><span class="p">,</span> <span class="s2">&quot;g_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">fct_ind</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">fct_ind</span><span class="p">,</span> <span class="n">par_names</span><span class="p">,</span> <span class="n">fit_pars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_dev</span><span class="p">))</span>
+        <span class="k">return</span>
+    
+    <span class="k">def</span> <span class="nf">_least_square_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the deviation of the coupled mode functions from the xy-input values for input parameters.</span>
+<span class="sd">        This is deviation is minimized in the fit routine (least squares).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pars: Parameters from the fit.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Deviation of coupled mode functions from xy-input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dev</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reshape</span><span class="p">(</span><span class="n">pars</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fct</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">):</span>
+            <span class="n">dev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ydata</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossing_fct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">pars</span><span class="p">)[:,</span> <span class="n">i</span><span class="p">])</span>
+            
+        <span class="k">return</span> <span class="n">dev</span>
+    
+<div class="viewcode-block" id="ACF.crossing_fct"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.crossing_fct">[docs]</a>    <span class="k">def</span> <span class="nf">crossing_fct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the functions of the coupled modes (diagonalizes the matrix).</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            x:        x-values where the the functions are to be evaluated</span>
+<span class="sd">            fct_pars: List of arrays, each array contains parameters of the corresponding (undressed) function.</span>
+<span class="sd">                      The last array in the list contains values for the coupling strenghts.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            List of arrays, where the i&#39;th array cointains the y-values of branch i of the coupled system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">fct_pars</span> <span class="o">=</span> <span class="n">pars</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">pars</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1">#Create the nondiagonal symmetric interaction matrix</span>
+        <span class="n">int_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">int_mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">g</span><span class="p">[:</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">int_mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:])]</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">i</span><span class="p">:]</span>
+        
+        <span class="n">int_mat</span> <span class="o">=</span> <span class="n">int_mat</span><span class="o">+</span><span class="n">int_mat</span><span class="o">.</span><span class="n">T</span>
+        
+        <span class="n">func_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">))</span>
+        
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+            <span class="c1">#Create diagonal parts of the matrix</span>
+            <span class="n">d_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fct</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">):</span>
+                <span class="n">d_mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">fct</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="o">*</span><span class="n">fct_pars</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            
+            <span class="n">mat</span> <span class="o">=</span> <span class="n">d_mat</span> <span class="o">+</span> <span class="n">int_mat</span>
+            <span class="n">func_vals</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">func_vals</span></div>
+    
+<div class="viewcode-block" id="ACF.fit"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show_data</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">show_plot</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit functions of the coupled modes to the stored xy-data.</span>
+<span class="sd">        Generates the results attribute, i.e. a list containing results for each free parameters:</span>
+<span class="sd">            1. Index of the function the parameter belongs to</span>
+<span class="sd">               For the coupling strenght this indicates the modes it belongs to</span>
+<span class="sd">            2. Name of the parameter</span>
+<span class="sd">            3. Value as extracted from the fit</span>
+<span class="sd">            4. Standard deviation of the value</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            show_data: If true, fit data is displayed after the fit.</span>
+<span class="sd">            show_plot: If true, plot is displayed after the fit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if fit is executable:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validity_check</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Address problems before fit can be excecuted.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_p0</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sort</span><span class="p">()</span>
+        
+        <span class="n">fit_results</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">leastsq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_least_square_val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">,</span> <span class="n">full_output</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_pars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov_mat</span> <span class="o">=</span> <span class="n">fit_results</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fit_results</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># Multiply covariance matrix with reduced chi squared to get standard deviation.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov_mat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cov_mat</span> <span class="o">*=</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_least_square_val</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_pars</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span>
+                             <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">))</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">))))</span>
+            <span class="c1"># Calculate standard deviation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">std_dev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cov_mat</span><span class="p">))</span><span class="o">**</span><span class="mf">0.5</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Covariance matrix could not be calculated.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">std_dev</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)]</span><span class="o">*</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fct_par_nums</span><span class="p">)</span>
+        
+        <span class="c1"># Reshape fit_pars into a list of parameters, as is accepted by crossing_fct.</span>
+        <span class="c1"># After reshaping fit_pars is a list, where the element i contains the fit parameters of function i. </span>
+        <span class="c1"># The last element of fit_pars contains the coupling strenghts.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_pars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_pars</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generate_results</span><span class="p">()</span>
+        
+        <span class="c1"># Show output. Includes some crude formatting.</span>
+        <span class="k">if</span> <span class="n">show_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_results</span><span class="p">()</span>
+                
+        <span class="c1"># Show plot.</span>
+        <span class="k">if</span> <span class="n">show_plot</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_results</span><span class="p">()</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="ACF.print_results"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.print_results">[docs]</a>    <span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the fit results in a legible form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_pars</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fit was not yet performed. No data available.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">format_str</span> <span class="o">=</span> <span class="s2">&quot; = ( </span><span class="si">{:7.4g}</span><span class="s2"> +- </span><span class="si">{:7.4g}</span><span class="s2">)&quot;</span>
+        <span class="n">fct_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">data_set</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">data_set</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">fct_index</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_set</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Curve &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">fct_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">fct_index</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;):&quot;</span><span class="p">)</span>
+                <span class="n">fct_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">fct_index</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_set</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">):</span>
+                <span class="n">fct_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Coupling strengths:&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    &quot;</span> <span class="o">+</span> <span class="n">data_set</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">format_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_set</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">data_set</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+        
+        <span class="k">return</span></div>
+
+    <span class="k">def</span> <span class="nf">_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots the input xy-datasets, as well as the coupled modes for the input parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pars: Parameters of coupled modes for the plot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dat_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;#0000FF&#39;</span><span class="p">,</span> <span class="s1">&#39;#FF0000&#39;</span><span class="p">,</span> <span class="s1">&#39;#008000&#39;</span><span class="p">,</span> <span class="s1">&#39;#00CCCC&#39;</span><span class="p">,</span> <span class="s1">&#39;#FF7F0E&#39;</span><span class="p">,</span> <span class="s1">&#39;#CC00CC&#39;</span><span class="p">,</span> <span class="s1">&#39;#000000&#39;</span><span class="p">])</span>
+        <span class="n">fct_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;#0000FF70&#39;</span><span class="p">,</span> <span class="s1">&#39;#FF000070&#39;</span><span class="p">,</span> <span class="s1">&#39;#00800070&#39;</span><span class="p">,</span> <span class="s1">&#39;#00CCCC50&#39;</span><span class="p">,</span> <span class="s1">&#39;#FF7F0E50&#39;</span><span class="p">,</span> <span class="s1">&#39;#CC00CC50&#39;</span><span class="p">,</span> <span class="s1">&#39;#00000050&#39;</span><span class="p">])</span>
+        <span class="n">mrkr</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flen</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">dat_cols</span><span class="p">):</span>
+            <span class="n">dat_cols</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dat_cols</span><span class="p">)))</span>
+            <span class="n">fct_cols</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dat_cols</span><span class="p">)))</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ydata</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No data for plot available.&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlen</span><span class="p">):</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ydata</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dat_cols</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="n">mrkr</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">xlin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">)),</span> <span class="mi">1000</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flen</span><span class="p">):</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xlin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossing_fct</span><span class="p">(</span><span class="n">xlin</span><span class="p">,</span> <span class="n">pars</span><span class="p">)[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">fct_cols</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xdata</span><span class="p">)))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ydata</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ydata</span><span class="p">)))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">return</span>
+    
+<div class="viewcode-block" id="ACF.plot_init_pars"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.plot_init_pars">[docs]</a>    <span class="k">def</span> <span class="nf">plot_init_pars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot of input xy-datasets and coupled modes for the initial parameters.</span>
+<span class="sd">        This is useful to find reasonable initial values for the fit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_p0</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sort</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p0</span><span class="p">))</span>
+        <span class="k">return</span></div>
+    
+<div class="viewcode-block" id="ACF.plot_results"><a class="viewcode-back" href="../../../qkit.analysis.html#qkit.analysis.avoided_crossing_fit.ACF.plot_results">[docs]</a>    <span class="k">def</span> <span class="nf">plot_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot of input xy-datasets and the coupled modes using the fit results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_pars</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fit was not yet performed. Use self.plot_init_pars() to look at your input.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_pars</span><span class="p">)</span>
+        <span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

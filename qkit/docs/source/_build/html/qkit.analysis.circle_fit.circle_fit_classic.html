@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.analysis.circle_fit.circle_fit_classic package &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.config package" href="qkit.config.html" />
+    <link rel="prev" title="qkit.analysis.circle_fit.circle_fit_2019 package" href="qkit.analysis.circle_fit.circle_fit_2019.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">qkit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.html#module-qkit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">qkit</a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.analysis.html">qkit.analysis package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.analysis.circle_fit.html">qkit.analysis.circle_fit package</a></li>
+      <li class="breadcrumb-item active">qkit.analysis.circle_fit.circle_fit_classic package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.analysis.circle_fit.circle_fit_classic.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-analysis-circle-fit-circle-fit-classic-package">
+<h1>qkit.analysis.circle_fit.circle_fit_classic package<a class="headerlink" href="#qkit-analysis-circle-fit-circle-fit-classic-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_classic.calibration">
+<span id="qkit-analysis-circle-fit-circle-fit-classic-calibration-module"></span><h2>qkit.analysis.circle_fit.circle_fit_classic.calibration module<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_classic.calibration" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.calibration.</span></span><span class="sig-name descname"><span class="pre">calibration</span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/calibration.html#calibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>some useful tools for manual calibration</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.baseline_func_amp">
+<span class="sig-name descname"><span class="pre">baseline_func_amp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/calibration.html#calibration.baseline_func_amp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.baseline_func_amp" title="Permalink to this definition"></a></dt>
+<dd><p>for this to work, you need to analyze a large part of the baseline
+tune lam and p until you get the desired result
+returns the baseline as a function
+the points in between the datapoints are computed by cubic interpolation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.baseline_func_phase">
+<span class="sig-name descname"><span class="pre">baseline_func_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/calibration.html#calibration.baseline_func_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.baseline_func_phase" title="Permalink to this definition"></a></dt>
+<dd><p>for this to work, you need to analyze a large part of the baseline
+tune lam and p until you get the desired result
+returns the baseline as a function
+the points in between the datapoints are computed by cubic interpolation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.fit_baseline_amp">
+<span class="sig-name descname"><span class="pre">fit_baseline_amp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/calibration.html#calibration.fit_baseline_amp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.fit_baseline_amp" title="Permalink to this definition"></a></dt>
+<dd><p>for this to work, you need to analyze a large part of the baseline
+tune lam and p until you get the desired result</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.fit_baseline_phase">
+<span class="sig-name descname"><span class="pre">fit_baseline_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/calibration.html#calibration.fit_baseline_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.fit_baseline_phase" title="Permalink to this definition"></a></dt>
+<dd><p>for this to work, you need to analyze a large part of the baseline
+tune lam and p until you get the desired result</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_amplitude">
+<span class="sig-name descname"><span class="pre">normalize_amplitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cal_ampdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/calibration.html#calibration.normalize_amplitude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_amplitude" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_by_func">
+<span class="sig-name descname"><span class="pre">normalize_by_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/calibration.html#calibration.normalize_by_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_by_func" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_phase">
+<span class="sig-name descname"><span class="pre">normalize_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cal_phase</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/calibration.html#calibration.normalize_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_phase" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_zdata">
+<span class="sig-name descname"><span class="pre">normalize_zdata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cal_z_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/calibration.html#calibration.normalize_zdata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_zdata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_classic.circlefit">
+<span id="qkit-analysis-circle-fit-circle-fit-classic-circlefit-module"></span><h2>qkit.analysis.circle_fit.circle_fit_classic.circlefit module<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_classic.circlefit" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circlefit.circlefit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.circlefit.</span></span><span class="sig-name descname"><span class="pre">circlefit</span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circlefit.html#circlefit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circlefit.circlefit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>contains all the circlefit procedures
+see <a class="reference external" href="http://scitation.aip.org/content/aip/journal/rsi/86/2/10.1063/1.4907935">http://scitation.aip.org/content/aip/journal/rsi/86/2/10.1063/1.4907935</a>
+arxiv version: <a class="reference external" href="http://arxiv.org/abs/1410.3365">http://arxiv.org/abs/1410.3365</a></p>
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_classic.circuit">
+<span id="qkit-analysis-circle-fit-circle-fit-classic-circuit-module"></span><h2>qkit.analysis.circle_fit.circle_fit_classic.circuit module<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_classic.circuit" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.batch_processing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.circuit.</span></span><span class="sig-name descname"><span class="pre">batch_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">porttype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#batch_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.batch_processing" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for batch processing of resonator data as a function of another variable
+Typical applications are power scans, magnetic field scans etc.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.batch_processing.autofit">
+<span class="sig-name descname"><span class="pre">autofit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cal_dataslice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#batch_processing.autofit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.batch_processing.autofit" title="Permalink to this definition"></a></dt>
+<dd><p>fits all data
+cal_dataslice: choose scatteringdata which should be used for calibration
+of the amplitude and phase, default = 0 (first)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.coupled_resonators">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.circuit.</span></span><span class="sig-name descname"><span class="pre">coupled_resonators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">porttype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#coupled_resonators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.coupled_resonators" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.batch_processing" title="qkit.analysis.circle_fit.circle_fit_classic.circuit.batch_processing"><code class="xref py py-class docutils literal notranslate"><span class="pre">batch_processing</span></code></a></p>
+<p>A class for fitting a resonator coupled to a second one</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.circuit.</span></span><span class="sig-name descname"><span class="pre">notch_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#notch_port"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.circlefit.circlefit" title="qkit.analysis.circle_fit.circle_fit_classic.circlefit.circlefit"><code class="xref py py-class docutils literal notranslate"><span class="pre">circlefit</span></code></a>, <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load" title="qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load"><code class="xref py py-class docutils literal notranslate"><span class="pre">save_load</span></code></a>, <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting" title="qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting"><code class="xref py py-class docutils literal notranslate"><span class="pre">plotting</span></code></a>, <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration" title="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration"><code class="xref py py-class docutils literal notranslate"><span class="pre">calibration</span></code></a></p>
+<p>notch type port probed in transmission</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.autofit">
+<span class="sig-name descname"><span class="pre">autofit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#notch_port.autofit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.autofit" title="Permalink to this definition"></a></dt>
+<dd><p>automatic calibration and fitting</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.circlefit">
+<span class="sig-name descname"><span class="pre">circlefit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refine_results</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#notch_port.circlefit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.circlefit" title="Permalink to this definition"></a></dt>
+<dd><p>performs a circle fit on a frequency vs. complex resonator scattering data set
+Data has to be normalized!!
+INPUT:
+f_data,z_data: input data (frequency, complex S21 data)
+OUTPUT:
+outpus a dictionary {key:value} consisting of the fit values, errors and status information about the fit
+values: {“phi0”:phi0, “Ql”:Ql, “absolute(Qc)”:absQc, “Qi”: Qi, “electronic_delay”:delay, “complexQc”:complQc, “resonance_freq”:fr, “prefactor_a”:a, “prefactor_alpha”:alpha}
+errors: {“phi0_err”:phi0_err, “Ql_err”:Ql_err, “absolute(Qc)_err”:absQc_err, “Qi_err”: Qi_err, “electronic_delay_err”:delay_err, “resonance_freq_err”:fr_err, “prefactor_a_err”:a_err, “prefactor_alpha_err”:alpha_err}
+for details, see:</p>
+<blockquote>
+<div><p>[1] (not diameter corrected) Jiansong Gao, “The Physics of Superconducting Microwave Resonators” (PhD Thesis), Appendix E, California Institute of Technology, (2008)
+[2] (diameter corrected) M. S. Khalil, et. al., J. Appl. Phys. 111, 054510 (2012)
+[3] (fitting techniques) N. CHERNOV AND C. LESORT, “Least Squares Fitting of Circles”, Journal of Mathematical Imaging and Vision 23, 239, (2005)
+[4] (further fitting techniques) P. J. Petersan, S. M. Anlage, J. Appl. Phys, 84, 3392 (1998)</p>
+</div></blockquote>
+<p>the program fits the circle with the algebraic technique described in [3], the rest of the fitting is done with the scipy.optimize least square fitting toolbox
+also, check out [5] S. Probst et al. “Efficient and reliable analysis of noisy complex scatterung resonator data for superconducting quantum circuits” (in preparation)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.do_calibration">
+<span class="sig-name descname"><span class="pre">do_calibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignoreslope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guessdelay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#notch_port.do_calibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.do_calibration" title="Permalink to this definition"></a></dt>
+<dd><p>performs an automated calibration and tries to determine the prefactors a, alpha, delay
+fr, Ql, and a possible slope are extra information, which can be used as start parameters for subsequent fits
+see also “do_normalization”
+the calibration procedure works for transmission line resonators as well</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.do_normalization">
+<span class="sig-name descname"><span class="pre">do_normalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amp_norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frcal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#notch_port.do_normalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.do_normalization" title="Permalink to this definition"></a></dt>
+<dd><p>removes the prefactors a, alpha, delay and returns the calibrated data, see also “do_calibration”
+works also for transmission line resonators</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_delay">
+<span class="sig-name descname"><span class="pre">get_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignoreslope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#notch_port.get_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_delay" title="Permalink to this definition"></a></dt>
+<dd><p>retrieves the cable delay assuming the ideal resonance has a circular shape
+modifies the cable delay until the shape Im(S21) vs Re(S21) is circular
+see “do_calibration”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_photons_in_resonator">
+<span class="sig-name descname"><span class="pre">get_photons_in_resonator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">power</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dBm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#notch_port.get_photons_in_resonator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_photons_in_resonator" title="Permalink to this definition"></a></dt>
+<dd><p>returns the average number of photons
+for a given power in units of W
+unit can be ‘dBm’ or ‘watt’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_single_photon_limit">
+<span class="sig-name descname"><span class="pre">get_single_photon_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dBm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#notch_port.get_single_photon_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_single_photon_limit" title="Permalink to this definition"></a></dt>
+<dd><p>returns the amout of power in units of W necessary
+to maintain one photon on average in the cavity
+unit can be ‘dBm’ or ‘watt’</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.circuit.</span></span><span class="sig-name descname"><span class="pre">reflection_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#reflection_port"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.circlefit.circlefit" title="qkit.analysis.circle_fit.circle_fit_classic.circlefit.circlefit"><code class="xref py py-class docutils literal notranslate"><span class="pre">circlefit</span></code></a>, <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load" title="qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load"><code class="xref py py-class docutils literal notranslate"><span class="pre">save_load</span></code></a>, <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting" title="qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting"><code class="xref py py-class docutils literal notranslate"><span class="pre">plotting</span></code></a>, <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration" title="qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration"><code class="xref py py-class docutils literal notranslate"><span class="pre">calibration</span></code></a></p>
+<p>normal direct port probed in reflection</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.autofit">
+<span class="sig-name descname"><span class="pre">autofit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#reflection_port.autofit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.autofit" title="Permalink to this definition"></a></dt>
+<dd><p>automatic calibration and fitting</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.circlefit">
+<span class="sig-name descname"><span class="pre">circlefit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refine_results</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calc_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#reflection_port.circlefit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.circlefit" title="Permalink to this definition"></a></dt>
+<dd><p>S11 version of the circlefit</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.do_calibration">
+<span class="sig-name descname"><span class="pre">do_calibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignoreslope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guessdelay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#reflection_port.do_calibration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.do_calibration" title="Permalink to this definition"></a></dt>
+<dd><p>calculating parameters for normalization</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.do_normalization">
+<span class="sig-name descname"><span class="pre">do_normalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amp_norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frcal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#reflection_port.do_normalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.do_normalization" title="Permalink to this definition"></a></dt>
+<dd><p>transforming resonator into canonical position</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_delay">
+<span class="sig-name descname"><span class="pre">get_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignoreslope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#reflection_port.get_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_delay" title="Permalink to this definition"></a></dt>
+<dd><p>ignoreslope option not used here
+retrieves the cable delay assuming the ideal resonance has a circular shape
+modifies the cable delay until the shape Im(S21) vs Re(S21) is circular
+see “do_calibration”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_photons_in_resonator">
+<span class="sig-name descname"><span class="pre">get_photons_in_resonator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">power</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dBm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#reflection_port.get_photons_in_resonator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_photons_in_resonator" title="Permalink to this definition"></a></dt>
+<dd><p>returns the average number of photons
+for a given power (defaul unit is ‘dbm’)
+unit can be ‘dBm’ or ‘watt’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_single_photon_limit">
+<span class="sig-name descname"><span class="pre">get_single_photon_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dBm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#reflection_port.get_single_photon_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_single_photon_limit" title="Permalink to this definition"></a></dt>
+<dd><p>returns the amout of power in units of W necessary
+to maintain one photon on average in the cavity
+unit can be ‘dbm’ or ‘watt’</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.circuit.</span></span><span class="sig-name descname"><span class="pre">resonator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ports</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#resonator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Universal resonator analysis class
+It can handle different kinds of ports and assymetric resonators.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.add_port">
+<span class="sig-name descname"><span class="pre">add_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#resonator.add_port"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.add_port" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.add_transm_meas">
+<span class="sig-name descname"><span class="pre">add_transm_meas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#resonator.add_transm_meas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.add_transm_meas" title="Permalink to this definition"></a></dt>
+<dd><p>input: port1
+output: port2
+adds a transmission measurement 
+connecting two direct ports S21</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.delete_port">
+<span class="sig-name descname"><span class="pre">delete_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#resonator.delete_port"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.delete_port" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_Qi">
+<span class="sig-name descname"><span class="pre">get_Qi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#resonator.get_Qi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_Qi" title="Permalink to this definition"></a></dt>
+<dd><p>based on the number of ports and the corresponding measurements
+it calculates the internal losses</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_photons_in_resonator">
+<span class="sig-name descname"><span class="pre">get_photons_in_resonator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">power</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#resonator.get_photons_in_resonator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_photons_in_resonator" title="Permalink to this definition"></a></dt>
+<dd><p>returns the average number of photons
+for a given power</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_single_photon_limit">
+<span class="sig-name descname"><span class="pre">get_single_photon_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#resonator.get_single_photon_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_single_photon_limit" title="Permalink to this definition"></a></dt>
+<dd><p>returns the amout of power necessary to maintain one photon 
+on average in the cavity</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.transmission_port">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.circuit.</span></span><span class="sig-name descname"><span class="pre">transmission_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#transmission_port"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.transmission_port" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.circlefit.circlefit" title="qkit.analysis.circle_fit.circle_fit_classic.circlefit.circlefit"><code class="xref py py-class docutils literal notranslate"><span class="pre">circlefit</span></code></a>, <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load" title="qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load"><code class="xref py py-class docutils literal notranslate"><span class="pre">save_load</span></code></a>, <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting" title="qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting"><code class="xref py py-class docutils literal notranslate"><span class="pre">plotting</span></code></a></p>
+<p>a class for handling transmission measurements</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.circuit.transmission_port.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/circuit.html#transmission_port.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.circuit.transmission_port.fit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_classic.utilities">
+<span id="qkit-analysis-circle-fit-circle-fit-classic-utilities-module"></span><h2>qkit.analysis.circle_fit.circle_fit_classic.utilities module<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_classic.utilities" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.Watt2dBm">
+<span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.utilities.</span></span><span class="sig-name descname"><span class="pre">Watt2dBm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#Watt2dBm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.Watt2dBm" title="Permalink to this definition"></a></dt>
+<dd><p>converts from units of watts to dBm</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.dBm2Watt">
+<span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.utilities.</span></span><span class="sig-name descname"><span class="pre">dBm2Watt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#dBm2Watt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.dBm2Watt" title="Permalink to this definition"></a></dt>
+<dd><p>converts from units of watts to dBm</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.utilities.</span></span><span class="sig-name descname"><span class="pre">plotting</span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#plotting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>some helper functions for plotting</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting.plotall">
+<span class="sig-name descname"><span class="pre">plotall</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#plotting.plotall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting.plotall" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting.plotcalibrateddata">
+<span class="sig-name descname"><span class="pre">plotcalibrateddata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#plotting.plotcalibrateddata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting.plotcalibrateddata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting.plotrawdata">
+<span class="sig-name descname"><span class="pre">plotrawdata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#plotting.plotrawdata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.plotting.plotrawdata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_classic.utilities.</span></span><span class="sig-name descname"><span class="pre">save_load</span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#save_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>procedures for loading and saving data used by other classes</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_data">
+<span class="sig-name descname"><span class="pre">add_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#save_load.add_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_fromhdf">
+<span class="sig-name descname"><span class="pre">add_fromhdf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#save_load.add_fromhdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_fromhdf" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_froms2p">
+<span class="sig-name descname"><span class="pre">add_froms2p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fdata_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#save_load.add_froms2p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_froms2p" title="Permalink to this definition"></a></dt>
+<dd><p>dtype = ‘realimag’, ‘dBmagphaserad’, ‘linmagphaserad’, ‘dBmagphasedeg’, ‘linmagphasedeg’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_fromtxt">
+<span class="sig-name descname"><span class="pre">add_fromtxt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">1,</span> <span class="pre">2)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fdata_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#save_load.add_fromtxt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.add_fromtxt" title="Permalink to this definition"></a></dt>
+<dd><p>dtype = ‘realimag’, ‘dBmagphaserad’, ‘linmagphaserad’, ‘dBmagphasedeg’, ‘linmagphasedeg’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.cut_data">
+<span class="sig-name descname"><span class="pre">cut_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#save_load.cut_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.cut_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.save_fitresults">
+<span class="sig-name descname"><span class="pre">save_fitresults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_classic/utilities.html#save_load.save_fitresults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_classic.utilities.save_load.save_fitresults" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_classic">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_classic" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.analysis.circle_fit.circle_fit_2019.html" class="btn btn-neutral float-left" title="qkit.analysis.circle_fit.circle_fit_2019 package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.config.html" class="btn btn-neutral float-right" title="qkit.config package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

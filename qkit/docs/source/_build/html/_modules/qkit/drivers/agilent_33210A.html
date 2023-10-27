@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.agilent_33210A &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.agilent_33210A</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.agilent_33210A</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># agilent_33210A class, derived from Picowatt_AVS47 class by Hannes Rotzinger.</span>
+<span class="c1"># Jochen Zimmer, June 2012 -- ALPHA release version 0.1</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+
+<span class="n">QTLAB</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="k">if</span> <span class="n">QTLAB</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">qkit.core.instrument_base</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">class</span> <span class="nc">Instrument</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="n">FLAG_GETSET</span> <span class="o">=</span> <span class="mi">0</span> 
+        <span class="n">FLAG_GET_AFTER_SET</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">def</span> <span class="nf">add_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">def</span> <span class="nf">add_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+<span class="kn">from</span> <span class="nn">qkit</span> <span class="kn">import</span> <span class="n">visa</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<div class="viewcode-block" id="agilent_33210A"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A">[docs]</a><span class="k">class</span> <span class="nc">agilent_33210A</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span> <span class="o">=</span> <span class="n">visa</span><span class="o">.</span><span class="n">instrument</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MIN_frequency</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MAX_frequency</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_ampl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MIN_amplitude</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_ampl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MAX_amplitude</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_offs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MIN_offset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_offs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MAX_offset</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_default</span><span class="p">()</span> <span class="c1">#reset</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_default&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_frequency&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_frequency&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_function&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_function&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_amplitude&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_amplitude&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_output&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_output&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_offset&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_offset&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_voltage_units&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_voltage_units&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_output_load&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_output_load&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="agilent_33210A.set_default"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.set_default">[docs]</a>    <span class="k">def</span> <span class="nf">set_default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;*RST&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_frequency"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">get_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;FREQuency?&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_MAX_frequency"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_MAX_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">get_MAX_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;FREQuency? MAX&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_MIN_frequency"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_MIN_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">get_MIN_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;FREQuency? MIN&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.set_frequency"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.set_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">set_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq</span><span class="p">):</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">freq</span><span class="o">&lt;</span><span class="bp">self</span><span class="o">.</span><span class="n">min_freq</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">freq</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">max_freq</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;agilent_33210A: frequency out of range!&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;FREQuency </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">freq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frequency</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_function"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_function">[docs]</a>    <span class="k">def</span> <span class="nf">get_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;FUNCtion?&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">res_str</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.set_function"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.set_function">[docs]</a>    <span class="k">def</span> <span class="nf">set_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">f_str</span> <span class="o">!=</span> <span class="s2">&quot;SIN&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">f_str</span> <span class="o">!=</span> <span class="s2">&quot;SQU&quot;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;agilent_33210A: selected function not recognized!&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="c1"># FUNCtion {SINusoid|SQUare|RAMP|PULSe|NOISe|DC|USER}, some not implemented</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;FUNCtion </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">f_str</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_function</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_amplitude"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">get_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;VOLTage?&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_MAX_amplitude"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_MAX_amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">get_MAX_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;VOLTage? MAX&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_MIN_amplitude"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_MIN_amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">get_MIN_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;VOLTage? MIN&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.set_amplitude"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.set_amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">set_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ampl</span><span class="p">):</span>
+        <span class="n">ampl</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ampl</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ampl</span><span class="o">&lt;</span><span class="bp">self</span><span class="o">.</span><span class="n">min_ampl</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ampl</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">max_ampl</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;agilent_33210A: amplitude out of range!&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;VOLTage </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ampl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_amplitude</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_output"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;OUTPut?&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">res_str</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.set_output"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.set_output">[docs]</a>    <span class="k">def</span> <span class="nf">set_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">onoff</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">onoff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">onoff</span><span class="p">))</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;OUTPut </span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">onoff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_offset"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_offset">[docs]</a>    <span class="k">def</span> <span class="nf">get_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;VOLTage:OFFset?&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_MAX_offset"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_MAX_offset">[docs]</a>    <span class="k">def</span> <span class="nf">get_MAX_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;VOLTage:OFFset? MAX&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_MIN_offset"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_MIN_offset">[docs]</a>    <span class="k">def</span> <span class="nf">get_MIN_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;VOLTage:OFFset? MIN&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.set_offset"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.set_offset">[docs]</a>    <span class="k">def</span> <span class="nf">set_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offs</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">offs</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">offs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">offs</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_offs</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">offs</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_offs</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;agilent_33210A: offset out of range!&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;VOLTage:OFFset </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">offs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_offset</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_voltage_units"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_voltage_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_voltage_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;VOLTage:UNIT?&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">res_str</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.set_voltage_units"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.set_voltage_units">[docs]</a>    <span class="k">def</span> <span class="nf">set_voltage_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vunits</span> <span class="o">=</span> <span class="s2">&quot;VPP&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">vunits</span> <span class="o">!=</span> <span class="s2">&quot;VPP&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">vunits</span> <span class="o">!=</span> <span class="s2">&quot;VRMS&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">vunits</span> <span class="o">!=</span> <span class="s2">&quot;DBM&quot;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;agilent_33210A: input error in set_voltage_units()&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;VOLTage:UNIT </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">vunits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_ampl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MIN_amplitude</span><span class="p">()</span> <span class="c1"># depends on the units, of course</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_ampl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MAX_amplitude</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_voltage_units</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.get_output_load"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.get_output_load">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;OUTPut:LOAD?&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">res_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="agilent_33210A.set_output_load"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.agilent_33210A.agilent_33210A.set_output_load">[docs]</a>    <span class="k">def</span> <span class="nf">set_output_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">load</span> <span class="o">==</span> <span class="s2">&quot;INF&quot;</span><span class="p">):</span>
+            <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;OUTPut:LOAD </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">load</span>
+        <span class="k">elif</span> <span class="nb">float</span><span class="p">(</span><span class="n">load</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">com_str</span> <span class="o">=</span> <span class="s2">&quot;OUTPut:LOAD </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">float</span><span class="p">(</span><span class="n">load</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;agilent_33210A: input error in set_output_load()&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">com_str</span><span class="p">)</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_ampl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MIN_amplitude</span><span class="p">()</span> <span class="c1"># also depends on load</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_ampl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_MAX_amplitude</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_load</span><span class="p">()</span></div></div>
+
+
+<span class="c1">## testing:</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="n">agilent_AWG</span> <span class="o">=</span> <span class="n">agilent_33210A</span><span class="p">(</span><span class="s2">&quot;agilent_AWG&quot;</span><span class="p">,</span> <span class="s2">&quot;TCPIP::192.168.0.2&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span> <span class="n">agilent_AWG</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;*IDN?&quot;</span><span class="p">))</span>
+    
+    <span class="nb">print</span><span class="p">(</span> <span class="n">agilent_AWG</span><span class="o">.</span><span class="n">set_voltage_units</span><span class="p">(</span><span class="s2">&quot;VRMS&quot;</span><span class="p">))</span>
+        
+    <span class="nb">print</span><span class="p">(</span> <span class="n">agilent_AWG</span><span class="o">.</span><span class="n">set_output_load</span><span class="p">(</span><span class="s2">&quot;INF&quot;</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span> <span class="n">agilent_AWG</span><span class="o">.</span><span class="n">set_frequency</span><span class="p">(</span><span class="mf">1000.0</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span> <span class="n">agilent_AWG</span><span class="o">.</span><span class="n">set_amplitude</span><span class="p">(</span><span class="mf">0.1</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span> <span class="n">agilent_AWG</span><span class="o">.</span><span class="n">set_offset</span><span class="p">(</span><span class="mf">0.1</span><span class="p">))</span>
+    
+    <span class="nb">print</span><span class="p">(</span> <span class="n">agilent_AWG</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span> <span class="n">agilent_AWG</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+<span class="c1">#    start = float(clock())</span>
+<span class="c1">#    for i in range(100):</span>
+<span class="c1">#        hp_mm.get_configuration()</span>
+<span class="c1">#    end = float(clock())    </span>
+<span class="c1">#    print &quot;Getting conf took:&quot;, end-start</span>
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.Keysight_35670A &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.Keysight_35670A</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.Keysight_35670A</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Keysight_357670A driver, TW 2017</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">import</span> <span class="nn">qkit</span>
+<span class="kn">from</span> <span class="nn">qkit.core.instrument_base</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">qkit.drivers.visa_prologix</span> <span class="kn">import</span> <span class="n">instrument</span>
+
+
+<div class="viewcode-block" id="Keysight_35670A"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A">[docs]</a><span class="k">class</span> <span class="nc">Keysight_35670A</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the python driver for the Keysight 35670A signal analyzer</span>
+<span class="sd">    Usage:</span>
+<span class="sd">    Initialise with</span>
+<span class="sd">    &lt;name&gt; = instruments.create(&#39;&lt;name&gt;&#39;, address=&#39;&lt;GPIB address&gt;&#39;, reset=&lt;bool&gt;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes </span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            name (string)    : name of the instrument</span>
+<span class="sd">            address (string) : GPIB address</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Initialization will take some seconds... Do not worry&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ip&quot;</span><span class="p">,</span> <span class="s2">&quot;10.22.197.155&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Keysight_35670A</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mi">4096</span><span class="p">),</span> <span class="n">delay</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ip</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;power&#39;</span><span class="p">:</span> <span class="s1">&#39;XFR:POW&#39;</span><span class="p">,</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span> <span class="s1">&#39;XFR:POW:LIN&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;coherence&#39;</span><span class="p">:</span> <span class="s1">&#39;XFR:POW:COH&#39;</span><span class="p">,</span> <span class="s1">&#39;cross&#39;</span><span class="p">:</span> <span class="s1">&#39;XFR:POW:CROS&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="s1">&#39;XTIM:VOLT&#39;</span><span class="p">,</span> <span class="s1">&#39;histogram&#39;</span><span class="p">:</span> <span class="s1">&#39;XTIM:VOLT:HIST&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inv_data_type</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+        <span class="c1"># Implement parameters</span>
+        <span class="c1"># ToDO: insert all parameters and function from the script below, check how to deal with channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;instrument_mode&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;nop&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span><span class="n">minval</span><span class="o">=</span><span class="mi">101</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">801</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;averages&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">99999</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;Average&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;centerfreq&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span><span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">51.2e3</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;startfreq&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">51.2e3</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;stopfreq&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">51.2e3</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;span&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">51.2e3</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;frequency_resolution&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;sweeptime&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;sweeptime_averages&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;window_type&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;active_traces&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;repeat_averaging&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_freqpoints&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_tracedata&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_single_trace&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;pre_measurement&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;start_measurement&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;ready&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;post_measurement&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;calibration&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;abort_measurement&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_measurement_continous&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;measure_PSD&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;fast_averaging&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_display_format&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_ac_coupling&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">reset</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_GPIB_dev_reset</span><span class="p">()</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_type</span><span class="o">=</span><span class="s1">&#39;signal_analyzer&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_instrument_mode</span><span class="p">(</span><span class="s1">&#39;FFT&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_return_format</span><span class="p">()</span>
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Keysight_35670A.get_all"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_all">[docs]</a>    <span class="k">def</span> <span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span> <span class="o">==</span> <span class="s1">&#39;FFT&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_centerfreq</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_span</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_frequency_resolution</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_startfreq</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_stopfreq</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_window_type</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_instrument_mode</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_averages</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_sweeptime</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_sweeptime_averages</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_active_traces</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_nop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_unit_c1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_y_unit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_unit_c2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_y_unit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.ready"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.ready">[docs]</a>    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This is a proxy function, returning True when the signal analyzer has finished measuring / averaging.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_operation_status_register</span><span class="p">()</span> <span class="o">&amp;</span> <span class="mi">256</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_return_format"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_return_format">[docs]</a>    <span class="k">def</span> <span class="nf">set_return_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_digits</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;specifies the number of significant digits&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;FORMAT:DATA ASCii, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s_digits</span><span class="p">))</span></div>
+    
+<div class="viewcode-block" id="Keysight_35670A.calibration"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.calibration">[docs]</a>    <span class="k">def</span> <span class="nf">calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">reply</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;*cal?&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reply</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;calibration error!&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.auto_calibration"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.auto_calibration">[docs]</a>    <span class="k">def</span> <span class="nf">auto_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;calibration:auto </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">status</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.abort_measurement"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.abort_measurement">[docs]</a>    <span class="k">def</span> <span class="nf">abort_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;abor&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.start_measurement"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.start_measurement">[docs]</a>    <span class="k">def</span> <span class="nf">start_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;starts a new measurement&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;INIT:IMM&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_changed</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_measurement_continous"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_measurement_continous">[docs]</a>    <span class="k">def</span> <span class="nf">set_measurement_continous</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pause</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;pauses(=0) or resumes(=1) the measurement&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;INIT:CONT </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pause</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_read_operation_status_register</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;reads the operation status register, returns??&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;STAT:OPER:COND?&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<div class="viewcode-block" id="Keysight_35670A.pre_measurement"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.pre_measurement">[docs]</a>    <span class="k">def</span> <span class="nf">pre_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.post_measurement"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.post_measurement">[docs]</a>    <span class="k">def</span> <span class="nf">post_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;nothing to do here??&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_active_traces"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_active_traces">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_active_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_of_traces</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets the number of active traces</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trace_names</span><span class="o">=</span><span class="s1">&#39;ABCD&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;CALC:ACT &quot;</span><span class="o">+</span><span class="n">trace_names</span><span class="p">[:</span><span class="n">num_of_traces</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_active_traces"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_active_traces">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_active_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the active traces&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;CALC:ACT?&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_trace_name"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_trace_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_trace_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function for signal spectroscopy script to automatically generate names for trace data</span>
+<span class="sd">        :param trace:</span>
+<span class="sd">        :return: (string) name of trace</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">meas_typ</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_meas_data_type</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="n">meas_format</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_trace_format</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">meas_typ</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">meas_format</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_input_channels"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_input_channels">[docs]</a>    <span class="k">def</span> <span class="nf">set_input_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the active input channels. Especially useful if you only have one channel and want to go to the highest</span>
+<span class="sd">        possible frequency, i.e., 102.4kHz</span>
+<span class="sd">        :param channel: 1 or 2 (int)</span>
+<span class="sd">        :param status: True or False (bool)</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">channel</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;channel 1 must always be on&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;OFF&#39;</span><span class="p">,</span> <span class="s1">&#39;ON&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;:inp</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="n">status</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_ac_coupling"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_ac_coupling">[docs]</a>    <span class="k">def</span> <span class="nf">set_ac_coupling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">val</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets input coupling to AC or DC for specified channels. 3dB point is at 1 Hz for AC coupling</span>
+<span class="sd">        :param channels: channels to change (list)</span>
+<span class="sd">        :param val: True for AC coupling False for DC coupling (List)</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DC&#39;</span><span class="p">,</span> <span class="s1">&#39;AC&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">channels</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;:Input</span><span class="si">{}</span><span class="s1">:Coup </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">mode</span><span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="n">num</span><span class="p">]]))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_ac_coupling"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_ac_coupling">[docs]</a>    <span class="k">def</span> <span class="nf">get_ac_coupling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        gets input coupling either AC or DC for specified channels. 3dB point is at 1 Hz for AC coupling</span>
+<span class="sd">        :param channel: channels to ask</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;:Input</span><span class="si">{}</span><span class="s1">:Coup?&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">))</span></div>
+
+
+    <span class="c1">#### Frequency options ####</span>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_centerfreq"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_centerfreq">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_centerfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center_freq</span><span class="p">):</span> <span class="c1"># in Hz</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets the center frequency&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Freq:Cent </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">center_freq</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_changed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_centerfreq"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_centerfreq">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_centerfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the center frequency&quot;&quot;&quot;</span>
+        <span class="c1">#print self.ask(&quot;Freq:Cent?&quot;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centerfreq</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;Freq:Cent?&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">centerfreq</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_startfreq"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_startfreq">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_startfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_freq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets the start frequency&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Freq:Start </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_freq</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_changed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_startfreq"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_startfreq">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_startfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the start frequency&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;Freq:Start?&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_span"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_span">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_span</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets the frequency span&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Freq:Span </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">span</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_changed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_span"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_span">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_span</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the frequency span&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_span</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;Freq:Span?&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency_span</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_frequency_resolution"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_frequency_resolution">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_frequency_resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets the frequency resolution in lines (unitless)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">resolution</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">800</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;only 100, 200, 400, 800 are allowed values&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Freq:Res </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resolution</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nop</span><span class="o">=</span><span class="n">resolution</span><span class="o">+</span><span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_frequency_resolution"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_frequency_resolution">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_frequency_resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the frequency resolution&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;Freq:Res?&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_nop"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_nop">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_nop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;proxy function for spectroscopy script&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span> <span class="o">==</span> <span class="s1">&#39;FFT&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nop</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frequency_resolution</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span> <span class="o">==</span> <span class="s1">&#39;histogram&#39;</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># maybe sth must go in here</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nop</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_stopfreq"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_stopfreq">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_stopfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets the stop frequency&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Freq:Stop </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stop</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_changed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_stopfreq"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_stopfreq">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_stopfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the stop frequeny&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;Freq:Stop?&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_frequency_bins"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_frequency_bins">[docs]</a>    <span class="k">def</span> <span class="nf">set_frequency_bins</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;sets frequency bin in histogram mode, not yet written&#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_instrument_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_instrument_mode">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_instrument_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets the instrument mode, expects string: &#39;FFT&#39;, &#39;histogram&#39;, &#39;correlation&#39; &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;FFT&#39;</span><span class="p">:</span>
+            <span class="n">mode_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;histogram&#39;</span><span class="p">:</span>
+            <span class="n">mode_number</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;correlation&#39;</span><span class="p">:</span>
+            <span class="n">mode_number</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;wrong input&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_get_instrument_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="n">mode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frequency_changed</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># new x-Axis when instrument mode is changed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;INST:NSEL </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode_number</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_instrument_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_instrument_mode">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_instrument_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the instrument mode&quot;&quot;&quot;</span>
+        <span class="n">mode_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;INST:NSEL?&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">mode_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span> <span class="o">=</span> <span class="s1">&#39;FFT&#39;</span>
+        <span class="k">elif</span> <span class="n">mode_number</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span> <span class="o">=</span> <span class="s1">&#39;histogram&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_sweep_mode"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_sweep_mode">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_sweep_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets sweepmode to mode=&#39;AUTO&#39; or &#39;MAN&#39; &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;AUTO&#39;</span><span class="p">,</span> <span class="s1">&#39;MAN&#39;</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;wrong input only AUTO and MAN are valid&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;swe:mode &#39;</span><span class="o">+</span><span class="n">mode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_sweeptime"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_sweeptime">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_sweeptime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets the sweep time (recording time) in sec  sweeptime=freqspan/freqresolution.</span>
+<span class="sd">        Chaning either will change the other&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;swe:TIME </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_sweeptime"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_sweeptime">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_sweeptime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the sweep time (recording time) &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sweeptime</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;swe:TIME?&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweeptime</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_sweeptime_averages"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_sweeptime_averages">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_sweeptime_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sweeptime_averages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_get_sweeptime</span><span class="p">()</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">do_get_averages</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweeptime_averages</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_window_type"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_window_type">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_window_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets the window type, expects string either &#39;HANN&#39;, &#39;FLAT&#39; or &#39;UNIF&#39;</span>
+<span class="sd">            HANN smears least but might be unprecise in amplitude, the opposite</span>
+<span class="sd">            is the case for FLAT</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;HANN&#39;</span><span class="p">,</span> <span class="s1">&#39;FLAT&#39;</span><span class="p">,</span> <span class="s1">&#39;UNIF&#39;</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;wrong input only HANN, FLAT, UNIF are allowed&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;WINDOW &#39;</span><span class="o">+</span><span class="nb">type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_window_type"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_window_type">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_window_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the window type&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;WINDOW?&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_type</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_autoscale"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_autoscale">[docs]</a>    <span class="k">def</span> <span class="nf">set_autoscale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">option</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;turns autoscalle off and on. A trace has to be selected,</span>
+<span class="sd">        option must be a string [AUTO, OFF, ON, ONCE] or 0 and 1&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;disp:wind</span><span class="si">{}</span><span class="s1">trac:y:auto &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span><span class="o">+</span><span class="n">option</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_input_shielding"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_input_shielding">[docs]</a>    <span class="k">def</span> <span class="nf">set_input_shielding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">channel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; determines the input shielding mode (expects string), either &quot;ground&quot; or &quot;floating&quot;,</span>
+<span class="sd">        for the chosen channels&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;INP</span><span class="si">{}</span><span class="s1">:LOW &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="n">mode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_input_shielding"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_input_shielding">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_shielding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; returns the input shield of the chosen channel&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;INP</span><span class="si">{}</span><span class="s1">:LOW?&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">))[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_range"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_range">[docs]</a>    <span class="k">def</span> <span class="nf">set_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets a fixed autorange, expects channel as list and an input value in Volts peak&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SENS:VOLT</span><span class="si">{}</span><span class="s1">:DC:RANGE </span><span class="si">{}</span><span class="s1"> VPK&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_range"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the specified range (Vpk) as a list for the chosen channels&quot;&quot;&quot;</span>
+        <span class="n">reply</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">:</span>
+            <span class="n">reply</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;SENS:VOLT</span><span class="si">{}</span><span class="s1">:DC:RANGE?&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">reply</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_autorange"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_autorange">[docs]</a>    <span class="k">def</span> <span class="nf">set_autorange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;turns (1) on or off (0) the range of the chosen channel to auto&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;sens:volt</span><span class="si">{}</span><span class="s1">:dc:range:auto </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">mode</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_autorange"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_autorange">[docs]</a>    <span class="k">def</span> <span class="nf">get_autorange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the autorange for specified channel; 1 is on 0 is off&quot;&quot;&quot;</span>
+        <span class="n">reply</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+            <span class="n">reply</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;sens:volt</span><span class="si">{}</span><span class="s1">:dc:range:auto?&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))[</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># remove newline and + before by[1]</span>
+        <span class="k">return</span> <span class="n">reply</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_display_format"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_display_format">[docs]</a>    <span class="k">def</span> <span class="nf">set_display_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;selects the number of traces [1,2,4] to be displayed (3 is not possible)&quot;&quot;&quot;</span>
+        <span class="n">option</span><span class="o">=</span><span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;SINGLE&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;ULOWER&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="s1">&#39;QUAD&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;DISPLAY:FORM &#39;</span> <span class="o">+</span> <span class="n">option</span><span class="p">[</span><span class="n">number</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_trace_format"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_trace_format">[docs]</a>    <span class="k">def</span> <span class="nf">set_trace_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">option</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;selects the display format for the specified trace, i.e., how it is displayed and to be collected from the</span>
+<span class="sd">        signal analyzer options: linear, phase, real, imag, NYQuist, UPHase, GDElay, POLAR. Don&#39;t confuse linear here</span>
+<span class="sd">        with the chosen power spectrum in meas datatype. It means that it&#39;s not logarithmic&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;calc</span><span class="si">{}</span><span class="s1">:format </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">option</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_trace_format"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_trace_format">[docs]</a>    <span class="k">def</span> <span class="nf">get_trace_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        gets the trace format of the selected trace, ie. the format how the data is diplayed and will be collected</span>
+<span class="sd">        from the signal analyzer</span>
+<span class="sd">        :param trace: 1 to 4</span>
+<span class="sd">        :return: trace format (string)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;calc</span><span class="si">{}</span><span class="s1">:format?&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trace</span><span class="p">))[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_meas_data_type"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_meas_data_type">[docs]</a>    <span class="k">def</span> <span class="nf">set_meas_data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets the datatype that is measured. You can choose between power spectrum, linear spectrum (interesting</span>
+<span class="sd">        if you want the complex values [no power averaging here]), cross spectrum (i.e. FFT(covariance ch1/ch2)),</span>
+<span class="sd">        time record. coherence (you have to look that up yourself). If you want to have the unfiltered timetrace,</span>
+<span class="sd">        you have to set the instrument into histogram mode first.</span>
+<span class="sd">        :param option: (str) &#39;power&#39;, &#39;linear, &#39;coherence&#39;, &#39;cross&#39;, &#39;time&#39;, &#39;histogram&#39;</span>
+<span class="sd">        :param channel: input channel (1 or 2), for cross spectrum and coherence, both channels are used (input &#39;1,2&#39;)</span>
+<span class="sd">        :param trace: trace to be displayed (1 to 4)</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">option</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;coherence&#39;</span><span class="p">,</span> <span class="s1">&#39;cross&#39;</span><span class="p">]:</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="s1">&#39;1,2&#39;</span>  <span class="c1"># This is channel 1 and 2. Device expects a string</span>
+        <span class="k">if</span> <span class="n">trace</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_display_format</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">message</span><span class="o">=</span> <span class="s2">&quot;CALC</span><span class="si">{}</span><span class="s2">:FEED &#39;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="p">[</span><span class="n">option</span><span class="p">],</span> <span class="n">channel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_meas_data_type"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_meas_data_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_meas_data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param trace: trace to ask for meas_data_type (1 to 4)</span>
+<span class="sd">        :return: the type of measurement data i.e. lin spec or power spec</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;CALC</span><span class="si">{}</span><span class="s2">:FEED?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trace</span><span class="p">))</span>
+        <span class="n">meas_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_data_type</span><span class="p">[</span><span class="n">reply</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]]</span><span class="o">+</span><span class="s1">&#39;_ch_&#39;</span><span class="o">+</span><span class="n">reply</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># removing the &#39; in the reply</span>
+        <span class="k">return</span> <span class="n">meas_data</span></div>
+
+    <span class="c1">########## AVERAGING ##############</span>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_Average"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_Average">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_Average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;turns averagin off/on&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;wrong input 0=off, 1=on&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_measurement_continous</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># pauses measurement so that new sequence does not start automatically</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;AVER </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">status</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_Average"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_Average">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_Average</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;AVER?&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.fast_averaging"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.fast_averaging">[docs]</a>    <span class="k">def</span> <span class="nf">fast_averaging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">displaynumber</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;turns on fast averaging, i.e., display is only updated at the chosen displaynumber&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;wrong input 0=off, 1=on&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;AVERAGE:IRES:RATE </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">displaynumber</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Average:IRES:Stat </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">status</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Average:Ires:Stat </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">status</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_averages"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_averages">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets the number of averages&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;AVER:COUN </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">number</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_averages"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_averages">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the numbers of averages&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span> <span class="o">==</span> <span class="s1">&#39;histogram&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">averages</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">averages</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;AVER:COUN?&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">averages</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_set_repeat_averaging"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_set_repeat_averaging">[docs]</a>    <span class="k">def</span> <span class="nf">do_set_repeat_averaging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;specify what happens after average_number is reached, i.e., repeat measurements or wait&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;AVERAGE:TCON FREEZE&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;AVERAGE:TCON REPEAT&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;wrong input 0=HOLD, 1=REPEAT&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.do_get_repeat_averaging"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.do_get_repeat_averaging">[docs]</a>    <span class="k">def</span> <span class="nf">do_get_repeat_averaging</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">repeat_aver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;AVER:TCON?&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">repeat_aver</span> <span class="o">==</span> <span class="s1">&#39;FRE&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">repeat_aver</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;REP&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span></div>
+
+   <span class="c1">########## MATH-OPTIONS #########</span>
+
+<div class="viewcode-block" id="Keysight_35670A.math_expression"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.math_expression">[docs]</a>    <span class="k">def</span> <span class="nf">math_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;stores a math expression (string conform with the device options) into the chosen register&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Calculate:Math:Expr</span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">register</span><span class="p">)</span> <span class="o">+</span> <span class="n">expression</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.math_state"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.math_state">[docs]</a>    <span class="k">def</span> <span class="nf">math_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;activates math evalution for chosen schannel&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;calculate</span><span class="si">{}</span><span class="s1">:math:state </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">status</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.math_select"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.math_select">[docs]</a>    <span class="k">def</span> <span class="nf">math_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">register</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;selects a previously defined math_expression in a register for a channel&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;:calc</span><span class="si">{}</span><span class="s1">:math:select F</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">register</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.calculate_PSD"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.calculate_PSD">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_PSD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates and display the PSD for the chosen channel&quot;&quot;&quot;</span>
+        <span class="n">expression</span><span class="o">=</span><span class="s1">&#39;(PSD(PSPEC</span><span class="si">{}</span><span class="s1">))&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">math_expression</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">expression</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">math_state</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">math_select</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span></div>
+
+    <span class="c1">######## Getting the data ######</span>
+
+<div class="viewcode-block" id="Keysight_35670A.get_freqpoints"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_freqpoints">[docs]</a>    <span class="k">def</span> <span class="nf">get_freqpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the x_values of a trace as numpy-array&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span> <span class="o">==</span> <span class="s1">&#39;FFT&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency_changed</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_averages</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_set_repeat_averaging</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">start_measurement</span><span class="p">()</span>  <span class="c1"># device only sets new x-axis when new measurement has ended</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>  <span class="c1"># but spectroscopy asks for x-values before meausurment is started</span>
+                    <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;CALC:X:DATA?&quot;</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_averages</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">averages</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">get_nop</span><span class="p">()]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_mode</span> <span class="o">==</span> <span class="s1">&#39;histogram&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency_changed</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">start_measurement</span><span class="p">()</span>  <span class="c1"># device only sets new x-axis when new measurement has ended</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>  <span class="c1"># but spectroscopy asks for x-values before meausurment is started</span>
+                    <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;CALC:X:DATA?&quot;</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;CALC:X:DATA?&quot;</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_single_trace"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_single_trace">[docs]</a>    <span class="k">def</span> <span class="nf">get_single_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the trace of trace 1,2,3,4&quot;&quot;&quot;</span>
+        <span class="n">trace_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s2">&quot;CALC</span><span class="si">{}</span><span class="s2">:DATA?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trace</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trace_values</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_tracedata"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_tracedata">[docs]</a>    <span class="k">def</span> <span class="nf">get_tracedata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;AmpPha&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_single_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_tracedata_pseudo_vna_scan"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_tracedata_pseudo_vna_scan">[docs]</a>    <span class="k">def</span> <span class="nf">get_tracedata_pseudo_vna_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a function to perform a pseudo vna scan with the spectrums analyzer using the timetrace (histogram)</span>
+<span class="sd">        mode.</span>
+<span class="sd">        :return: amplitude, phase, I and Q data (one single point)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_single_trace</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_single_trace</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">I_max</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">I</span><span class="p">)])</span>
+        <span class="n">Q_max</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">Q</span><span class="p">)])</span>
+        <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">I_max</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">Q_max</span><span class="p">)</span>
+        <span class="n">pha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">I_max</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">Q_max</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">amp</span><span class="p">],</span> <span class="p">[</span><span class="n">pha</span><span class="p">],</span> <span class="p">[</span><span class="n">I_max</span><span class="p">],</span> <span class="p">[</span><span class="n">Q_max</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.set_y_unit"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.set_y_unit">[docs]</a>    <span class="k">def</span> <span class="nf">set_y_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;sets the y-unit (string), can also be used for PSD calucalation&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">unit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">:</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">unit</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+        <span class="k">if</span> <span class="n">channel</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]:</span>  <span class="c1"># implement string for unit</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;calculate</span><span class="si">{}</span><span class="s1">:unit:voltage &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="o">+</span> <span class="n">unit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.get_y_unit"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.get_y_unit">[docs]</a>    <span class="k">def</span> <span class="nf">get_y_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;gets the y-unit of the selected trace&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">trace</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]:</span>
+            <span class="n">y_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;CALCulate</span><span class="si">{}</span><span class="s1">:UNIT:VOLTage?&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trace</span><span class="p">))[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">y_unit</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;wrong input&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Keysight_35670A.measure_PSD"><a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keysight_35670A.Keysight_35670A.measure_PSD">[docs]</a>    <span class="k">def</span> <span class="nf">measure_PSD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;proxy funciton for set y-unit with unit = &quot;V2/Hz&quot; &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_y_unit</span><span class="p">(</span><span class="s1">&#39;&quot;V2/HZ&quot;&#39;</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.oscilloscope.oscilloscope &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.measure.oscilloscope.oscilloscope</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.measure.oscilloscope.oscilloscope</h1><div class="highlight"><pre>
+<span></span><span class="c1"># oscilloscope.py measurement class</span>
+<span class="c1"># Joao Barbosa, j.barbosa.1@research.gla.ac.uk 2021</span>
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="kn">import</span> <span class="nn">qkit</span>
+<span class="kn">from</span> <span class="nn">qkit.storage</span> <span class="kn">import</span> <span class="n">store</span> <span class="k">as</span> <span class="n">hdf</span>
+<span class="kn">from</span> <span class="nn">qkit.gui.plot</span> <span class="kn">import</span> <span class="n">plot</span> <span class="k">as</span> <span class="n">qviewkit</span>
+<span class="kn">from</span> <span class="nn">qkit.gui.notebook.Progress_Bar</span> <span class="kn">import</span> <span class="n">Progress_Bar</span>
+<span class="kn">from</span> <span class="nn">qkit.measure.measurement_class</span> <span class="kn">import</span> <span class="n">Measurement</span> 
+<span class="kn">import</span> <span class="nn">qkit.measure.write_additional_files</span> <span class="k">as</span> <span class="nn">waf</span>
+
+<div class="viewcode-block" id="scope_class"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class">[docs]</a><span class="k">class</span> <span class="nc">scope_class</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Measurement class for automated oscilloscope measurements.</span>
+<span class="sd">    Measure_1D() and Measure_2D() functions are used to get data from scope.</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">        from qkit.measure.oscilloscope import oscilloscope</span>
+
+<span class="sd">        scope=qkit.instruments.create(&quot;scope&quot;, &lt;driver_name&gt;, address=&lt;TCPIP address&gt;)</span>
+<span class="sd">        scope.set_meas_channel([list])</span>
+<span class="sd">        &lt;set scope parameters&gt;</span>
+
+<span class="sd">        scope_meas_class=oscilloscope.scope_class(scope)</span>
+<span class="sd">        scope_meas_class.measure_1D()</span>
+<span class="sd">        ...</span>
+<span class="sd">        &lt;set 2d measurement&gt;</span>
+<span class="sd">        scope_meas_class.measure_2D()</span>
+<span class="sd">    </span>
+<span class="sd">    Scope drivers should implement the following functions (WIP:create alternatives for drivers which don&#39;t have these functions):</span>
+<span class="sd">        scope.set_meas_channels()</span>
+<span class="sd">        scope.ready()</span>
+<span class="sd">        scope.start_measurement()</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope_device</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">=</span><span class="n">scope_device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_flowcontrol_func</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">get_function_names</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ready&quot;</span><span class="p">,</span><span class="s2">&quot;_start_measurement&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manual_trigger_control</span><span class="o">=</span><span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">=</span><span class="n">Measurement</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">measurement_type</span> <span class="o">=</span> <span class="s1">&#39;oscilloscope&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurement_object_axis_name</span> <span class="o">=</span> <span class="s1">&#39;time&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#self._filename = None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_expname</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_qviewkit</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scan_dim</span> <span class="o">=</span> <span class="kc">None</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_set_obj</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_vec</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_coordname</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_unit</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_set_obj</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1">#for 3D sweeps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_vec</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_coordname</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_unit</span> <span class="o">=</span> <span class="kc">None</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_function</span><span class="o">=</span><span class="kc">None</span>
+
+
+
+<div class="viewcode-block" id="scope_class.set_filename"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_filename">[docs]</a>    <span class="k">def</span> <span class="nf">set_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="o">=</span><span class="n">filename</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="scope_class.get_filename"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.get_filename">[docs]</a>    <span class="k">def</span> <span class="nf">get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span></div>
+
+<div class="viewcode-block" id="scope_class.set_expname"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_expname">[docs]</a>    <span class="k">def</span> <span class="nf">set_expname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expname</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_expname</span><span class="o">=</span><span class="n">expname</span>
+        <span class="k">return</span></div>
+<div class="viewcode-block" id="scope_class.get_expname"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.get_expname">[docs]</a>    <span class="k">def</span> <span class="nf">get_expname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expname</span></div>
+    
+<div class="viewcode-block" id="scope_class.set_comment"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_comment">[docs]</a>    <span class="k">def</span> <span class="nf">set_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comment</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span><span class="o">=</span><span class="n">comment</span>
+        <span class="k">return</span></div>
+<div class="viewcode-block" id="scope_class.get_comment"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.get_comment">[docs]</a>    <span class="k">def</span> <span class="nf">get_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span></div>
+
+<div class="viewcode-block" id="scope_class.set_log_function"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_log_function">[docs]</a>    <span class="k">def</span> <span class="nf">set_log_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A function (object) can be passed to the measurement loop which is excecuted before every x iteration</span>
+<span class="sd">        but after executing the x_object setter in 2D measurements and before every line (but after setting</span>
+<span class="sd">        the x value) in 3D measurements.</span>
+<span class="sd">        The return value of the function of type float or similar is stored in a value vector in the h5 file.</span>
+
+<span class="sd">        Call without any arguments to delete all log functions. The timestamp is automatically saved.</span>
+
+<span class="sd">        func: function object in list form</span>
+<span class="sd">        name: name of logging parameter appearing in h5 file, default: &#39;log_param&#39;</span>
+<span class="sd">        unit: unit of logging parameter, default: &#39;&#39;</span>
+<span class="sd">        log_dtype: h5 data type, default: &#39;f&#39; (float32)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;log_param&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">log_dtype</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">log_dtype</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;f&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">log_dtype</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_function</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_name</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_unit</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dtype</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">func</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_function</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_unit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unit</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_dtype</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log_dtype</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="scope_class.set_x_parameters"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_x_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_x_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_vec</span><span class="p">,</span> <span class="n">x_coordname</span><span class="p">,</span> <span class="n">x_set_obj</span><span class="p">,</span> <span class="n">x_unit</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Same functionality as seen on spectroscopy class</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_vec</span> <span class="o">=</span> <span class="n">x_vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_coordname</span> <span class="o">=</span> <span class="n">x_coordname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_unit</span> <span class="o">=</span> <span class="n">x_unit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_set_obj</span> <span class="o">=</span> <span class="n">x_set_obj</span>
+        <span class="k">return</span></div>
+    
+<div class="viewcode-block" id="scope_class.set_y_parameters"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.set_y_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_y_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_vec</span><span class="p">,</span> <span class="n">y_coordname</span><span class="p">,</span> <span class="n">y_set_obj</span><span class="p">,</span> <span class="n">y_unit</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets parameters for sweep. In a 3D measurement, the x-parameters will be the &quot;outer&quot; sweep.</span>
+<span class="sd">        For every x value all y values are swept</span>
+<span class="sd">        Same functionality as seen on spectroscopy class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_vec</span> <span class="o">=</span> <span class="n">y_vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_coordname</span> <span class="o">=</span> <span class="n">y_coordname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_set_obj</span> <span class="o">=</span> <span class="n">y_set_obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_unit</span> <span class="o">=</span> <span class="n">y_unit</span>
+        <span class="k">return</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_prepare_measurement_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#data.h5 file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span> <span class="o">=</span> <span class="n">hdf</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">_uuid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">hdf_relpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">_relpath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">instruments</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">get_instrument_names</span><span class="p">()</span>
+        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_textlist</span><span class="p">(</span><span class="s1">&#39;measurement&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">get_JSON</span><span class="p">())</span>
+
+        <span class="c1">#settings file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_textlist</span><span class="p">(</span><span class="s1">&#39;settings&#39;</span><span class="p">)</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">waf</span><span class="o">.</span><span class="n">get_instrument_settings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        
+        <span class="c1">#log file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_file</span> <span class="o">=</span> <span class="n">waf</span><span class="o">.</span><span class="n">open_log_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">())</span>
+
+        <span class="c1">#data variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hdf_time</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hdf_voltage</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_V</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1">#add data variables to h5</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scan_dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_coordinate</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_meas_channel</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_data_V</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_value_vector</span><span class="p">(</span><span class="s2">&quot;voltage_ch</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ch</span><span class="p">),</span><span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_t</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;V&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scan_dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_coordinate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_coordname</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_unit</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_vec</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_coordinate</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_t</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timepoints</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_meas_channel</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_data_V</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_value_matrix</span><span class="p">(</span><span class="s2">&quot;voltage_ch</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ch</span><span class="p">),</span><span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_t</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;V&quot;</span><span class="p">,</span><span class="n">save_timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_function</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># use logging</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log_value</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_function</span><span class="p">)):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_value_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_name</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_x</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_unit</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                                         <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_dtype</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+            <span class="c1">#self._data_V = self._data_file.add_value_matrix(&quot;voltage&quot;, x=self._data_x, y=self.data_t, unit=&quot;V&quot;, save_timestamp=True)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scan_dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="c1">#3D sweep (WIP)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_coordinate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_coordname</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_unit</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_vec</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_coordinate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_coordname</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_unit</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_y</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_vec</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_coordinate</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_t</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timepoints</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_meas_channel</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_data_V</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_value_box</span><span class="p">(</span><span class="s1">&#39;voltage_ch</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ch</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_y</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_x</span><span class="p">,</span>
+                                                           <span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_t</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;V&#39;</span><span class="p">,</span>
+                                                           <span class="n">save_timestamp</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+
+        <span class="c1">#add view </span>
+        <span class="c1">#self._hdf_t_view = self._data_file.add_view(&quot;data&quot;, x=self._data_t, y=self._data_V, </span>
+        <span class="c1">#                                            view_params={&quot;labels&quot; : (&quot;t&quot;,&quot;V&quot;), &quot;plot_style&quot;: 1, &quot;markersize&quot;:5})</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comment</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_comment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_comment</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_prepare_measurement_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">get_nop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timepoints</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">get_time_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_flowcontrol_func</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_pre_measurement</span><span class="p">()</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_end_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">())</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">qviewkit</span><span class="o">.</span><span class="n">save_plots</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot_comment</span><span class="p">])</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">close_file</span><span class="p">()</span>
+        <span class="n">waf</span><span class="o">.</span><span class="n">close_log_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_flowcontrol_func</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_post_measurement</span><span class="p">()</span>
+
+<div class="viewcode-block" id="scope_class.measure_1D"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.measure_1D">[docs]</a>    <span class="k">def</span> <span class="nf">measure_1D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Measures the active channel on the oscilloscope</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scan_dim</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">measurement_func</span> <span class="o">=</span> <span class="s1">&#39;measure_1D&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">x_axis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">measurement_object_axis_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">y_axis</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">z_axis</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span><span class="o">=</span><span class="s2">&quot;Scope_Tracedata&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_scope</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_file</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_qviewkit</span><span class="p">:</span>
+            <span class="n">open_ds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;voltage_ch</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_meas_channel</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qvk_process</span> <span class="o">=</span> <span class="n">qviewkit</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span> <span class="n">datasets</span><span class="o">=</span><span class="n">open_ds</span><span class="p">)</span>
+        
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_start_measurement</span><span class="p">()</span>
+            <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_meas_channel</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_data_V</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
+
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end_measurement</span><span class="p">()</span>
+
+        <span class="k">return</span></div>
+    
+<div class="viewcode-block" id="scope_class.measure_2D"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.measure_2D">[docs]</a>    <span class="k">def</span> <span class="nf">measure_2D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Measures the active channel on the oscilloscope for all parameters x_vec in x_obj</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_set_obj</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;axes parameters not properly set...aborting&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_vec</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;No points to measure given. Check your x vector... aborting&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scan_dim</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">measurement_func</span> <span class="o">=</span> <span class="s1">&#39;measure_2D&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">x_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_coordname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">y_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_object_axis_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">z_axis</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> 
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span> <span class="o">=</span> <span class="s2">&quot;Scope_Tracedata_&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">x_coordname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="s1">&#39;2D_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_scope</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_file</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_qviewkit</span><span class="p">:</span>
+            <span class="n">open_ds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;voltage_ch</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_meas_channel</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qvk_process</span> <span class="o">=</span> <span class="n">qviewkit</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span> <span class="n">datasets</span><span class="o">=</span><span class="n">open_ds</span><span class="p">)</span>
+
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_vec</span><span class="p">):</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_function</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_function</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log_value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="p">()))</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x_set_obj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+                    <span class="k">if</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">manual_trigger_control</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_start_measurement</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_start_measurement_manual_trigger</span><span class="p">()</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+                    <span class="n">t</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_meas_channel</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_data_V</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_end_measurement</span><span class="p">()</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="scope_class.measure_3D"><a class="viewcode-back" href="../../../../qkit.measure.oscilloscope.html#qkit.measure.oscilloscope.oscilloscope.scope_class.measure_3D">[docs]</a>    <span class="k">def</span> <span class="nf">measure_3D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Measures the active channels on the oscilloscope for all parameters x_vec in x_obj and y_vec in y_obj. Sweep over y_vec is outer and x_vec inner, for every y_vec[i], all values of x_vec are considered</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_set_obj</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;axes parameters not properly set...aborting&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_vec</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_vec</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;No points to measure given. Check your x vector... aborting&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scan_dim</span> <span class="o">=</span> <span class="mi">3</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">measurement_func</span> <span class="o">=</span> <span class="s1">&#39;measure_2D&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">x_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_coordname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">y_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_object_axis_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">z_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_coordname</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span> <span class="o">=</span> <span class="s2">&quot;Scope_Tracedata_&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">x_coordname</span><span class="o">+</span><span class="s2">&quot;-&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">y_coordname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="s1">&#39;3D_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirname</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_scope</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_file</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_qviewkit</span><span class="p">:</span>
+            <span class="n">open_ds</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;voltage_ch</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_meas_channel</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qvk_process</span> <span class="o">=</span> <span class="n">qviewkit</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">(),</span> <span class="n">datasets</span><span class="o">=</span><span class="n">open_ds</span><span class="p">)</span>
+
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_vec</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">y_set_obj</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_vec</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">x_set_obj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+                        <span class="k">if</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">manual_trigger_control</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_start_measurement</span><span class="p">()</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_start_measurement_manual_trigger</span><span class="p">()</span>
+                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+                        <span class="n">t</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+                        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_meas_channel</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_data_V</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+                
+                <span class="k">for</span> <span class="n">ind</span><span class="p">,</span><span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">_meas_channel</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_data_V</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">next_matrix</span><span class="p">()</span>
+                
+        <span class="c1"># except Exception as e:</span>
+        <span class="c1">#     print(e)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_end_measurement</span><span class="p">()</span>
+
+        <span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

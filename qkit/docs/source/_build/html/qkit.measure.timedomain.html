@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.timedomain package &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.measure.timedomain.awg package" href="qkit.measure.timedomain.awg.html" />
+    <link rel="prev" title="qkit.measure.spectroscopy package" href="qkit.measure.spectroscopy.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">qkit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.html#module-qkit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">qkit</a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.measure.html">qkit.measure package</a></li>
+      <li class="breadcrumb-item active">qkit.measure.timedomain package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.measure.timedomain.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-measure-timedomain-package">
+<h1>qkit.measure.timedomain package<a class="headerlink" href="#qkit-measure-timedomain-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qkit.measure.timedomain.awg.html">qkit.measure.timedomain.awg package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.awg.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.awg.html#module-qkit.measure.timedomain.awg.generate_waveform">qkit.measure.timedomain.awg.generate_waveform module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.arb_function"><code class="docutils literal notranslate"><span class="pre">arb_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.compensate"><code class="docutils literal notranslate"><span class="pre">compensate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.drag"><code class="docutils literal notranslate"><span class="pre">drag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.erf"><code class="docutils literal notranslate"><span class="pre">erf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.exp"><code class="docutils literal notranslate"><span class="pre">exp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.gauss"><code class="docutils literal notranslate"><span class="pre">gauss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.ramsey"><code class="docutils literal notranslate"><span class="pre">ramsey()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.spinecho"><code class="docutils literal notranslate"><span class="pre">spinecho()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.square"><code class="docutils literal notranslate"><span class="pre">square()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.t1"><code class="docutils literal notranslate"><span class="pre">t1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.triangle"><code class="docutils literal notranslate"><span class="pre">triangle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.generate_waveform.udd"><code class="docutils literal notranslate"><span class="pre">udd()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.awg.html#module-qkit.measure.timedomain.awg.load_awg">qkit.measure.timedomain.awg.load_awg module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.load_awg.update_sequence"><code class="docutils literal notranslate"><span class="pre">update_sequence()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.awg.html#module-qkit.measure.timedomain.awg.load_tawg">qkit.measure.timedomain.awg.load_tawg module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit.measure.timedomain.awg.load_tawg.load_tabor"><code class="docutils literal notranslate"><span class="pre">load_tabor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.awg.html#qkit-measure-timedomain-awg-tomography-module">qkit.measure.timedomain.awg.tomography module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.awg.html#module-qkit.measure.timedomain.awg">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html">qkit.measure.timedomain.quantum_machine package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-basic-qubit-experiments-module">qkit.measure.timedomain.quantum_machine.basic_qubit_experiments module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-basic-qubit-experiments-v2-module">qkit.measure.timedomain.quantum_machine.basic_qubit_experiments_V2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#module-qkit.measure.timedomain.quantum_machine.pulses">qkit.measure.timedomain.quantum_machine.pulses module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.pulses.const"><code class="docutils literal notranslate"><span class="pre">const()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.pulses.const_zeroed"><code class="docutils literal notranslate"><span class="pre">const_zeroed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.pulses.gauss"><code class="docutils literal notranslate"><span class="pre">gauss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.pulses.plot_pulses"><code class="docutils literal notranslate"><span class="pre">plot_pulses()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#module-qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper">qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper"><code class="docutils literal notranslate"><span class="pre">QmQkitWrapper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper.close_files"><code class="docutils literal notranslate"><span class="pre">QmQkitWrapper.close_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper.measure"><code class="docutils literal notranslate"><span class="pre">QmQkitWrapper.measure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper.store_data"><code class="docutils literal notranslate"><span class="pre">QmQkitWrapper.store_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-qm-qubit-config-module">qkit.measure.timedomain.quantum_machine.qm_qubit_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-qm-qubit-config-v2-module">qkit.measure.timedomain.quantum_machine.qm_qubit_config_V2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-quantum-jump-monitoring-module">qkit.measure.timedomain.quantum_machine.quantum_jump_monitoring module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-qubit-high-temp-module">qkit.measure.timedomain.quantum_machine.qubit_high_temp module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-script-module">qkit.measure.timedomain.quantum_machine.script module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#qkit-measure-timedomain-quantum-machine-script-pyqt-module">qkit.measure.timedomain.quantum_machine.script_pyqt module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.timedomain.quantum_machine.html#module-qkit.measure.timedomain.quantum_machine">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-qkit.measure.timedomain.VirtualAWG">
+<span id="qkit-measure-timedomain-virtualawg-module"></span><h2>qkit.measure.timedomain.VirtualAWG module<a class="headerlink" href="#module-qkit.measure.timedomain.VirtualAWG" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.TdChannel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.VirtualAWG.</span></span><span class="sig-name descname"><span class="pre">TdChannel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#TdChannel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.TdChannel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class managing the channels for the VirtualAWG class.
+These channels are similar to the channel of an awg.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>add_sequence:      add sequence maintaining currently stored sequences
+set_sequence:      add sequence deleting previously stored sequences
+delete_sequence:   delete previously stored sequences
+set_interleave:    turn interleaving of sequences on/off</p>
+<p>get_sequence_dict: returns a dictionary containing all important channel attributes
+plot:              plot the pulse sequences</p>
+</dd>
+<dt>TODO:</dt><dd><p>Add option to compensate linearly (for Bias Tees with finite decay time).</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.TdChannel.add_sequence">
+<span class="sig-name descname"><span class="pre">add_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence" title="qkit.measure.timedomain.pulse_sequence.PulseSequence"><span class="pre">PulseSequence</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#TdChannel.add_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.TdChannel.add_sequence" title="Permalink to this definition"></a></dt>
+<dd><p>Append sequence to sequences currently stored in channel.</p>
+<dl>
+<dt>Args:</dt><dd><p>sequence:     sequence object
+<a href="#id1"><span class="problematic" id="id2">**</span></a>variables:  One or multiple keywords matching the variable names of time functions and each containing a list of values.</p>
+<blockquote>
+<div><p>In a T1 measurement this would be the wait time between pi-pulse and readout tone.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.TdChannel.delete_sequence">
+<span class="sig-name descname"><span class="pre">delete_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq_nr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#TdChannel.delete_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.TdChannel.delete_sequence" title="Permalink to this definition"></a></dt>
+<dd><p>Delete sequence number seq_nr (counting from 0).
+If seq_nr is None, all sequences are deleted.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>seq_nr: Number of the sequence to be deleted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.TdChannel.get_sequence">
+<span class="sig-name descname"><span class="pre">get_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence" title="qkit.measure.timedomain.pulse_sequence.PulseSequence"><span class="pre">PulseSequence</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#TdChannel.get_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.TdChannel.get_sequence" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the PulseSequence object and variables for a given index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.TdChannel.get_sequence_dict">
+<span class="sig-name descname"><span class="pre">get_sequence_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#TdChannel.get_sequence_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.TdChannel.get_sequence_dict" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Returns a dictionary featuring all important channel attributes:</dt><dd><p>sequence_i: list of all pulses of sequences number i (counting from 0)
+par_i: parameter values for which sequence is called (usually this parameter is a time, e.g. separating two pulses)
+value of the interleave attribute</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.TdChannel.is_interleaved">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_interleaved</span></span><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.TdChannel.is_interleaved" title="Permalink to this definition"></a></dt>
+<dd><p>If the sequences in this channel are to be played interleaved.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.TdChannel.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_quadrature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ns'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#TdChannel.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.TdChannel.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the sequences stored in channel.
+A slider provides the option to sweep through different time values.
+Readout pulse is fixed at t = 0, where is t&gt;0 before the readout tone.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x_unit: unit of the x-axis in the plot. Options are “s”, “ms”, “us”, “ns”.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.TdChannel.sequence_count">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sequence_count</span></span><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.TdChannel.sequence_count" title="Permalink to this definition"></a></dt>
+<dd><p>The number of loaded sequences.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.TdChannel.set_interleave">
+<span class="sig-name descname"><span class="pre">set_interleave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_interleave</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#TdChannel.set_interleave"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.TdChannel.set_interleave" title="Permalink to this definition"></a></dt>
+<dd><p>Sequences with an equal number of timesteps may be interleaved.
+In order for this to work they must have the same number of time steps.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>use_interleave: if true, the sequences in this channel are interleaved.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.TdChannel.set_sequence">
+<span class="sig-name descname"><span class="pre">set_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#TdChannel.set_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.TdChannel.set_sequence" title="Permalink to this definition"></a></dt>
+<dd><p>Set sequence in channel to sequence deleting previously stored sequences.</p>
+<dl>
+<dt>Input:</dt><dd><p>sequence:     sequence object
+<a href="#id3"><span class="problematic" id="id4">**</span></a>variables:  One or multiple keywords matching the variable names of time functions and each containing a list of values.</p>
+<blockquote>
+<div><p>In a T1 measurement this would be the wait time between pi-pulse and readout tone.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.VirtualAWG">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.VirtualAWG.</span></span><span class="sig-name descname"><span class="pre">VirtualAWG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#VirtualAWG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.VirtualAWG" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class managing multiple manipulation channels for a timedomain experiment (virtual AWG).
+Each channel stores pulse sequences which can be loaded onto your device.
+The readout pulse of each sequences is used to align sequences of multiple channles.</p>
+<dl>
+<dt>Important attributes:</dt><dd><p>self.channel[nr]: channel object - sequences can be added and plotted
+add_sequences:    add sequence(s) object (see pulse_sequence.py), maintaining currently stored sequences
+set_sequences:    add sequence(s) object (see pulse_sequence.py), deleting previously stored sequences
+delete_sequence:  delete previously stored sequences
+set_interleave:   for a specified channel turn interleaving of sequences on/off</p>
+<p>get_sequence_dicts: returns a dictionary containing all important channel attributes
+plot: plot the pulse sequences of all channels
+load: load sequences of specified channel(s) on your physical device</p>
+</dd>
+<dt>TODO:</dt><dd><p>Write .load fct to directly load the pulse sequences on a device, i.e. VirtualAWG.load(device).</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.VirtualAWG.add_sequence">
+<span class="sig-name descname"><span class="pre">add_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#VirtualAWG.add_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.VirtualAWG.add_sequence" title="Permalink to this definition"></a></dt>
+<dd><p>Sequence is added to current sequences.
+If channel is None all sequence is added to all channels.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>sequence:     sequence or list of sequences.
+channel:      channel number in which sequence will be loaded.
+<a href="#id5"><span class="problematic" id="id6">**</span></a>variables:  keyword arguments matching the variable names of time functions and each containing a list of values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.VirtualAWG.channel_count">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_count</span></span><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.VirtualAWG.channel_count" title="Permalink to this definition"></a></dt>
+<dd><p>The number of existing channels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.VirtualAWG.delete_sequence">
+<span class="sig-name descname"><span class="pre">delete_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq_nr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#VirtualAWG.delete_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.VirtualAWG.delete_sequence" title="Permalink to this definition"></a></dt>
+<dd><p>Delete sequence seq_nr in stated channel.
+If channel is None sequence seq_nr is deleted from all channels.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>seq_nr:  number of the sequence to be deleted
+channel: channel number</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.VirtualAWG.get_sequence_dicts">
+<span class="sig-name descname"><span class="pre">get_sequence_dicts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#VirtualAWG.get_sequence_dicts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.VirtualAWG.get_sequence_dicts" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>For each channel, returns a dictionary featuring all important channel attributes:</dt><dd><p>sequence_i: list of all pulses of sequnces number i (counting from 0)
+time_i: time values for which sequence is called
+value of the interleave attribute</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.VirtualAWG.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_progress_bar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#VirtualAWG.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.VirtualAWG.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load the sequences stored in the channels of the virtual AWG to your physical device (awg, fpga).
+Currently only enabled for the tabor awg.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.VirtualAWG.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_quadrature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ns'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#VirtualAWG.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.VirtualAWG.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the sequences stored in all channels.
+A slider provides the option to sweep through the sequences.
+Readout pulse is fixed at t = 0, where is t&gt;0 before the readout tone.
+By default, the amplitude of each sequence is plotted.
+This may be changed by setting the show_quadrature option to either “I” or “Q”.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>show_quadrature: set to “I” or “Q” if you want to display either quadrature instead of the amplitude
+x_unit:          unit of the x-axis in the plot (options are “s”, “ms”, “us”, “ns”).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.VirtualAWG.set_interleave">
+<span class="sig-name descname"><span class="pre">set_interleave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#VirtualAWG.set_interleave"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.VirtualAWG.set_interleave" title="Permalink to this definition"></a></dt>
+<dd><p>For each channel, sequences with an equal number of timesteps may be interleaved.
+In order for this to work the squences must have the same number of time steps.</p>
+<dl>
+<dt>Args:</dt><dd><p>value:   if true, the sequences in this channel are interleaved.
+channel: number of the channel where sequences should be interleaved.</p>
+<blockquote>
+<div><p>If channel is None action applies to all channels.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.VirtualAWG.set_sequence">
+<span class="sig-name descname"><span class="pre">set_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#VirtualAWG.set_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.VirtualAWG.set_sequence" title="Permalink to this definition"></a></dt>
+<dd><p>Delete previously added sequences, replacing them with sequence.
+If channel is None set all sequences in all channels to sequence.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>sequence:     sequence or list of sequences.
+channel:      channel number in which sequence will be loaded.
+<a href="#id7"><span class="problematic" id="id8">**</span></a>variables:  keyword arguments matching the variable names of time functions and each containing a list of values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.all_are_same">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.VirtualAWG.</span></span><span class="sig-name descname"><span class="pre">all_are_same</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#all_are_same"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.all_are_same" title="Permalink to this definition"></a></dt>
+<dd><p>Check if all elements of a list are the same.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.VirtualAWG.dictify_variable_lists">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.VirtualAWG.</span></span><span class="sig-name descname"><span class="pre">dictify_variable_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/qkit/measure/timedomain/VirtualAWG.html#dictify_variable_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.VirtualAWG.dictify_variable_lists" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-qkit.measure.timedomain.gate_func">
+<span id="qkit-measure-timedomain-gate-func-module"></span><h2>qkit.measure.timedomain.gate_func module<a class="headerlink" href="#module-qkit.measure.timedomain.gate_func" title="Permalink to this heading"></a></h2>
+<p>usage and inputs:</p>
+<blockquote>
+<div><p>from qkit.measure.timedomain import gate_func
+or: import gate_func
+mspec.set_gate_func(gate_func.Gate_Func(awg = tawg, ni_daq = ftdidaq).gate_fcn)
+#pass the name of the AWG as imported to qtLAB (e.g. fastawg or tawg)
+#with the spectrum card wrapper virtual_measure_spec.py:
+mspec.set_gate_func(gfunc.gate_fcn)</p>
+</div></blockquote>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.gate_func.Gate_Func">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.gate_func.</span></span><span class="sig-name descname"><span class="pre">Gate_Func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">awg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pulser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ni_daq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ni_daq_ch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PFI0:0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/gate_func.html#Gate_Func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.gate_func.Gate_Func" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.gate_func.Gate_Func.gate_fcn">
+<span class="sig-name descname"><span class="pre">gate_fcn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/gate_func.html#Gate_Func.gate_fcn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.gate_func.Gate_Func.gate_fcn" title="Permalink to this definition"></a></dt>
+<dd><p>gate function
+inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>state: boolean, chooses one of the actions reset or trigger</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>outputs:</dt><dd><ul class="simple">
+<li></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.timedomain.initialize">
+<span id="qkit-measure-timedomain-initialize-module"></span><h2>qkit.measure.timedomain.initialize module<a class="headerlink" href="#module-qkit.measure.timedomain.initialize" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.initialize.</span></span><span class="sig-name descname"><span class="pre">InitializeTimeDomain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/initialize.html#InitializeTimeDomain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.align_pulses">
+<span class="sig-name descname"><span class="pre">align_pulses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">768</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/initialize.html#InitializeTimeDomain.align_pulses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.align_pulses" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.check_sidebands">
+<span class="sig-name descname"><span class="pre">check_sidebands</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/initialize.html#InitializeTimeDomain.check_sidebands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.check_sidebands" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.crop_recording_window">
+<span class="sig-name descname"><span class="pre">crop_recording_window</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/initialize.html#InitializeTimeDomain.crop_recording_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.crop_recording_window" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/initialize.html#InitializeTimeDomain.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.initialize" title="Permalink to this definition"></a></dt>
+<dd><p>doc-string tbd</p>
+<p>you will need a valid sample file with the following parameters set:</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.optional_params">
+<span class="sig-name descname"><span class="pre">optional_params</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'acqu_window':</span> <span class="pre">['</span> <span class="pre">position</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">adc</span> <span class="pre">recording</span> <span class="pre">window</span> <span class="pre">as</span> <span class="pre">array</span> <span class="pre">[start,</span> <span class="pre">end].</span> <span class="pre">No</span> <span class="pre">longer</span> <span class="pre">needed</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">divisible</span> <span class="pre">by</span> <span class="pre">32.</span> <span class="pre">(samples)',</span> <span class="pre">[96,</span> <span class="pre">545]],</span> <span class="pre">'overlap':</span> <span class="pre">['</span> <span class="pre">Overlap</span> <span class="pre">between</span> <span class="pre">manipulation</span> <span class="pre">window</span> <span class="pre">and</span> <span class="pre">readout</span> <span class="pre">pulse.',</span> <span class="pre">0],</span> <span class="pre">'readout_delay':</span> <span class="pre">['</span> <span class="pre">Time</span> <span class="pre">offset</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">readout</span> <span class="pre">pulse</span> <span class="pre">to</span> <span class="pre">adjust</span> <span class="pre">the</span> <span class="pre">timing</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">devices',</span> <span class="pre">0],</span> <span class="pre">'readout_iq_frequency':</span> <span class="pre">['</span> <span class="pre">IQ</span> <span class="pre">frequency</span> <span class="pre">for</span> <span class="pre">readout</span> <span class="pre">[Hz]',</span> <span class="pre">30000000.0],</span> <span class="pre">'readout_pha':</span> <span class="pre">['</span> <span class="pre">Phase</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">readout</span> <span class="pre">tone',</span> <span class="pre">0],</span> <span class="pre">'readout_relamp':</span> <span class="pre">['</span> <span class="pre">relative</span> <span class="pre">amplitude</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">different</span> <span class="pre">readout</span> <span class="pre">tones',</span> <span class="pre">1],</span> <span class="pre">'spec_input_level':</span> <span class="pre">['</span> <span class="pre">Input</span> <span class="pre">range</span> <span class="pre">in</span> <span class="pre">mV</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">spectrum</span> <span class="pre">adc</span> <span class="pre">card.</span> <span class="pre">Restricted</span> <span class="pre">to</span> <span class="pre">card-dependant</span> <span class="pre">values',</span> <span class="pre">250]}</span></em><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.optional_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.params">
+<span class="sig-name descname"><span class="pre">params</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'T_rep':</span> <span class="pre">'</span> <span class="pre">repetition</span> <span class="pre">rate</span> <span class="pre">[s]</span> <span class="pre">(200e-6)',</span> <span class="pre">'awg':</span> <span class="pre">'</span> <span class="pre">Instrument:</span> <span class="pre">qubit</span> <span class="pre">manipulation</span> <span class="pre">awg',</span> <span class="pre">'clock':</span> <span class="pre">'</span> <span class="pre">samplerate</span> <span class="pre">for</span> <span class="pre">manipulation</span> <span class="pre">awg</span> <span class="pre">[S/s]</span> <span class="pre">(1.2e9)',</span> <span class="pre">'exc_T':</span> <span class="pre">'</span> <span class="pre">maximum</span> <span class="pre">window</span> <span class="pre">for</span> <span class="pre">manipulation</span> <span class="pre">[s]</span>&#160; <span class="pre">(20e-6)',</span> <span class="pre">'f01':</span> <span class="pre">'</span> <span class="pre">qubit</span> <span class="pre">transition</span> <span class="pre">frequency</span> <span class="pre">[Hz]</span> <span class="pre">(5.469e9)',</span> <span class="pre">'fr':</span> <span class="pre">'</span> <span class="pre">resonator</span> <span class="pre">readout</span> <span class="pre">frequency</span> <span class="pre">[Hz]</span> <span class="pre">(9e9)',</span> <span class="pre">'iq_frequency':</span> <span class="pre">'</span> <span class="pre">IQ</span> <span class="pre">frequency</span> <span class="pre">for</span> <span class="pre">manipulation</span> <span class="pre">[Hz]</span> <span class="pre">(80e6)',</span> <span class="pre">'mspec':</span> <span class="pre">'</span> <span class="pre">Instrument</span> <span class="pre">virtual_measure_spec',</span> <span class="pre">'mw_power':</span> <span class="pre">'</span> <span class="pre">power</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">qubit</span> <span class="pre">microwave</span> <span class="pre">source',</span> <span class="pre">'qubit_mw_src':</span> <span class="pre">'</span> <span class="pre">Instrument:</span> <span class="pre">qubit</span> <span class="pre">manipulation</span> <span class="pre">microwave</span> <span class="pre">source',</span> <span class="pre">'readout_awg':</span> <span class="pre">'</span> <span class="pre">Instrument:</span> <span class="pre">readout</span> <span class="pre">awg',</span> <span class="pre">'readout_clock':</span> <span class="pre">'</span> <span class="pre">samplerate</span> <span class="pre">for</span> <span class="pre">readout</span> <span class="pre">dac</span> <span class="pre">[S/s]</span> <span class="pre">(1.2e9)',</span> <span class="pre">'readout_mw_src':</span> <span class="pre">'</span> <span class="pre">Instrument:</span> <span class="pre">readout</span> <span class="pre">microwave</span> <span class="pre">source',</span> <span class="pre">'readout_tone_length':</span> <span class="pre">'</span> <span class="pre">length</span> <span class="pre">of</span> <span class="pre">readout</span> <span class="pre">tone</span> <span class="pre">[s]</span>&#160; <span class="pre">(400e-09)',</span> <span class="pre">'spec_samplerate':</span> <span class="pre">'</span> <span class="pre">samplerate</span> <span class="pre">for</span> <span class="pre">readout</span> <span class="pre">adc</span> <span class="pre">[S/s]</span> <span class="pre">(1.25e9)'}</span></em><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.record_averaged_trace">
+<span class="sig-name descname"><span class="pre">record_averaged_trace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/initialize.html#InitializeTimeDomain.record_averaged_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.record_averaged_trace" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.record_single_trace">
+<span class="sig-name descname"><span class="pre">record_single_trace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/initialize.html#InitializeTimeDomain.record_single_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.record_single_trace" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.set_spec_input_level">
+<span class="sig-name descname"><span class="pre">set_spec_input_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/initialize.html#InitializeTimeDomain.set_spec_input_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.set_spec_input_level" title="Permalink to this definition"></a></dt>
+<dd><p>possible levels depend on the card and are specified in mV.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.update_qubit_mw_src">
+<span class="sig-name descname"><span class="pre">update_qubit_mw_src</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/initialize.html#InitializeTimeDomain.update_qubit_mw_src"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.update_qubit_mw_src" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.initialize.InitializeTimeDomain.update_timings">
+<span class="sig-name descname"><span class="pre">update_timings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zero_dac_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/initialize.html#InitializeTimeDomain.update_timings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.initialize.InitializeTimeDomain.update_timings" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.timedomain.measure_td">
+<span id="qkit-measure-timedomain-measure-td-module"></span><h2>qkit.measure.timedomain.measure_td module<a class="headerlink" href="#module-qkit.measure.timedomain.measure_td" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.measure_td.</span></span><span class="sig-name descname"><span class="pre">Measure_td</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>useage:</p>
+<p>m = Measure_td()</p>
+<p>m.set_x_parameters(arange(-0.05,0.05,0.01),’flux coil current (mA)’,coil.set_current)
+m.set_y_parameters(arange(4e9,7e9,10e6),’excitation frequency (Hz)’,mw_src1.set_frequency)</p>
+<p>m.measure_XX()
+Generally, we want to use
+ReadoutTrace = True -&gt; if we want to record the readout pulse or
+AWGTrace = True -&gt; if we have a N different time steps in the AWG (Not used, this is done via the mode variable now.)</p>
+<dl class="simple">
+<dt>ToDO (S1, 09/2017):</dt><dd><ul class="simple">
+<li><p>Include LogFunctions</p></li>
+<li><p>Include 2D_AWG with pre-averaging</p></li>
+<li><p>Check multi-tone readout</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.add_qubit_state_cal">
+<span class="sig-name descname"><span class="pre">add_qubit_state_cal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath_to_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath_to_1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.add_qubit_state_cal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.add_qubit_state_cal" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.measure_1D">
+<span class="sig-name descname"><span class="pre">measure_1D</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.measure_1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.measure_1D" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.measure_1D_AWG">
+<span class="sig-name descname"><span class="pre">measure_1D_AWG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.measure_1D_AWG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.measure_1D_AWG" title="Permalink to this definition"></a></dt>
+<dd><p>use AWG sequence for x_vec, averaging over iterations</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.measure_1D_awg_1D_ddc_timetrace">
+<span class="sig-name descname"><span class="pre">measure_1D_awg_1D_ddc_timetrace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.measure_1D_awg_1D_ddc_timetrace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.measure_1D_awg_1D_ddc_timetrace" title="Permalink to this definition"></a></dt>
+<dd><p>Performs a digital down conversion of your readout trace for every value in your y-vector
+while also sweeping another parameter. y_vec should be awg sequence and z_vec/obj the sweeping parameter.
+x-vec is automatically set by acquisition window.
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.measure_1D_awg_ddc_timetrace">
+<span class="sig-name descname"><span class="pre">measure_1D_awg_ddc_timetrace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.measure_1D_awg_ddc_timetrace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.measure_1D_awg_ddc_timetrace" title="Permalink to this definition"></a></dt>
+<dd><p>Performs a digital down conversion of your readout trace for every value in your y-vector,
+whereas y_vec should be awg sequence. This function is useful for magnon cavity experiments.
+x-vec is automatically set by acquisition window.
+(Also, all data are there at once)
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.measure_1D_ddc_time_trace">
+<span class="sig-name descname"><span class="pre">measure_1D_ddc_time_trace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.measure_1D_ddc_time_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.measure_1D_ddc_time_trace" title="Permalink to this definition"></a></dt>
+<dd><p>measures the time evolution of your transmission / reflection
+in your network by performing a digital down conversion
+:return: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.measure_2D">
+<span class="sig-name descname"><span class="pre">measure_2D</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.measure_2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.measure_2D" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.measure_2D_AWG">
+<span class="sig-name descname"><span class="pre">measure_2D_AWG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.measure_2D_AWG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.measure_2D_AWG" title="Permalink to this definition"></a></dt>
+<dd><p>x_vec is sequence in AWG</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.measure_2D_ddc_time_trace">
+<span class="sig-name descname"><span class="pre">measure_2D_ddc_time_trace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.measure_2D_ddc_time_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.measure_2D_ddc_time_trace" title="Permalink to this definition"></a></dt>
+<dd><p>Performs a digital down conversion for exactly one value in your awg sequence. But you can sweep other
+parameters, such as mw-power or so.
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.measure_3D_AWG">
+<span class="sig-name descname"><span class="pre">measure_3D_AWG</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.measure_3D_AWG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.measure_3D_AWG" title="Permalink to this definition"></a></dt>
+<dd><p>x_vec is sequence in AWG</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.set_plot_comment">
+<span class="sig-name descname"><span class="pre">set_plot_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.set_plot_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.set_plot_comment" title="Permalink to this definition"></a></dt>
+<dd><p>Small comment to add at the end of plot pics for more information i.e. good for wiki entries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.set_x_parameters">
+<span class="sig-name descname"><span class="pre">set_x_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_set_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.set_x_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.set_x_parameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.set_y_parameters">
+<span class="sig-name descname"><span class="pre">set_y_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_set_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.set_y_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.set_y_parameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.measure_td.Measure_td.set_z_parameters">
+<span class="sig-name descname"><span class="pre">set_z_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_coordname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_set_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/measure_td.html#Measure_td.set_z_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.measure_td.Measure_td.set_z_parameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.timedomain.pulse_sequence">
+<span id="qkit-measure-timedomain-pulse-sequence-module"></span><h2>qkit.measure.timedomain.pulse_sequence module<a class="headerlink" href="#module-qkit.measure.timedomain.pulse_sequence" title="Permalink to this heading"></a></h2>
+<p>Module to provide a high-level possibility to arange pulses for an experiment.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.ParametrizedValue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.pulse_sequence.</span></span><span class="sig-name descname"><span class="pre">ParametrizedValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#ParametrizedValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.ParametrizedValue" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>class for calculating the value of a lambda expression
+value: Type lambda or float</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.ParametrizedValue.Type">
+<span class="sig-name descname"><span class="pre">Type</span></span><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.ParametrizedValue.Type" title="Permalink to this definition"></a></dt>
+<dd><p>The type of the parametrized values as given by the user.</p>
+<p>alias of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code>[[…], <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.ParametrizedValue.crop_string">
+<span class="sig-name descname"><span class="pre">crop_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#ParametrizedValue.crop_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.ParametrizedValue.crop_string" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.ParametrizedValue.is_parametrized">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_parametrized</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.ParametrizedValue.is_parametrized" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.ParametrizedValue.variables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.ParametrizedValue.variables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.Pulse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.pulse_sequence.</span></span><span class="sig-name descname"><span class="pre">Pulse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">length:</span> <span class="pre">~typing.Union[float,</span> <span class="pre">~typing.Callable[[...],</span> <span class="pre">float]],</span> <span class="pre">shape:</span> <span class="pre">~qkit.measure.timedomain.pulse_sequence.Shape</span> <span class="pre">=</span> <span class="pre">&lt;qkit.measure.timedomain.pulse_sequence.Shape</span> <span class="pre">object&gt;,</span> <span class="pre">name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">amplitude:</span> <span class="pre">~typing.Union[float,</span> <span class="pre">~typing.Callable[[...],</span> <span class="pre">float]]</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">phase:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0,</span> <span class="pre">iq_frequency:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0,</span> <span class="pre">iq_dc_offset:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0,</span> <span class="pre">iq_angle:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">90.0,</span> <span class="pre">q_rel:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">ptype=PulseType.Pulse</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#Pulse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.Pulse" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to describe a single pulse.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.Pulse.is_parametrized">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_parametrized</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.Pulse.is_parametrized" title="Permalink to this definition"></a></dt>
+<dd><p>False if only fixed Values for length/amplitude</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.Pulse.variable_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">variable_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.Pulse.variable_names" title="Permalink to this definition"></a></dt>
+<dd><p>A set with the names of all variables necessary to calculate the pulse length and amplitude.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseSequence">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.pulse_sequence.</span></span><span class="sig-name descname"><span class="pre">PulseSequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samplerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dc_corr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#PulseSequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for aranging pulses for a time-domain experiment.
+Sequence objects are callable, returning the sequence envelope for a given time step.
+Add wait as variable times in the experiment.
+Add readout to synchornize different channels in more sophisticated experiments.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>add:         adds a given pulse to the experiment
+add_wait:    adds a wait time
+add_readout: adds the readout to the experiment
+plot:        plots schematic of the sequence
+get_pulses:  returns list of currently added pulses and their properties.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseSequence.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pulse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qkit.measure.timedomain.pulse_sequence.Pulse" title="qkit.measure.timedomain.pulse_sequence.Pulse"><span class="pre">Pulse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#PulseSequence.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence.add" title="Permalink to this definition"></a></dt>
+<dd><p>Append a pulse to the sequence.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>pulse: pulse object
+skip:  if True the next pulse in the sequence will not wait until this pulse is finished (i.e. they happen at the same time)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseSequence.add_readout">
+<span class="sig-name descname"><span class="pre">add_readout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pulse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qkit.measure.timedomain.pulse_sequence.Pulse" title="qkit.measure.timedomain.pulse_sequence.Pulse"><span class="pre">Pulse</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#PulseSequence.add_readout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence.add_readout" title="Permalink to this definition"></a></dt>
+<dd><p>Add a readout pulse to the sequence.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>skip<span class="classifier">bool, optional</span></dt><dd><p>If True the next pulse will follow at the same time as the readout, by default False.</p>
+</dd>
+<dt>pulse<span class="classifier">Pulse, optional</span></dt><dd><p>pulse: A user-defined readout pulse can be specified if necessary, by default rectangular shaped Pulse with lengtht as specified in sample.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>PulseSequence</dt><dd><p>The PulseSequence with an added Readout</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseSequence.add_wait">
+<span class="sig-name descname"><span class="pre">add_wait</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#PulseSequence.add_wait"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence.add_wait" title="Permalink to this definition"></a></dt>
+<dd><p>Add a wait time to the sequence.
+Use a (lambda) function for variable wait times.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">PulseSequence</span></dt><dd><p>the PulseSequence</p>
+</dd>
+<dt>time<span class="classifier">ParametrizedValue.Type</span></dt><dd><p>the waiting period as float or function</p>
+</dd>
+<dt>name<span class="classifier">str, optional</span></dt><dd><p>A special name can be passed for this wait block (by default, wait[#] will be used)</p>
+</dd>
+<dt>skip<span class="classifier">bool, optional</span></dt><dd><p>if this wait should be parallel to the next item in the sequece, by default False</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>PulseSequence</dt><dd><p>the PulsSequence with an added waiting period</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseSequence.get_pulses">
+<span class="sig-name descname"><span class="pre">get_pulses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#PulseSequence.get_pulses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence.get_pulses" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of all pulses and their properties.
+The properties of each pulse are stored in a dictionary with keys: name, shape, length, skip value</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseSequence.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#PulseSequence.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a schematic of the stored pulses.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseSequence.pulses">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pulses</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#qkit.measure.timedomain.pulse_sequence.Pulse" title="qkit.measure.timedomain.pulse_sequence.Pulse"><span class="pre">Pulse</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence.pulses" title="Permalink to this definition"></a></dt>
+<dd><p>A dictionary containing pulse name as key and pulse as value</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseSequence.sequence">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sequence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qkit.measure.timedomain.pulse_sequence.Pulse" title="qkit.measure.timedomain.pulse_sequence.Pulse"><span class="pre">Pulse</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence.sequence" title="Permalink to this definition"></a></dt>
+<dd><p>A List of Lists containing pulses. If pulses are paralles they will be in the same sublist</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseSequence.variable_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">variable_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseSequence.variable_names" title="Permalink to this definition"></a></dt>
+<dd><p>A set with the names of all variables present in this sequence.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.pulse_sequence.</span></span><span class="sig-name descname"><span class="pre">PulseType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#PulseType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Type of Pulse object</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseType.Pulse">
+<span class="sig-name descname"><span class="pre">Pulse</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseType.Pulse" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseType.Readout">
+<span class="sig-name descname"><span class="pre">Readout</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseType.Readout" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.PulseType.Wait">
+<span class="sig-name descname"><span class="pre">Wait</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.PulseType.Wait" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.Shape">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.pulse_sequence.</span></span><span class="sig-name descname"><span class="pre">Shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#Shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.Shape" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">vectorize</span></code></p>
+<p>A vectorized function describing a possible shape
+defined on the standardized interval [0,1).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.pulse_sequence.ShapeLibClass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.pulse_sequence.</span></span><span class="sig-name descname"><span class="pre">ShapeLibClass</span></span><a class="reference internal" href="_modules/qkit/measure/timedomain/pulse_sequence.html#ShapeLibClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.pulse_sequence.ShapeLibClass" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Object containing pre-defined pulse shapes.
+Currently implemented: rect, gauss</p>
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.timedomain.sequence_library">
+<span id="qkit-measure-timedomain-sequence-library-module"></span><h2>qkit.measure.timedomain.sequence_library module<a class="headerlink" href="#module-qkit.measure.timedomain.sequence_library" title="Permalink to this heading"></a></h2>
+<p>sequency_library.py
+A. Stehli (05/2018)</p>
+<p>This library provides the measurement sequences for standard qubit experiments.
+Currently this includes:</p>
+<blockquote>
+<div><p>rabi experiment
+T1 measurments
+Ramsey experiments
+Spin/Hahn echo</p>
+</div></blockquote>
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.sequence_library.rabi">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.sequence_library.</span></span><span class="sig-name descname"><span class="pre">rabi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pulse_shape=&lt;qkit.measure.timedomain.pulse_sequence.Shape</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iq_frequency=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/sequence_library.html#rabi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.sequence_library.rabi" title="Permalink to this definition"></a></dt>
+<dd><p>Generate sequence object for a rabi experiment (varying drive pulse lengths).</p>
+<dl>
+<dt>Args:</dt><dd><p>sample:      sample object
+pulse_shape: shape of the pulses (i.e. square, gauss, …)
+amplitude:   relative ampitude of the sequence
+iq_frequency: IQ-frequency for heterodyne mixing. If iq_frequency is None, the sample.iq_frequency is used.</p>
+<blockquote>
+<div><p>If iq_frequency is 0 homodyne mixing is employed.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>Sequence object for rabi experiment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.sequence_library.ramsey">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.sequence_library.</span></span><span class="sig-name descname"><span class="pre">ramsey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pulse_shape=&lt;qkit.measure.timedomain.pulse_sequence.Shape</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iq_frequency=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/sequence_library.html#ramsey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.sequence_library.ramsey" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a sequence with two pi/2 pulses seperated by a time delay.</p>
+<dl>
+<dt>Args:</dt><dd><p>sample:       sample object
+pulse_shape:  shape of the pulses (i.e. square, gauss, …)
+amplitude:    relative ampitude of the sequence
+iq_frequency: IQ-frequency for heterodyne mixing. If iq_frequency is None, the sample.iq_frequency is used.</p>
+<blockquote>
+<div><p>If iq_frequency is 0 homodyne mixing is employed.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>Sequence object for ramsey measurement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.sequence_library.spinecho">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.sequence_library.</span></span><span class="sig-name descname"><span class="pre">spinecho</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_pi=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pulse_shape=&lt;qkit.measure.timedomain.pulse_sequence.Shape</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iq_frequency=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/sequence_library.html#spinecho"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.sequence_library.spinecho" title="Permalink to this definition"></a></dt>
+<dd><p>Generate sequence with two pi/2 pulses at the ends and a number n_pi pi pulses inbetween
+pi2 - time/(2*n) - pi - time/n - pi - … - pi - time/(2*n) - pi2</p>
+<dl>
+<dt>Args:</dt><dd><p>sample:       sample object
+n_pi:         number of pi-pulses
+pulse_shape:  shape of the pulses (i.e. square, gauss, …)
+amplitude:    relative ampitude of the sequence
+iq_frequency: IQ-frequency for heterodyne mixing. If iq_frequency is None, the sample.iq_frequency is used.</p>
+<blockquote>
+<div><p>If iq_frequency is 0 homodyne mixing is employed.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>Sequence object for spinecho measurement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.sequence_library.spinlocking">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.sequence_library.</span></span><span class="sig-name descname"><span class="pre">spinlocking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pi2sign=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_pi=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_time=5e-09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pulse_shape=&lt;qkit.measure.timedomain.pulse_sequence.Shape</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iq_frequency=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/sequence_library.html#spinlocking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.sequence_library.spinlocking" title="Permalink to this definition"></a></dt>
+<dd><p>Generate sequence with two pi/2 pulses (around y-axis) at the ends and a drive in-between.
+The drive is phase shifted by 90 degrees in respect to the pi/2 pulses (rotates around x-axis).
+Furthermore a pi-pulse (around x-axis) may be added (True by default) before as well as after the drive.
+This reduces the susceptibility to low frequency oscillations.</p>
+<dl>
+<dt>Args:</dt><dd><p>sample:       sample object
+pi2sign:      sign of the first pi/2 pulse
+add_pi:       if True an additional pi-pulse is added before and after the drive
+wait_time:    wait time between pi/2 or pi-pulse and the drive
+pulse_shape:  shape of the pi and pi/2 pulses (i.e. square, gauss, …)
+amplitude:    relative ampitude of the sequence
+iq_frequency: IQ-frequency for heterodyne mixing. If iq_frequency is None, the sample.iq_frequency is used.</p>
+<blockquote>
+<div><p>If iq_frequency is 0 homodyne mixing is employed.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>Sequence object for spinecho measurement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.sequence_library.t1">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.sequence_library.</span></span><span class="sig-name descname"><span class="pre">t1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pulse_shape=&lt;qkit.measure.timedomain.pulse_sequence.Shape</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iq_frequency=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/sequence_library.html#t1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.sequence_library.t1" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a sequence with one pi pulse followed by a time delay.</p>
+<dl>
+<dt>Args:</dt><dd><p>sample:       sample object
+pulse_shape:  shape of the pulses (i.e. square, gauss, …)
+amplitude:    relative ampitude of the sequence
+iq_frequency: IQ-frequency for heterodyne mixing. If iq_frequency is None, the sample.iq_frequency is used.</p>
+<blockquote>
+<div><p>If iq_frequency is 0 homodyne mixing is employed.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>Sequence object for T1 measurement</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.timedomain">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.measure.timedomain" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.measure.spectroscopy.html" class="btn btn-neutral float-left" title="qkit.measure.spectroscopy package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.measure.timedomain.awg.html" class="btn btn-neutral float-right" title="qkit.measure.timedomain.awg package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

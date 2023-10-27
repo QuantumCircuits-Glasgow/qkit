@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.storage package &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="_notebooks/index.html" />
+    <link rel="prev" title="qkit.services.raspi_misc.tip package" href="qkit.services.raspi_misc.tip.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">qkit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">qkit.storage package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.html#module-qkit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">qkit</a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+      <li class="breadcrumb-item active">qkit.storage package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.storage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-storage-package">
+<h1>qkit.storage package<a class="headerlink" href="#qkit-storage-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-qkit.storage.hdf_DateTimeGenerator">
+<span id="qkit-storage-hdf-datetimegenerator-module"></span><h2>qkit.storage.hdf_DateTimeGenerator module<a class="headerlink" href="#module-qkit.storage.hdf_DateTimeGenerator" title="Permalink to this heading"></a></h2>
+<p>Created 2015</p>
+<p>&#64;author: hrotzing</p>
+<p>Modified 2017 by S1</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.storage.hdf_DateTimeGenerator.</span></span><span class="sig-name descname"><span class="pre">DateTimeGenerator</span></span><a class="reference internal" href="_modules/qkit/storage/hdf_DateTimeGenerator.html#DateTimeGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>DateTimeGenerator class to provide a timestamp for each measurement file
+upon creation.</p>
+<p>For sorting and unique identification across multiple measurement setups
+we provide a timestamp for each h5 file created with qkit. We use the unix
+timestamp to get time resolution of one second which should be enough for
+our needs. The integer timestamp is then converted either into a HHMMSS
+representation using day and month information to create a folder, or the
+timestamp gets converted using the alphabet to create a 6 digit UUID.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator.new_filename">
+<span class="sig-name descname"><span class="pre">new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_DateTimeGenerator.html#DateTimeGenerator.new_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator.new_filename" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator.new_filename_v1">
+<span class="sig-name descname"><span class="pre">new_filename_v1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_DateTimeGenerator.html#DateTimeGenerator.new_filename_v1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator.new_filename_v1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator.new_filename_v2">
+<span class="sig-name descname"><span class="pre">new_filename_v2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_DateTimeGenerator.html#DateTimeGenerator.new_filename_v2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_DateTimeGenerator.DateTimeGenerator.new_filename_v2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.storage.hdf_DateTimeGenerator.decode_uuid">
+<span class="sig-prename descclassname"><span class="pre">qkit.storage.hdf_DateTimeGenerator.</span></span><span class="sig-name descname"><span class="pre">decode_uuid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_DateTimeGenerator.html#decode_uuid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_DateTimeGenerator.decode_uuid" title="Permalink to this definition"></a></dt>
+<dd><p>Decodes the 6 digit UUID back into integer unix timestamp.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>6 digit UUID string.</p>
+</dd>
+<dt>Return:</dt><dd><p>Integer-cast unix timestamp.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.storage.hdf_DateTimeGenerator.encode_uuid">
+<span class="sig-prename descclassname"><span class="pre">qkit.storage.hdf_DateTimeGenerator.</span></span><span class="sig-name descname"><span class="pre">encode_uuid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_DateTimeGenerator.html#encode_uuid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_DateTimeGenerator.encode_uuid" title="Permalink to this definition"></a></dt>
+<dd><p>Encodes the integer unix timestamp into a 6 digit UUID using the alphabet.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>Integer-cast unix timestamp.</p>
+</dd>
+<dt>Return:</dt><dd><p>6 digit UUID string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-qkit.storage.hdf_constants">
+<span id="qkit-storage-hdf-constants-module"></span><h2>qkit.storage.hdf_constants module<a class="headerlink" href="#module-qkit.storage.hdf_constants" title="Permalink to this heading"></a></h2>
+<p>Created on Fri Feb 19 14:39:10 2016</p>
+<p>&#64;author: hrotzing</p>
+</section>
+<section id="module-qkit.storage.hdf_dataset">
+<span id="qkit-storage-hdf-dataset-module"></span><h2>qkit.storage.hdf_dataset module<a class="headerlink" href="#module-qkit.storage.hdf_dataset" title="Permalink to this heading"></a></h2>
+<p>Created 2015</p>
+<p>&#64;author: hrotzing</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.storage.hdf_dataset.hdf_dataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.storage.hdf_dataset.</span></span><span class="sig-name descname"><span class="pre">hdf_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdf_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_dataset.html#hdf_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_dataset.hdf_dataset" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Dataset representation in qkit.</p>
+<p>Wrapper class around the native h5py.crate_dataset().
+This is also a helper class to postpone the creation of the datasets.
+The main issue here is that until the first data is aquired, 
+some dimensions and items are unknown.
+To keep the userinterface simple, we choose to postpone the creation 
+of the datasets and derive all the unknown values from the real data.
+The working horse here is the ‘append()’ or the ‘add()’ function. Before, 
+just an empty dataset is created and the metadata are set.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_dataset.hdf_dataset.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_dataset.html#hdf_dataset.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_dataset.hdf_dataset.add" title="Permalink to this definition"></a></dt>
+<dd><p>Function to save a 1dim dataset once.</p>
+<p>The add method is used to add data to a coordinate dataset. The data is
+cast to a numpy array.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_dataset.hdf_dataset.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pointwise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_dataset.html#hdf_dataset.append"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_dataset.hdf_dataset.append" title="Permalink to this definition"></a></dt>
+<dd><p>Function to save a growing measurement dataset to the hdf file.</p>
+<p>Data is added one datapoint (vector) or one dataline (matrix, box) at a
+time. The data is cast to numpy arrays if possible and appended to the
+existing dataset. A timestamp-dataset is also recorded here.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>data: any data to be appended to the dataset
+reset (Boolean, optional); indicator for appending, or resetting the dataset
+pointwise (Boolean): if True, the data is appended pointwise, i.e. to the innermost dimension</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_dataset.hdf_dataset.next_matrix">
+<span class="sig-name descname"><span class="pre">next_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_dataset.html#hdf_dataset.next_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_dataset.hdf_dataset.next_matrix" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.storage.hdf_file">
+<span id="qkit-storage-hdf-file-module"></span><h2>qkit.storage.hdf_file module<a class="headerlink" href="#module-qkit.storage.hdf_file" title="Permalink to this heading"></a></h2>
+<p>Created 2015</p>
+<p>&#64;author: H. Rotzinger, MP Pfirrmann, M Wildermuth</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.storage.hdf_file.H5_file">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.storage.hdf_file.</span></span><span class="sig-name descname"><span class="pre">H5_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_file.html#H5_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_file.H5_file" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base hdf5 class intended for qkit.</p>
+<p>hdf5 based Data class as compatible as possible to the standard data class. 
+It is in many respects more restricted to the hdf5_data.py class, 
+it e.g. does only create one group in the HDF5 file, etc.</p>
+<p>The class itself contans only the interface to the hdf5 file and 
+can be used also standalone.
+Here we again wrap the create_dataset() fctn and the append() fct does the
+trick of placing added data in the correct position in the dataset.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_file.H5_file.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pointwise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_file.html#H5_file.append"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_file.H5_file.append" title="Permalink to this definition"></a></dt>
+<dd><p>Method for appending hdf5 data.</p>
+<p>A simple append method for data traces.
+Reshapes the array and updates the attributes.
+The optional ‘next_matrix’ atrribute arranges the incoming data in a 
+value_box correctly.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>hdf_dataset ‘ds’
+numpy array ‘data’
+boolean ‘next_matrix’
+pointwise (Boolean): if True, the data is appended pointwise, i.e. to the innermost dimension</p>
+</dd>
+<dt>Returns:</dt><dd><p>The function operates on the given variables.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_file.H5_file.close_file">
+<span class="sig-name descname"><span class="pre">close_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_file.html#H5_file.close_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_file.H5_file.close_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_file.H5_file.create_dataset">
+<span class="sig-name descname"><span class="pre">create_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_file.html#H5_file.create_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_file.H5_file.create_dataset" title="Permalink to this definition"></a></dt>
+<dd><p>Dataset for one, two, and three dimensional data</p>
+<p>Args:</p>
+<blockquote>
+<div><p>‘tracelength’</p>
+<dl class="simple">
+<dt>‘dim’</dt><dd><p>is 1 for a single data point in a 1D scan (array of scalars)
+is the length of the first trace in 2D scan (array of vectors)
+For 2D scans the traces have to have the same tracelength
+and are simply appended to the trace array</p>
+</dd>
+</dl>
+<p>‘folder’ is a optional group relative to the default group</p>
+<p>‘kwargs’ are appended as attributes to the dataset</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_file.H5_file.create_file">
+<span class="sig-name descname"><span class="pre">create_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_file.html#H5_file.create_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_file.H5_file.create_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_file.H5_file.flush">
+<span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_file.html#H5_file.flush"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_file.H5_file.flush" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_file.H5_file.set_base_attributes">
+<span class="sig-name descname"><span class="pre">set_base_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_file.html#H5_file.set_base_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_file.H5_file.set_base_attributes" title="Permalink to this definition"></a></dt>
+<dd><p>stores some attributes and creates the default data group</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_file.H5_file.setup_required_groups">
+<span class="sig-name descname"><span class="pre">setup_required_groups</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_file.html#H5_file.setup_required_groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_file.H5_file.setup_required_groups" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.storage.hdf_lib">
+<span id="qkit-storage-hdf-lib-module"></span><h2>qkit.storage.hdf_lib module<a class="headerlink" href="#module-qkit.storage.hdf_lib" title="Permalink to this heading"></a></h2>
+<p>Library to ease the use of the file format hdf5 for datastorage
+It can be used with or without the qtlab environment.</p>
+<p>&#64;author: <a class="reference external" href="mailto:hannes&#46;rotzinger&#37;&#52;&#48;kit&#46;edu">hannes<span>&#46;</span>rotzinger<span>&#64;</span>kit<span>&#46;</span>edu</a> 2015
+&#64;version: 0.1</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.storage.hdf_lib.</span></span><span class="sig-name descname"><span class="pre">Data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>this is a basic hdf5 class adopted to our needs</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.add_comment">
+<span class="sig-name descname"><span class="pre">add_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.add_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.add_comment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.add_coordinate">
+<span class="sig-name descname"><span class="pre">add_coordinate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.add_coordinate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.add_coordinate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.add_textlist">
+<span class="sig-name descname"><span class="pre">add_textlist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.add_textlist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.add_textlist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.add_value_box">
+<span class="sig-name descname"><span class="pre">add_value_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.add_value_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.add_value_box" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.add_value_matrix">
+<span class="sig-name descname"><span class="pre">add_value_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.add_value_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.add_value_matrix" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.add_value_vector">
+<span class="sig-name descname"><span class="pre">add_value_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.add_value_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.add_value_vector" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.add_view">
+<span class="sig-name descname"><span class="pre">add_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.add_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.add_view" title="Permalink to this definition"></a></dt>
+<dd><p>a view is a way to display plot x-y data.
+x, y with the corresponding error are the datasets to display, e.g.
+x = h5[“/entry/data0/temperature”]
+y = h5[“/entry/analysis0/frequency_fit”]
+error = h5[“/entry/analysis0/frequency_fit_error”]
+filter is a string of reguar python code, which
+accesses the x,y dataset returns arrays of (x,y)
+(Fixme: not jet implemented)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.close" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.close_file">
+<span class="sig-name descname"><span class="pre">close_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.close_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.close_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.flush">
+<span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.flush"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.flush" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.generate_file_name">
+<span class="sig-name descname"><span class="pre">generate_file_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.generate_file_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.generate_file_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.get_dataset">
+<span class="sig-name descname"><span class="pre">get_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.get_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.get_dataset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.get_filepath">
+<span class="sig-name descname"><span class="pre">get_filepath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.get_filepath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.get_filepath" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.get_folder">
+<span class="sig-name descname"><span class="pre">get_folder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.get_folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.get_folder" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_lib.Data.save_finished">
+<span class="sig-name descname"><span class="pre">save_finished</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_lib.html#Data.save_finished"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_lib.Data.save_finished" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.storage.hdf_view">
+<span id="qkit-storage-hdf-view-module"></span><h2>qkit.storage.hdf_view module<a class="headerlink" href="#module-qkit.storage.hdf_view" title="Permalink to this heading"></a></h2>
+<p>Created 2015</p>
+<p>&#64;author: hrotzing</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.storage.hdf_view.dataset_view">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.storage.hdf_view.</span></span><span class="sig-name descname"><span class="pre">dataset_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdf_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'views'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_view.html#dataset_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_view.dataset_view" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class describes a view on one or two datasets.</p>
+<p>Views do not contain any data but only ds_url information about the datasets
+that should  be displayed. The attributes ‘overlays’ and ‘xy_i’ hold the 
+information about how many plots are created over one another and which
+datasets are plotted against each other.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.hdf_view.dataset_view.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pyfilter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/hdf_view.html#dataset_view.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.hdf_view.dataset_view.add" title="Permalink to this definition"></a></dt>
+<dd><p>Adds one y vs x overlay plot to the dataset_view object.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>x, y, error: hdf_datasets; y over x gets plotted with error being </dt><dd><p>the y-error data.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.storage.store">
+<span id="qkit-storage-store-module"></span><h2>qkit.storage.store module<a class="headerlink" href="#module-qkit.storage.store" title="Permalink to this heading"></a></h2>
+<p>Library to ease the use of the file format hdf5 for datastorage
+It can be used with or without the qtlab environment.</p>
+<p>&#64;author: <a class="reference external" href="mailto:hannes&#46;rotzinger&#37;&#52;&#48;kit&#46;edu">hannes<span>&#46;</span>rotzinger<span>&#64;</span>kit<span>&#46;</span>edu</a> 2018
+&#64;author: <a class="reference external" href="mailto:marco&#46;pfirrmann&#37;&#52;&#48;kit&#46;edu">marco<span>&#46;</span>pfirrmann<span>&#64;</span>kit<span>&#46;</span>edu</a> 2018
+&#64;version: 0.1</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.storage.store.Data">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.storage.store.</span></span><span class="sig-name descname"><span class="pre">Data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'r+'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Basic hdf5 class adopted to our needs.</p>
+<p>This class is the public API for the qkit users with the hdf5 file. It
+is based in its core on h5py as well as our own adaptions in hdf_view, 
+hdf_file, and hdf_dataset. Here mostly have wrapper that operate on the
+mentioned classes.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.add_comment">
+<span class="sig-name descname"><span class="pre">add_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.add_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.add_comment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.add_coordinate">
+<span class="sig-name descname"><span class="pre">add_coordinate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.add_coordinate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.add_coordinate" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a coordinate dataset to the h5 file.</p>
+<p>This function is a wrapper to create a hdf_dataset object with some 
+predefined arguments. name, unit, comment, and folder are parsed to the hdf_dataset
+init and the ds_type is set. The dataset does not have any axes. The data
+is specifically casted to 64bit float.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name: String to name the dataset.
+unit: Optional string.
+comment: Optional string to put in any comment.
+folder: Optional string (‘data’ or ‘analysis’).</p>
+</dd>
+<dt>Returns:</dt><dd><p>hdf_dataset object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.add_fid_param">
+<span class="sig-name descname"><span class="pre">add_fid_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.add_fid_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.add_fid_param" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a parameter (and value) to be read out with the file info database class.</p>
+<p>This function adds an entry to the atrribute dict of the self.hf agrp-entry. By default
+this is set to the attribute0 folder. The dict may be read out by the file info database
+class and in the end the entries can be sorted by all params.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>param: Parameter name
+value: Parameter value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.add_textlist">
+<span class="sig-name descname"><span class="pre">add_textlist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.add_textlist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.add_textlist" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a dataset containing only text to the h5 file.</p>
+<p>This function is a wrapper to create a hdf_dataset object with some 
+predefined arguments. name, comment, and folder are parsed to the hdf_dataset
+init and the ds_type is set. The dataset does not have any axes.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name: String to name the dataset.
+comment: Optional string to put in any comment.
+folder: Optional string (‘data’ or ‘analysis’).</p>
+</dd>
+<dt>Returns:</dt><dd><p>hdf_dataset object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.add_value_box">
+<span class="sig-name descname"><span class="pre">add_value_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.add_value_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.add_value_box" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a 3dim dataset to the h5 file.</p>
+<p>This function is a wrapper to create a hdf_dataset object with some 
+predefined arguments. name, x-axis, y-axis, z-axis, unit, comment, and folder 
+are parsed to the hdf_dataset init and the ds_type is set.
+Our convention here is: y-axis changes “faster” than the x-axis.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name: String to name the dataset.
+x: Optional hdf_dataset representing the x-coordinate of the box.
+y: Optional hdf_dataset representing the y-coordinato of the box.
+z: Optional hdf_dataset representing the y-coordinato of the box.
+unit: Optional string.
+comment: Optional string to put in any comment.
+folder: Optional string (‘data’ or ‘analysis’).</p>
+</dd>
+<dt>Returns:</dt><dd><p>hdf_dataset object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.add_value_matrix">
+<span class="sig-name descname"><span class="pre">add_value_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.add_value_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.add_value_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a 2dim dataset to the h5 file.</p>
+<p>This function is a wrapper to create a hdf_dataset object with some 
+predefined arguments. name, x-axis, y-axis, unit, comment, and folder 
+are parsed to the hdf_dataset init and the ds_type is set.
+Our convention here is: y-axis changes “faster” than the x-axis.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name: String to name the dataset.
+x: Optional hdf_dataset representing the x-coordinate of the matrix.
+y: Optional hdf_dataset representing the y-coordinato of the matrix.
+unit: Optional string.
+comment: Optional string to put in any comment.
+folder: Optional string (‘data’ or ‘analysis’).</p>
+</dd>
+<dt>Returns:</dt><dd><p>hdf_dataset object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.add_value_vector">
+<span class="sig-name descname"><span class="pre">add_value_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.add_value_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.add_value_vector" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a 1dim dataset to the h5 file.</p>
+<p>This function is a wrapper to create a hdf_dataset object with some 
+predefined arguments. name, x-axis, unit, comment, and folder are parsed
+to the hdf_dataset init and the ds_type is set.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name: String to name the dataset.
+x: Optional hdf_dataset representing the x-coordinate of the vector.
+unit: Optional string.
+comment: Optional string to put in any comment.
+folder: Optional string (‘data’ or ‘analysis’).</p>
+</dd>
+<dt>Returns:</dt><dd><p>hdf_dataset object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.add_view">
+<span class="sig-name descname"><span class="pre">add_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.add_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.add_view" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a view to plot x-y data.</p>
+<p>This function is a wrapper to create a dataset_view.
+x, y with the corresponding error are the datasets to display, e.g.
+x = h5[“/entry/data0/temperature”]
+y = h5[“/entry/analysis0/frequency_fit”]
+error = h5[“/entry/analysis0/frequency_fit_error”]
+filter is a string of reguar python code, which
+accesses the x,y dataset returns arrays of (x,y)
+(Fixme: not jet implemented)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.close" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.close_file">
+<span class="sig-name descname"><span class="pre">close_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.close_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.close_file" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.flush">
+<span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.flush"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.flush" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.get_dataset">
+<span class="sig-name descname"><span class="pre">get_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.get_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.get_dataset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.get_filepath">
+<span class="sig-name descname"><span class="pre">get_filepath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.get_filepath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.get_filepath" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.get_folder">
+<span class="sig-name descname"><span class="pre">get_folder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.get_folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.get_folder" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.storage.store.Data.save_finished">
+<span class="sig-name descname"><span class="pre">save_finished</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/storage/store.html#Data.save_finished"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.storage.store.Data.save_finished" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.storage">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.storage" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.services.raspi_misc.tip.html" class="btn btn-neutral float-left" title="qkit.services.raspi_misc.tip package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="_notebooks/index.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

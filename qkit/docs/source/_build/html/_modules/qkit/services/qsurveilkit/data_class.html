@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.services.qsurveilkit.data_class &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.services.qsurveilkit.data_class</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.services.qsurveilkit.data_class</h1><div class="highlight"><pre>
+<span></span><span class="c1"># DATA class v1.0 written by HR,JB@KIT 2011, 2016</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">DATA exchange class, also holds global variables for thread management. </span>
+<span class="sd">Generalized version based on TIP.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">qkit.storage</span> <span class="kn">import</span> <span class="n">store</span> <span class="k">as</span> <span class="n">hdf_lib</span>
+<span class="kn">from</span> <span class="nn">qkit.gui.plot</span> <span class="kn">import</span> <span class="n">plot</span> <span class="k">as</span> <span class="n">qviewkit</span>
+
+<div class="viewcode-block" id="DATA"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA">[docs]</a><span class="k">class</span> <span class="nc">DATA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    DATA class. Controls all access to parameter values and stored data.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="DATA.LOCALHOST"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.LOCALHOST">[docs]</a>    <span class="k">class</span> <span class="nc">LOCALHOST</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LOCALHOST&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ip</span>   <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LOCALHOST&#39;</span><span class="p">,</span><span class="s1">&#39;ip&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;LOCALHOST&#39;</span><span class="p">,</span><span class="s1">&#39;port&#39;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="DATA.REMOTEHOST"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.REMOTEHOST">[docs]</a>    <span class="k">class</span> <span class="nc">REMOTEHOST</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REMOTEHOST&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ip</span>   <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REMOTEHOST&#39;</span><span class="p">,</span><span class="s1">&#39;ip&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s1">&#39;REMOTEHOST&#39;</span><span class="p">,</span><span class="s1">&#39;port&#39;</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="DATA.PARAMETER"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER">[docs]</a>    <span class="k">class</span> <span class="nc">PARAMETER</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">p_index</span><span class="p">,</span><span class="n">p_attr</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Initialize parameter attributes, mostly taken from the config file.</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_index</span> <span class="o">=</span> <span class="n">p_index</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p_attr</span><span class="p">),</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p_attr</span><span class="p">),</span><span class="s1">&#39;interval&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_request_object</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">0</span>   <span class="c1">#this is written by server_main.py</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_schedule</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logging</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p_attr</span><span class="p">),</span><span class="s1">&#39;logging&#39;</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p_attr</span><span class="p">),</span><span class="s1">&#39;log_path&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url_timestamps</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parameter </span><span class="si">%s</span><span class="s2"> loaded.&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            
+<div class="viewcode-block" id="DATA.PARAMETER.get_all"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.get_all">[docs]</a>        <span class="k">def</span> <span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Get all parameter attributes.</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="k">with</span> <span class="n">Lock</span><span class="p">():</span>
+                <span class="k">return</span> <span class="p">{</span>
+                    <span class="s2">&quot;parameter&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_index</span><span class="p">,</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s2">&quot;interval&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">,</span>
+                    <span class="s2">&quot;value&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+                    <span class="s2">&quot;next_schedule&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">next_schedule</span><span class="p">,</span>
+                    <span class="p">}</span></div>
+
+<div class="viewcode-block" id="DATA.PARAMETER.set_interval"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.set_interval">[docs]</a>        <span class="k">def</span> <span class="nf">set_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">interval</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Setup the scheduling, which corresponds to the value request interval.</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="n">interval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">interval</span> <span class="o">=</span> <span class="mi">120</span><span class="o">*</span><span class="mi">365</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">3600</span> <span class="c1">#120 years</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_schedule</span> <span class="o">+=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="o">+</span><span class="n">interval</span> <span class="c1">#update next schedule</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>   </div>
+        
+<div class="viewcode-block" id="DATA.PARAMETER.get_last_value"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.get_last_value">[docs]</a>        <span class="k">def</span> <span class="nf">get_last_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">Lock</span><span class="p">():</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span></div>
+<div class="viewcode-block" id="DATA.PARAMETER.get_timestamp"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.get_timestamp">[docs]</a>        <span class="k">def</span> <span class="nf">get_timestamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">Lock</span><span class="p">():</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span></div>
+        
+<div class="viewcode-block" id="DATA.PARAMETER.get_history"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.get_history">[docs]</a>        <span class="k">def</span> <span class="nf">get_history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">range</span><span class="p">,</span><span class="n">nchunks</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Read out the h5 file.</span>
+<span class="sd">            - range: history data range</span>
+<span class="sd">            - nchunks: number of data points to be returned</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_timestamps</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_lock</span><span class="p">:</span>
+                        <span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">url_timestamps</span><span class="p">])</span>
+                        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">url_values</span><span class="p">])</span>
+                    <span class="n">data_points_requested_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">timestamps</span> <span class="o">&lt;</span> <span class="nb">range</span><span class="o">*</span><span class="mi">3600</span><span class="p">)</span>
+                    <span class="n">timestamps_requested</span> <span class="o">=</span> <span class="n">timestamps</span><span class="p">[</span><span class="n">data_points_requested_mask</span><span class="p">]</span>
+                    <span class="n">data_points_requested</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">data_points_requested_mask</span><span class="p">]</span>
+                    <span class="c1">#return only nchunks data points</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_points_requested</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">nchunks</span><span class="p">:</span>
+                        <span class="n">timestamp_chunks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">timestamps_requested</span><span class="p">[:(</span><span class="nb">len</span><span class="p">(</span><span class="n">timestamps_requested</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">timestamps_requested</span><span class="p">)</span><span class="o">%</span><span class="n">nchunks</span><span class="p">)],</span><span class="n">nchunks</span><span class="p">))</span>
+                        <span class="n">timestamps</span> <span class="o">=</span> <span class="n">timestamp_chunks</span><span class="p">[:,</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">timestamps_requested</span><span class="p">)</span><span class="o">/</span><span class="n">nchunks</span><span class="p">)]</span>
+                        <span class="n">data_chunks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">data_points_requested</span><span class="p">[:(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_points_requested</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">data_points_requested</span><span class="p">)</span><span class="o">%</span><span class="n">nchunks</span><span class="p">)],</span><span class="n">nchunks</span><span class="p">))</span>
+                        <span class="c1">#calculate medians and return them instead of the mean (due to runaways in the log file)</span>
+                        <span class="n">medians</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">data_chunks</span><span class="p">,</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[:,</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">data_points_requested</span><span class="p">)</span><span class="o">/</span><span class="n">nchunks</span><span class="p">)]</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="n">timestamps</span><span class="p">,</span><span class="n">medians</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="n">timestamps_requested</span><span class="p">,</span><span class="n">data_points_requested</span><span class="p">]</span>
+                    
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>   <span class="c1">#AttributeError, NameError:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error opening h5 log file.&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+        
+<div class="viewcode-block" id="DATA.PARAMETER.store_value"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.store_value">[docs]</a>        <span class="k">def</span> <span class="nf">store_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Store method, used by the worker.</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="k">with</span> <span class="n">Lock</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;type cast error, ignoring&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logging</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">append_to_log</span><span class="p">()</span></div>
+                
+<div class="viewcode-block" id="DATA.PARAMETER.create_logfile"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.create_logfile">[docs]</a>        <span class="k">def</span> <span class="nf">create_logfile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Create new log file for parameter </span><span class="si">%s</span><span class="s1">.&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_path</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">+</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">%m%Y%H%M%S&#39;</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.h5&#39;</span><span class="p">)</span>
+            <span class="c1">#print self.fname</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hf</span> <span class="o">=</span> <span class="n">hdf_lib</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdf_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">add_coordinate</span><span class="p">(</span><span class="s1">&#39;timestamps&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdf_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">add_value_vector</span><span class="p">(</span><span class="s1">&#39;values&#39;</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdf_t</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url_timestamps</span> <span class="o">=</span> <span class="s1">&#39;/entry/data0/timestamps&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url_values</span> <span class="o">=</span> <span class="s1">&#39;/entry/data0/values&#39;</span>
+            <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="s1">&#39;data_vs_time&#39;</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdf_t</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdf_v</span><span class="p">)</span>   <span class="c1">#fit</span></div>
+        
+<div class="viewcode-block" id="DATA.PARAMETER.append_to_log"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.append_to_log">[docs]</a>        <span class="k">def</span> <span class="nf">append_to_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_lock</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hdf_t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_timestamp</span><span class="p">()))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hdf_v</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()))</span></div>
+            
+<div class="viewcode-block" id="DATA.PARAMETER.close_logfile"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.close_logfile">[docs]</a>        <span class="k">def</span> <span class="nf">close_logfile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">close_file</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="DATA.PARAMETER.schedule"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.schedule">[docs]</a>        <span class="k">def</span> <span class="nf">schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Specifiy whether the parameter is to be updated, </span>
+<span class="sd">            typicalled called in each worker iteration. </span>
+<span class="sd">            Returns True if new parameter value needs to be read.</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_schedule</span><span class="p">:</span>
+                <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_schedule</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">next_schedule</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="DATA.PARAMETER.set_schedule"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.PARAMETER.set_schedule">[docs]</a>        <span class="k">def</span> <span class="nf">set_schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_schedule</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">True</span></div></div>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reads the cfg file and instanciates all parameters accordingly.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wants_abort</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cycle_time</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="s1">&#39;worker&#39;</span><span class="p">,</span><span class="s1">&#39;cycle_time&#39;</span><span class="p">)</span>
+        
+        <span class="n">p_instances</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;parameters&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>   <span class="c1">#parameter instance names</span>
+        <span class="c1">#print(p_instances)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">PARAMETER</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">p_instances</span><span class="p">)]</span>   <span class="c1">#instanciate parameter array</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">p_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">p_instances</span><span class="p">):</span>   <span class="c1">#create human readable aliases, such that objects are accessible from clients according to the seetings.cfg entry in []</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">p_i</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">localhost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LOCALHOST</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="c1">#self.remotehost = self.REMOTEHOST(config)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DATA.atexit"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wants_abort</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DATA.get_wants_abort"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.get_wants_abort">[docs]</a>    <span class="k">def</span> <span class="nf">get_wants_abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_lock</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wants_abort</span></div>
+<div class="viewcode-block" id="DATA.set_wants_abort"><a class="viewcode-back" href="../../../../qkit.services.qsurveilkit.html#qkit.services.qsurveilkit.data_class.DATA.set_wants_abort">[docs]</a>    <span class="k">def</span> <span class="nf">set_wants_abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wants_abort</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+        
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">DATA</span> <span class="o">=</span> <span class="n">DATA</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

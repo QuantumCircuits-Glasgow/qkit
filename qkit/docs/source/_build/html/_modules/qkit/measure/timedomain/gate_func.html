@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.timedomain.gate_func &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.measure.timedomain.gate_func</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.measure.timedomain.gate_func</h1><div class="highlight"><pre>
+<span></span><span class="c1"># gate_func.py</span>
+<span class="c1"># adapted from earlier versions by Jochen Braumueller &lt;jochen.braumueller@kit.edu&gt;, 05/2016</span>
+
+<span class="c1"># The gate function resets an AWG to the first waveform of a sequence for state==False and sends a trigger</span>
+<span class="c1"># by raising a gate for state==True.</span>
+<span class="c1"># Separate functions are supplied for Tektronix AWG and Tabor AWG</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">usage and inputs:</span>
+
+<span class="sd"> from qkit.measure.timedomain import gate_func</span>
+<span class="sd"> or: import gate_func</span>
+<span class="sd"> mspec.set_gate_func(gate_func.Gate_Func(awg = tawg, ni_daq = ftdidaq).gate_fcn)</span>
+<span class="sd"> #pass the name of the AWG as imported to qtLAB (e.g. fastawg or tawg)</span>
+<span class="sd"> #with the spectrum card wrapper virtual_measure_spec.py:</span>
+<span class="sd"> mspec.set_gate_func(gfunc.gate_fcn)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">qkit</span>
+
+<div class="viewcode-block" id="Gate_Func"><a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.gate_func.Gate_Func">[docs]</a><span class="k">class</span> <span class="nc">Gate_Func</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">awg</span><span class="p">,</span> <span class="n">pulser</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ni_daq</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ni_daq_ch</span> <span class="o">=</span> <span class="s1">&#39;PFI0:0&#39;</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        initialize gate function</span>
+<span class="sd">        inputs:</span>
+<span class="sd">         - awg: qubit awg instrument object</span>
+<span class="sd">         - pulser: instrument object (to send out pulse directly from pulser instead of triggering the pulser</span>
+<span class="sd">         - ni_daq: ni_daq instrument object (in tunnel electronics rack)</span>
+<span class="sd">         - ni_daq_ch: used channel of ni_daq</span>
+<span class="sd">         - readout_tabor: tabor awg (2ch of 4ch) for readout</span>
+<span class="sd">        outputs:</span>
+<span class="sd">         -</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">awg</span> <span class="o">=</span> <span class="n">awg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span> <span class="o">=</span> <span class="n">sample</span>
+        <span class="k">if</span> <span class="n">pulser</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pulser</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pulser</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gate_high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pulser</span><span class="o">.</span><span class="n">set_mode_continuous</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gate_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pulser</span><span class="o">.</span><span class="n">set_mode_gated</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pulser</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">ni_daq</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ni_daq</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ni_daq</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ni_daq_ch</span> <span class="o">=</span> <span class="n">ni_daq_ch</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gate_high</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ni_daq</span><span class="o">.</span><span class="n">digital_out</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ni_daq_ch</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gate_low</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ni_daq</span><span class="o">.</span><span class="n">digital_out</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ni_daq_ch</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ni_daq</span> <span class="o">=</span> <span class="kc">None</span>
+       
+        <span class="bp">self</span><span class="o">.</span><span class="n">selftriggered</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pulser</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ni_daq</span> <span class="o">==</span> <span class="kc">None</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selftriggered</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;Tabor&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">():</span>
+                <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">_numchannels</span> <span class="o">==</span> <span class="mi">4</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_gate_low</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">({</span><span class="s1">&#39;p1_trigger_time&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;p2_trigger_time&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">})</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_gate_high</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">({</span><span class="s1">&#39;p1_trigger_time&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">,</span><span class="s1">&#39;p2_trigger_time&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">})</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_gate_low</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">({</span><span class="s1">&#39;trigger_time&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">})</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_gate_high</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">({</span><span class="s1">&#39;trigger_time&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_gate_low</span>  <span class="o">=</span>  <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">({</span><span class="s1">&#39;trigger_time&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;p1_trigger_time&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">})</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_gate_high</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">({</span><span class="s1">&#39;trigger_time&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">,</span> <span class="s1">&#39;p1_trigger_time&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">})</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selftriggered</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="s1">&#39;Tabor&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;selftriggered mode (without pulser and nidaq) is currently only available for Tabor AWGs.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ni_daq_ch</span> <span class="o">=</span> <span class="n">ni_daq_ch</span>
+        
+<div class="viewcode-block" id="Gate_Func.gate_fcn"><a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.gate_func.Gate_Func.gate_fcn">[docs]</a>    <span class="k">def</span> <span class="nf">gate_fcn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        gate function</span>
+<span class="sd">        inputs:</span>
+<span class="sd">         - state: boolean, chooses one of the actions reset or trigger</span>
+<span class="sd">        outputs:</span>
+<span class="sd">         -</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">:</span>   <span class="c1">#switch gate to high, let the pulses run</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gate_high</span><span class="p">()</span>
+                
+        <span class="k">else</span><span class="p">:</span>   <span class="c1">#reset AWG and wait for it</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gate_low</span><span class="p">()</span>
+            
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.025</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="s1">&#39;Tektronix&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reset_tek</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="s1">&#39;Tabor&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reset_tabor</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;AWG unknown&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span></div>
+            
+    <span class="k">def</span> <span class="nf">_reset_tek</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        reset Tektronix AWG to first sequence</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tries</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">get_seq_position</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tries</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Tektronix AWG does not respond. Aborting.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;AWG did not reset to first waveform after </span><span class="si">%i</span><span class="s1"> iterations. There is something seriously going wrong. Check if AWG can enter run mode!&#39;</span><span class="o">%</span><span class="n">tries</span><span class="p">)</span>
+            <span class="n">tries</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+            <span class="c1">#self.awg.wait()</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.025</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">tries</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tektronix AWG reached first waveform after </span><span class="si">%d</span><span class="s1"> iterations.&#39;</span><span class="o">%</span><span class="n">tries</span><span class="p">)</span>
+                
+    <span class="k">def</span> <span class="nf">_reset_tabor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        reset Tabor AWG to first sequence</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># workaround to intialize to first waveform and make the AWG ready</span>
+        <span class="k">if</span> <span class="s2">&quot;p1_runmode&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_p1_runmode</span><span class="p">(</span><span class="s1">&#39;USER&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_p2_runmode</span><span class="p">(</span><span class="s1">&#39;USER&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_p1_runmode</span><span class="p">(</span><span class="s1">&#39;SEQ&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_p2_runmode</span><span class="p">(</span><span class="s1">&#39;SEQ&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_runmode</span><span class="p">(</span><span class="s1">&#39;USER&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_runmode</span><span class="p">(</span><span class="s1">&#39;SEQ&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

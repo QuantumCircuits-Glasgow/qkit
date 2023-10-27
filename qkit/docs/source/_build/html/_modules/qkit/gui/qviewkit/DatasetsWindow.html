@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.gui.qviewkit.DatasetsWindow &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.gui.qviewkit.DatasetsWindow</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.gui.qviewkit.DatasetsWindow</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: hannes.rotzinger@kit.edu / 2015,2016,2017 </span>
+<span class="sd">         marco.pfirrmann@kit.edu / 2016, 2017</span>
+<span class="sd">@license: GPL</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span><span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">qkit</span>
+<span class="c1"># support both PyQt4 and 5</span>
+<span class="n">in_pyqt5</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">in_pyqt4</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">QtCore</span>
+    <span class="kn">import</span> <span class="nn">PyQt5.QtWidgets</span> <span class="k">as</span> <span class="nn">QtGui</span>
+    <span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">pyqtSignal</span><span class="p">,</span> <span class="n">pyqtSlot</span><span class="p">,</span> <span class="n">QObject</span><span class="p">,</span><span class="n">QTimer</span>
+    <span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QMainWindow</span><span class="p">,</span> <span class="n">QApplication</span><span class="p">,</span> <span class="n">QFileDialog</span>
+    <span class="n">in_pyqt5</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">in_pyqt5</span><span class="p">:</span>    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+        <span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+        <span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+        <span class="n">in_pyqt4</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;import of PyQt5 and PyQt4 failed. Install one of those.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">from</span> <span class="nn">qkit.gui.qviewkit.main_view</span> <span class="kn">import</span> <span class="n">Ui_MainWindow</span>
+<span class="kn">from</span> <span class="nn">qkit.core.lib.misc</span> <span class="kn">import</span>  <span class="n">str3</span>
+
+<div class="viewcode-block" id="DatasetsWindow"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow">[docs]</a><span class="k">class</span> <span class="nc">DatasetsWindow</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">,</span> <span class="n">Ui_MainWindow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;DatasetsWindow fills the frame of the Ui_MainWindow.</span>
+
+<span class="sd">    This class reads the file content and displays i.e. the dataset tree and</span>
+<span class="sd">    the dataset attributes and handles the signal slots from the UI buttons</span>
+<span class="sd">    i.e. the checking/unchecking of the live option.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">refresh_signal</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="n">pw_refresh_signal</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">DATA</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Inits DatasetsWindows with a DATA object coming from the main call</span>
+<span class="sd">        in main.py.</span>
+
+<span class="sd">        The Ui_MainWindow gets set up, the signal slots to the UI buttons get</span>
+<span class="sd">        connected and set_cmd_options() evaluates the parsed arguments of the </span>
+<span class="sd">        main call.</span>
+<span class="sd">        Once a file is opened the handle functions emmit signals as soon as </span>
+<span class="sd">        some user interaction happens (i.e. a dataset is clicked to be opened)</span>
+<span class="sd">        and update_plots() emmits the update signal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span> <span class="o">=</span> <span class="n">DATA</span>
+        <span class="c1">#QMainWindow.__init__(self,None,Qt.WindowStaysOnTopHint)</span>
+        <span class="n">QMainWindow</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">WA_DeleteOnClose</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        
+        <span class="c1"># set up User Interface (widgets, layout...)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Qviewkit&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">treeWidget</span><span class="o">.</span><span class="n">setHeaderHidden</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">refreshTime_value</span> <span class="o">=</span> <span class="mi">2000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_refresh</span>  <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_force_live_plot</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_signal_slots</span><span class="p">()</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_timer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_cmd_options</span><span class="p">()</span>
+        
+        
+<div class="viewcode-block" id="DatasetsWindow.setup_timer"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.setup_timer">[docs]</a>    <span class="k">def</span> <span class="nf">setup_timer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="n">QTimer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_update_onoff</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="DatasetsWindow.set_cmd_options"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.set_cmd_options">[docs]</a>    <span class="k">def</span> <span class="nf">set_cmd_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># prepare datasets to display</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+            <span class="n">dss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            
+            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">dss</span><span class="p">:</span>
+                <span class="n">fd</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">dsp</span> <span class="o">=</span> <span class="s2">&quot;/entry/data0/&quot;</span><span class="o">+</span><span class="n">fd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">ds_cmd_open</span><span class="p">[</span><span class="n">dsp</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">dsp</span> <span class="o">=</span> <span class="s2">&quot;/entry/&quot;</span><span class="o">+</span><span class="n">fd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">fd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">ds_cmd_open</span><span class="p">[</span><span class="n">dsp</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Display:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">ds_cmd_open</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">DataFilePath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_file</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">refresh_time</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refreshTime</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">refresh_time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_refresh_time_handler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">refresh_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">live_plot</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">liveCheckBox</span><span class="o">.</span><span class="n">click</span><span class="p">()</span></div>
+            <span class="c1">#self.live_update_onoff()</span>
+            
+    <span class="k">def</span> <span class="nf">_setup_signal_slots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">treeWidget</span><span class="o">.</span><span class="n">itemChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handleChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">treeWidget</span><span class="o">.</span><span class="n">itemSelectionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">handleSelectionChanged</span><span class="p">))</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">refreshTime</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_refresh_time_handler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateButton</span><span class="o">.</span><span class="n">released</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_file</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">FileButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">liveCheckBox</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_update_onoff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_file</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DatasetsWindow.closeEvent"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.closeEvent">[docs]</a>    <span class="k">def</span> <span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">widgetList</span> <span class="o">=</span> <span class="n">QApplication</span><span class="o">.</span><span class="n">topLevelWidgets</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">_remove_plot_widgets</span><span class="p">(</span> <span class="n">closeAll</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">set_info_thread_continue</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span></div>
+    
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_close_plot_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">_remove_plot_widgets</span><span class="p">()</span>
+                
+<div class="viewcode-block" id="DatasetsWindow.live_update_onoff"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.live_update_onoff">[docs]</a>    <span class="k">def</span> <span class="nf">live_update_onoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">liveCheckBox</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">refreshTime_value</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">heardBeat</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+    
+    <span class="k">def</span> <span class="nf">_disable_live_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_force_live_plot</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="s1">&#39;entry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;updating&#39;</span><span class="p">,</span><span class="kc">True</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">liveCheckBox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_force_live_plot</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># don&#39;t disable the live plot if it is manually enabled again</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">qkit</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Qviewkit/DatasetsWindow.py: Error on checking for live plot: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_refresh_time_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">refreshTime</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refreshTime_value</span> <span class="o">=</span> <span class="n">refreshTime</span><span class="o">*</span><span class="mi">1000</span> <span class="c1"># ms -&gt; s</span>
+        
+<div class="viewcode-block" id="DatasetsWindow.populate_data_list"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.populate_data_list">[docs]</a>    <span class="k">def</span> <span class="nf">populate_data_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        populate_data_list is called regularly withing the refresh cycle to</span>
+<span class="sd">        update the data tree.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">treeWidget</span><span class="o">.</span><span class="n">invisibleRootItem</span><span class="p">()</span>
+        <span class="n">column</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">parents</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">s</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;itterate over the whole entry tree and collect the attributes &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">pentry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="s2">&quot;/entry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">tree_key</span> <span class="o">=</span> <span class="s2">&quot;/entry/&quot;</span><span class="o">+</span><span class="n">pentry</span>
+            <span class="k">if</span> <span class="n">tree_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">ds_tree_items</span><span class="p">:</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addParent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">pentry</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">ds_tree_items</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent</span>
+                <span class="n">parents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">ds_tree_items</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span>
+                
+            <span class="n">s</span><span class="o">=</span> <span class="s2">&quot;comment:</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">str3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comment&#39;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">))</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">dataset_info</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+            
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">centry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="n">tree_key</span> <span class="o">=</span> <span class="s2">&quot;/entry/&quot;</span><span class="o">+</span><span class="n">pentry</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">centry</span>
+                <span class="k">if</span> <span class="n">tree_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">ds_tree_items</span><span class="p">:</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">centry</span><span class="p">),</span><span class="n">tree_key</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">ds_tree_items</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+                    
+                    <span class="k">if</span> <span class="n">tree_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">ds_cmd_open</span><span class="p">:</span>
+                        <span class="c1"># the order of the following two lines are important! otherwise two plots are opened</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">append_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">item</span><span class="p">,</span><span class="n">tree_key</span><span class="p">)</span>
+                        <span class="n">item</span><span class="o">.</span><span class="n">setCheckState</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Checked</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">update_plots</span><span class="p">()</span>
+                       
+                <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">s</span><span class="o">=</span><span class="s2">&quot;shape</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                        <span class="n">s</span> <span class="o">+=</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">str3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="n">s</span><span class="o">=</span><span class="s2">&quot;shape</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span> 
+                        <span class="n">s</span> <span class="o">+=</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;catch: populate data list:&quot;</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">dataset_info</span><span class="p">[</span><span class="n">tree_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span></div>
+               
+<div class="viewcode-block" id="DatasetsWindow.addParent"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.addParent">[docs]</a>    <span class="k">def</span> <span class="nf">addParent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QTreeWidgetItem</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="p">[</span><span class="n">title</span><span class="p">])</span>
+        <span class="c1">#item.setData(column, QtCore.Qt.UserRole, data)</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">setChildIndicatorPolicy</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QTreeWidgetItem</span><span class="o">.</span><span class="n">ShowIndicator</span><span class="p">)</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">setExpanded</span> <span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="DatasetsWindow.addChild"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.addChild">[docs]</a>    <span class="k">def</span> <span class="nf">addChild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QTreeWidgetItem</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="p">[</span><span class="n">title</span><span class="p">])</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">UserRole</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">setCheckState</span> <span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Unchecked</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="DatasetsWindow.handleChanged"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.handleChanged">[docs]</a>    <span class="k">def</span> <span class="nf">handleChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">column</span><span class="p">):</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;/entry/&quot;</span><span class="o">+</span><span class="n">item</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">column</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">item</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">column</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">checkState</span><span class="p">(</span><span class="n">column</span><span class="p">)</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Checked</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">plot_is_open</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+                <span class="s2">&quot;this condition occures when the ds is opened from the cmd-l&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">append_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">item</span><span class="p">,</span><span class="n">ds</span><span class="p">)</span>
+
+            <span class="c1"># this is a not very sound hack of a concurrency problem!</span>
+            <span class="c1"># better to use a locking technique            </span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_file</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_plots</span><span class="p">()</span>
+                
+            <span class="c1"># uncheck </span>
+            <span class="n">window</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">open_plots</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)]</span>
+            <span class="n">window</span><span class="o">.</span><span class="n">destroyed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_close_plot_window</span><span class="p">)</span>
+                
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">checkState</span><span class="p">(</span><span class="n">column</span><span class="p">)</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Unchecked</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">plot_is_open</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">remove_plot</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">),</span><span class="n">ds</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="DatasetsWindow.handleSelectionChanged"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.handleSelectionChanged">[docs]</a>    <span class="k">def</span> <span class="nf">handleSelectionChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">getSelected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">treeWidget</span><span class="o">.</span><span class="n">selectedItems</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">getSelected</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="p">():</span>
+            <span class="n">ds</span> <span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;/entry/&quot;</span><span class="o">+</span><span class="n">getSelected</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">getSelected</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">Dataset_properties</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Dataset_properties</span><span class="o">.</span><span class="n">insertPlainText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">dataset_info</span><span class="p">[</span><span class="n">ds</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="s2">&quot;/entry/&quot;</span><span class="o">+</span><span class="n">getSelected</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">Dataset_properties</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Dataset_properties</span><span class="o">.</span><span class="n">insertPlainText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">dataset_info</span><span class="p">[</span><span class="n">ds</span><span class="p">])</span></div>
+ 
+            
+<div class="viewcode-block" id="DatasetsWindow.update_file"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.update_file">[docs]</a>    <span class="k">def</span> <span class="nf">update_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;update_file is regularly called when _something_ has to be updated. open-&gt; do something-&gt;close&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">DataFilePath</span><span class="p">),</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">populate_data_list</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_plots</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_disable_live_update</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            
+            <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">DataFilePath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">5</span><span class="p">:])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">showMessage</span><span class="p">((</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">s</span><span class="p">))</span>
+            
+            <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Qviewkit: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">DataFilePath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">:][</span><span class="mi">0</span><span class="p">][:</span><span class="mi">6</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DatasetsWindow.open_file"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.open_file">[docs]</a>    <span class="k">def</span> <span class="nf">open_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">in_pyqt5</span><span class="p">:</span>
+            <span class="n">_DataFilePath</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;*.h5&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">in_pyqt4</span><span class="p">:</span>
+            <span class="n">_DataFilePath</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;*.h5&quot;</span><span class="p">))</span>
+            
+        <span class="k">if</span> <span class="n">_DataFilePath</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">DataFilePath</span> <span class="o">=</span> <span class="n">_DataFilePath</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">DataFilePath</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">populate_data_list</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">h5file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            
+            <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">DataFilePath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">5</span><span class="p">:])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">showMessage</span><span class="p">((</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">s</span><span class="p">))</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Qviewkit: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">DataFilePath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">:][</span><span class="mi">0</span><span class="p">][:</span><span class="mi">6</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="DatasetsWindow.update_plots"><a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.DatasetsWindow.DatasetsWindow.update_plots">[docs]</a>    <span class="k">def</span> <span class="nf">update_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

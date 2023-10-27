@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.analysis.circle_fit.circle_fit_classic.calibration &mdash; QKIT 0.3 alpha documentation</title>
+      <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            QKIT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">qkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../_notebooks/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../Contributing.html">How to contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">QKIT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.analysis.circle_fit.circle_fit_classic.calibration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.analysis.circle_fit.circle_fit_classic.calibration</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+
+<div class="viewcode-block" id="calibration"><a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration">[docs]</a><span class="k">class</span> <span class="nc">calibration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    some useful tools for manual calibration</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="calibration.normalize_zdata"><a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_zdata">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_zdata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">cal_z_data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">z_data</span><span class="o">/</span><span class="n">cal_z_data</span></div>
+        
+<div class="viewcode-block" id="calibration.normalize_amplitude"><a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">cal_ampdata</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">z_data</span><span class="o">/</span><span class="n">cal_ampdata</span></div>
+        
+<div class="viewcode-block" id="calibration.normalize_phase"><a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_phase">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">cal_phase</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">z_data</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">cal_phase</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="calibration.normalize_by_func"><a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.normalize_by_func">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_by_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">z_data</span><span class="o">/</span><span class="n">func</span><span class="p">(</span><span class="n">f_data</span><span class="p">)</span></div>
+        
+    <span class="k">def</span> <span class="nf">_baseline_als</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">lam</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        see http://zanran_storage.s3.amazonaws.com/www.science.uva.nl/ContentPages/443199618.pdf</span>
+<span class="sd">        &quot;Asymmetric Least Squares Smoothing&quot; by P. Eilers and H. Boelens in 2005.</span>
+<span class="sd">        http://stackoverflow.com/questions/29156532/python-baseline-correction-library</span>
+<span class="sd">        &quot;There are two parameters: p for asymmetry and lambda for smoothness. Both have to be</span>
+<span class="sd">        tuned to the data at hand. We found that generally 0.001&lt;=p&lt;=0.1 is a good choice</span>
+<span class="sd">        (for a signal with positive peaks) and 10e2&lt;=lambda&lt;=10e9, but exceptions may occur.&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">L</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">niter</span><span class="p">):</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">spdiags</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+            <span class="n">Z</span> <span class="o">=</span> <span class="n">W</span> <span class="o">+</span> <span class="n">lam</span> <span class="o">*</span> <span class="n">D</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">w</span><span class="o">*</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">z</span>
+        
+<div class="viewcode-block" id="calibration.fit_baseline_amp"><a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.fit_baseline_amp">[docs]</a>    <span class="k">def</span> <span class="nf">fit_baseline_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">lam</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        for this to work, you need to analyze a large part of the baseline</span>
+<span class="sd">        tune lam and p until you get the desired result</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_baseline_als</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">z_data</span><span class="p">),</span><span class="n">lam</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">niter</span><span class="o">=</span><span class="n">niter</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="calibration.baseline_func_amp"><a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.baseline_func_amp">[docs]</a>    <span class="k">def</span> <span class="nf">baseline_func_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">lam</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        for this to work, you need to analyze a large part of the baseline</span>
+<span class="sd">        tune lam and p until you get the desired result</span>
+<span class="sd">        returns the baseline as a function</span>
+<span class="sd">        the points in between the datapoints are computed by cubic interpolation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_baseline_als</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">z_data</span><span class="p">),</span><span class="n">lam</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">niter</span><span class="o">=</span><span class="n">niter</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="calibration.baseline_func_phase"><a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.baseline_func_phase">[docs]</a>    <span class="k">def</span> <span class="nf">baseline_func_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">lam</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        for this to work, you need to analyze a large part of the baseline</span>
+<span class="sd">        tune lam and p until you get the desired result</span>
+<span class="sd">        returns the baseline as a function</span>
+<span class="sd">        the points in between the datapoints are computed by cubic interpolation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_baseline_als</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">z_data</span><span class="p">),</span><span class="n">lam</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">niter</span><span class="o">=</span><span class="n">niter</span><span class="p">),</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="calibration.fit_baseline_phase"><a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.calibration.calibration.fit_baseline_phase">[docs]</a>    <span class="k">def</span> <span class="nf">fit_baseline_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">lam</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        for this to work, you need to analyze a large part of the baseline</span>
+<span class="sd">        tune lam and p until you get the desired result</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_baseline_als</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">z_data</span><span class="p">),</span><span class="n">lam</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">niter</span><span class="o">=</span><span class="n">niter</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, QKITgroup.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
