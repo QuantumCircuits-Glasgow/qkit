@@ -1180,7 +1180,7 @@ class transport(object):
         -------
         None
         """
-        self._sweep_mode = self._IVD.get_sweep_mode()  # 0 (VV-mode) | 1 (IV-mode) | 2 (VI-mode)
+        self._sweep_mode = self._IVD.get_sweep_mode()  # 0 (VV-mode) | 1 (IV-mode) | 2 (VI-mode) | 3 (II-mode)
         self._bias = self._IVD.get_sweep_bias()  # 0 (current bias) | 1 (voltage bias)
         self._IV_modes = {0: 'I', 1: 'V'}
         self._IV_units = {0: 'A', 1: 'V'}
@@ -1447,9 +1447,10 @@ class transport(object):
         start = float(sweep[0])
         stop = float(sweep[1])
         step = float(sweep[2])
-        nop = int(round(abs((stop-start)/step)+1))
-        arr = np.linspace(start, np.sign(stop-start)*(np.floor(np.abs(np.round(float(stop-start)/step)))*step)+start, nop)  # stop is rounded down to multiples of step
-        return np.array([np.sign(val)*round(np.abs(val), -int(np.floor(np.log10(np.abs(step))))+1) for val in arr])  # round to overcome missing precision of numpy linspace
+        ndigits = -int(np.floor(np.log10(np.abs(step)))) + 1
+        nop = int(abs((stop - start) / step + np.sign(stop - start) * step / 100)) + 1
+        return np.round(np.linspace(start, np.sign(stop - start) * (nop - 1) * step + start, nop), # stop is rounded down to multiples of step
+                        decimals=ndigits)  # every element is rounded to overcome missing precision of numpy linspace
     
     def _get_numder_comment(self, name):
         """
@@ -1543,8 +1544,15 @@ class transport(object):
                                                      view_params={"labels": ('V', 'I'),
                                                                   'plot_style': 1,
                                                                   'markersize': 5})
+        self._hdf_view_VI = self._data_file.add_view('VI',
+                                                     x=self._hdf_I[0],
+                                                     y=self._hdf_V[0],
+                                                     view_params={"labels": ('I', 'V'),
+                                                                  'plot_style': 1,
+                                                                  'markersize': 5})
         for i in range(1, self.sweeps.get_nos()):
             self._hdf_view_IV.add(x=self._hdf_V[i], y=self._hdf_I[i])
+            self._hdf_view_VI.add(x=self._hdf_I[i], y=self._hdf_V[i])
         if self._dVdI:
             self._hdf_view_dVdI = self._data_file.add_view('dVdI',
                                                            x=self._hdf_I[0],
@@ -1574,7 +1582,13 @@ class transport(object):
             self.sweeps.create_iterator()
             for j in range(self.sweeps.get_nos()):
                 # take data
-                I_values, V_values = self.take_IV(sweep=self.sweeps.get_sweep())
+                if (self._IVD.get_sweep_mode()%2 == 0): #volt bias
+                    V_values, I_values = self.take_IV(sweep=self.sweeps.get_sweep())
+                elif(self._IVD.get_sweep_mode()%2 == 1): #curr bias
+                    I_values, V_values = self.take_IV(sweep=self.sweeps.get_sweep())
+                else:
+                    raise Exception("Wrong sweep mode defined in SMU.")
+
                 data = {self._hdf_I[j]:(I_values,),
                         self._hdf_V[j]:(V_values,)} # tuple in oder to use *args later
                 if self._dVdI:
@@ -1618,8 +1632,15 @@ class transport(object):
                 self.sweeps.create_iterator()
                 for j in range(self.sweeps.get_nos()):
                     # take data
-                    for val, lst in zip(self.take_IV(sweep=self.sweeps.get_sweep()), [I_values, V_values]):
-                        lst[i].append(list(val))  # append as list in order to later use zip
+                    if (self._IVD.get_sweep_mode()%2 == 0): #volt bias
+                        for val, lst in zip(self.take_IV(sweep=self.sweeps.get_sweep()), [V_values, I_values]):
+                            lst[i].append(list(val))  # append as list in order to later use zip
+                    elif(self._IVD.get_sweep_mode()%2 == 1): #curr bias
+                        for val, lst in zip(self.take_IV(sweep=self.sweeps.get_sweep()), [I_values, V_values]):
+                            lst[i].append(list(val))  # append as list in order to later use zip
+                    else:
+                        raise Exception("Wrong sweep mode defined in SMU.")
+
                     I_values_avg, V_values_avg = np.mean(list(zip(*I_values))[j], axis=0), np.mean(list(zip(*V_values))[j], axis=0)  # use zip since np.mean cannot handle different shapes
                     data = {self._hdf_I[j]:I_values_avg,
                             self._hdf_V[j]:V_values_avg}
