@@ -1,6 +1,17 @@
 # This file brings QKIT around: init 
 # YS@KIT/2017
 # HR@kit/2017
+
+'''
+This file sets up the logger and loads the core modules of the Qkit framework.
+Runs all the setup scripts in the s_init directory.
+
+This start() function is called by the qkit/__init__.py file.
+Based on the environment file variables in qkit/config/environment.py,
+, it loads the core modules of the Qkit framework.
+
+
+'''
 import qkit
 import os
 import importlib

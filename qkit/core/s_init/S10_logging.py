@@ -1,7 +1,30 @@
 import qkit
-import os
+import os,sys
 import logging
 from time import strftime
+
+class CustomFormatter(logging.Formatter):
+    purple = "\x1b[35;1m"
+    blue = "\x1b[34;1m"
+    yellow = "\x1b[43;34;1m"
+    red = "\x1b[31;1m"
+    bold_red = "\x1b[31;43;1m"
+    reset = "\x1b[0m"
+    
+    format = '%(asctime)s [ %(levelname)-4s ]|: %(message)s <%(filename)s :%(funcName)s:%(lineno)d>'
+
+    FORMATS = {
+        logging.DEBUG: purple + format + reset,
+        logging.INFO: blue + format + reset,
+        logging.WARNING: yellow + format + reset,
+        logging.ERROR: red + format + reset,
+        logging.CRITICAL: bold_red + format + reset
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt,datefmt='%Y-%m-%d %H:%M:%S')
+        return formatter.format(record)
 
 
 def cleanup_logfiles():
@@ -20,26 +43,27 @@ def cleanup_logfiles():
 
 
 def _setup_logging():
-    fileLogLevel = getattr(logging, qkit.cfg.get('file_log_level', 'WARNING'))
-    stdoutLogLevel = getattr(logging, qkit.cfg.get('stdout_log_level', 'WARNING'))
+
+    level=getattr(logging, qkit.cfg.get('debug', 'WARNING'))
+
+    fileLogLevel = getattr(logging, qkit.cfg.get('file_log_level', 'WARNING'))# repeat
+    stdoutLogLevel = getattr(logging, qkit.cfg.get('stdout_log_level', 'WARNING')) #
     
     rootLogger = logging.getLogger()
     
     fileLogger = logging.FileHandler(filename=os.path.join(qkit.cfg['logdir'], strftime('qkit_%Y%m%d_%H%M%S.log')), mode='a+')
     fileLogger.setFormatter(
-            logging.Formatter('%(asctime)s %(levelname)-8s: %(message)s (%(filename)s:%(lineno)d)',
+            logging.Formatter('%(asctime)s %(levelname)-4s: %(message)s <%(pathname)s -> %(module)s->%(funcName)s:%(lineno)d>',
                               datefmt='%Y-%m-%d %H:%M:%S'))
-    fileLogger.setLevel(fileLogLevel)
-    
-    jupyterLogger = logging.StreamHandler()
-    jupyterLogger.setFormatter(
-            logging.Formatter('%(asctime)s [%(levelname)-8s]: %(message)s (%(filename)s:%(lineno)d)',
-                              datefmt='%Y-%m-%d %H:%M:%S'))
-    jupyterLogger.setLevel(stdoutLogLevel)
+    fileLogger.setLevel(min(level, fileLogLevel))
+
+    jupyterLogger = logging.StreamHandler(sys.stdout)
+    jupyterLogger.setFormatter(CustomFormatter())
+    jupyterLogger.setLevel(level) # thows to the jupyter output
     
     rootLogger.addHandler(fileLogger)
     rootLogger.addHandler(jupyterLogger)
-    rootLogger.setLevel(min(stdoutLogLevel, fileLogLevel))
+    rootLogger.setLevel(min(level, fileLogLevel))
     
     logging.info(' ---------- LOGGING STARTED ---------- ')
     
@@ -48,6 +72,9 @@ def _setup_logging():
     
     cleanup_logfiles()
 
+
+
+#NOT USED
 def set_debug(enable):
     logger = logging.getLogger()
     if enable:

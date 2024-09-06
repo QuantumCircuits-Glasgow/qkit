@@ -18,7 +18,8 @@ class ConfClass(dict):
         """ Sets basic settings, most of the services are not loaded (default)
             The file index service is run and the UUID registry is populated.
         """
-
+        self['debug']          = False
+        
         self['load_info_service'] = False
         self['load_ri_service']   = False
         self['load_visa']         = False
