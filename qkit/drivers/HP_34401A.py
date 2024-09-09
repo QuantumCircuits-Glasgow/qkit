@@ -153,7 +153,10 @@ class HP_34401A(Instrument):
         self._visainstrument.write(com_str)
         sleep(0.1)
         return self.get_measurement_mode()
-
+	
+	
+	
+	
     def set_range_resolution(self,new_range,new_res):
         new_range = float(new_range)
         new_res = float(new_res)
@@ -208,9 +211,17 @@ class HP_34401A(Instrument):
         self._visainstrument.write(com_str)
         sleep(0.5)
         res_str = self._visainstrument.read()
+		#print(mode)
         return float(res_str)
 
-
+    def measure_R(self):
+        mode = 'RES'
+        com_str = "MEAS:%s?" % mode
+        self._visainstrument.write(com_str)
+        sleep(0.5)
+        res_str = self._visainstrument.read()
+		#print(mode)
+        return float(res_str)
 ## testing:
 
 """ if __name__ == "__main__":
