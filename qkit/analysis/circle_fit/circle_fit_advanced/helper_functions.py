@@ -11,7 +11,17 @@ author = Wridhdhisom Karar
 University of Glasgow, 2024
 
 '''
-
+def Watt2dBm(x):
+	'''
+	converts from units of watts to dBm
+	'''
+	return 10.*np.log10(x*1000.)
+	
+def dBm2Watt(x):
+	'''
+	converts from units of watts to dBm
+	'''
+	return 10**(x/10.) /1000.	
 
 def soft_averager(z_data_raw:np.ndarray,averages:int=20)->np.ndarray:
     '''

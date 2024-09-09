@@ -14,7 +14,8 @@ import scipy.optimize as spopt
 from scipy import stats
 from scipy.interpolate import splrep, splev
 from scipy.ndimage.filters import gaussian_filter1d
-from .helper_functions import soft_averager
+from .helper_functions import *
+import scipy.constants as const
 
 
 plot_enable = False
@@ -110,7 +111,7 @@ class CircleFitter(object):
             z_data = self.z_data_raw - np.complex(self.xc,self.yc)
         # Find first estimate of parameters
             # fr, Ql, theta, self.delay_excess = self._fit_phase(z_data) # put this into auto delay calculation, no need TODO
-        print(self.delay,self.fitresults)
+        logging.info(f'the delay is {self.delay} ns, \n fitresults : {self.fitresults}')
         self._calibrate() # finds all the parameters after phase fit, and delay fit ;6 parameters
         self._normalize()
         self._extract_Qs(calc_errors=calc_errors)
@@ -620,40 +621,40 @@ class CircleFitter(object):
         real_norm=self.z_data_norm.real
         imag_norm=self.z_data_norm.imag
 
-        plt.subplot(221, aspect="equal")
-        plt.axvline(0, c="k", ls="--", lw=1)
-        plt.axhline(0, c="k", ls="--", lw=1)
-        plt.plot(real,imag,label='rawdata')
-        plt.plot(real2,imag2,label='fit')
-        plt.xlabel('Re(S21)')
-        plt.ylabel('Im(S21)')
-        plt.legend()
+        fig,axs=plt.subplots(2, 2,gridspec_kw={'width_ratios': [1,1],'height_ratios': [1,1]},figsize=(8,7))
+        axs[0,0].axvline(0, c="k", ls="--", lw=1)
+        axs[0,0].axhline(0, c="k", ls="--", lw=1)
+        axs[0,0].plot(real,imag,label='rawdata')
+        axs[0,0].plot(real2,imag2,label='fit')
+        axs[0,0].set_aspect("equal",adjustable='datalim')
+        axs[0,0].set_xlabel('Re(S21)',fontsize = 12)
+        axs[0,0].set_ylabel('Im(S21)',fontsize = 12)
+        axs[0,0].legend()
 
         imag_cannonical=imag-self.offrespoint.imag
-        plt.subplot(222, aspect="equal")
-        plt.axvline(0, c="k", ls="--", lw=1)
-        plt.axhline(0, c="k", ls="--", lw=1)
-        plt.scatter(real,imag_cannonical,label='raw_canonical',s=2,color='b')
-        plt.scatter(real_norm,imag_norm,label='norm-data',s=2,color='r')
-        # plt.plot(real2,imag2,label='fit')
-        plt.xlabel('Re(S21)')
-        plt.ylabel('Im(S21)')
-        plt.legend()
+        axs[0,1].set_aspect("equal",adjustable='datalim')
+        axs[0,1].axvline(0, c="k", ls="--", lw=1)
+        axs[0,1].axhline(0, c="k", ls="--", lw=1)
+        axs[0,1].scatter(real,imag_cannonical,label='raw_canonical',s=3,color='b')
+        axs[0,1].scatter(real_norm,imag_norm,label='norm-data',s=2,color='r')
+        axs[0,1].set_xlabel('Re(S21)',fontsize = 12)
+        axs[0,1].set_ylabel('Im(S21)',fontsize = 12)
+        axs[0,1].legend(loc=1)
 
-        plt.subplot(223)
-        plt.plot(self.f_data*1e-9,np.absolute(self.z_data_raw),label='rawdata')
-        plt.plot(self.f_data*1e-9,np.absolute(self.z_data_sim),label='fit')
-        plt.xlabel('f (GHz)')
-        plt.ylabel('|S21|')
-        plt.legend()
 
-        plt.subplot(224)
-        plt.plot(self.f_data*1e-9,np.angle(self.z_data_raw),label='rawdata')
-        plt.plot(self.f_data*1e-9,np.angle(self.z_data_sim),label='fit')
-        plt.xlabel('f (GHz)')
-        plt.ylabel('arg(|S21|)')
-        plt.legend()
-        plt.tight_layout()
+        axs[1,0].plot(self.f_data*1e-9,np.absolute(self.z_data_raw),label='rawdata')
+        axs[1,0].plot(self.f_data*1e-9,np.absolute(self.z_data_sim),label='fit')
+        axs[1,0].set_xlabel('f (GHz)',fontsize = 12)
+        axs[1,0].set_ylabel('|S21|',fontsize = 12)
+        axs[1,0].legend()
+
+        axs[1,1].plot(self.f_data*1e-9,np.angle(self.z_data_raw),label='rawdata')
+        axs[1,1].plot(self.f_data*1e-9,np.angle(self.z_data_sim),label='fit')
+        axs[1,1].set_xlabel('f (GHz)',fontsize = 12)
+        axs[1,1].set_ylabel('arg(|S21|)',fontsize = 12)
+        axs[1,1].legend()
+
+        fig.tight_layout()
         plt.show()
         
     def plotcalibrateddata(self):
@@ -699,6 +700,50 @@ class CircleFitter(object):
         plt.ylabel('arg(|S21|)')
         plt.legend()
         plt.show()
+
+
+    def get_single_photon_limit(self,unit='dBm',diacorr=True):
+        '''
+	    returns the amout of power in units of W necessary
+		to maintain one photon on average in the cavity
+		unit can be 'dBm' or 'watt'
+	    '''
+        if self.fitresults!={}:
+            fr = self.fitresults['fr']
+            if diacorr:
+                k_c = 2*np.pi*fr/self.fitresults['Qc']
+                k_i = 2*np.pi*fr/self.fitresults['Qi']
+            else:
+                k_c = 2*np.pi*fr/self.fitresults['Qc_abs']
+                k_i = 2*np.pi*fr/self.fitresults['Qi_no_dia_corr']
+            if unit=='dBm':
+                return Watt2dBm(1./(4.*k_c/(2.*np.pi*const.hbar*fr*(k_c+k_i)**2)))
+            elif unit=='watt':
+                return 1./(4.*k_c/(2.*np.pi*const.hbar*fr*(k_c+k_i)**2))				  
+        else:
+            logging.warning('Please perform the fit first',UserWarning)
+            return None
+        
+    def get_photons_in_resonator(self,power,unit='dBm',diacorr=True):
+        '''
+        returns the average number of photons
+        for a given power in units of W
+        unit can be 'dBm' or 'watt'
+        '''
+        if self.fitresults!={}:
+            if unit=='dBm':
+                power = dBm2Watt(power)
+            fr = self.fitresults['fr']
+            if diacorr:
+                k_c = 2*np.pi*fr/self.fitresults['Qc']
+                k_i = 2*np.pi*fr/self.fitresults['Qi']
+            else:
+                k_c = 2*np.pi*fr/self.fitresults['Qc_abs']
+                k_i = 2*np.pi*fr/self.fitresults['Qi_no_dia_corr']
+            return 4.*k_c/(2.*np.pi*const.hbar*fr*(k_c+k_i)**2) * power
+        else:
+            logging.warning('Please perform the fit first',UserWarning)
+            return None	
     
 # class reflection_port(circuit):
 #     """
@@ -714,4 +759,4 @@ class notch_port(CircleFitter):
     """
     
     # See Sij of circuit class for explanation
-    n_ports = 2.
+    n_ports = 2

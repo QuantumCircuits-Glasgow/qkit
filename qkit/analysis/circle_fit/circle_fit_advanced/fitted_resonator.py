@@ -90,7 +90,7 @@ class FittedResonator(Resonator):
 
         '''
         if self._powers>1 and index: # here sij is 2D
-            for i,power in enumerate(self._pow):
+            for i,power in reversed(list(enumerate(self._pow))):
                 result=self.fit(self._sij[:,i],self._f,power,delay=self.delay) #result is a dictionary #FIX this which index to take later TODO
                 self._fit_params.append({"power":power,
                                          "result":result})
