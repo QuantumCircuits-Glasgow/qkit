@@ -28,10 +28,10 @@ class Keysight_VNA_P50xxA(Instrument):
         self._ci=int(channel_id)
         self.cw_mode=cw_mode
         self._edel=0
-        #self._freqpoints=None
-        #self._nop=None
-        #self._startfreq=None
-        #self._stopfreq=None
+        self._freqpoints=0
+        self._nop=None
+        self._startfreq=None
+        self._stopfreq=None
 
         self.add_parameter("averages", flag=Instrument.FLAG_GETSET, type=int,
             units="", minval=1)
@@ -89,7 +89,7 @@ class Keysight_VNA_P50xxA(Instrument):
         self.get_sweeptime()
         self.get_sweepmode()
         self.get_rf_output()
-        
+        self.get_edel()
     ###
     ###
 
@@ -115,7 +115,7 @@ class Keysight_VNA_P50xxA(Instrument):
     def avg_clear(self):
         self.write("SENS{}:AVER:CLE".format(self._ci))
 
-    def data_format(self, value="ASC"):
+    def data_format(self, value="REAL64"):
         if value=="ASC": self.write("FORM ASC")
         elif value =="REAL32": self.write("FORM REAL,32")
         elif value =="REAL64": self.write("FORM REAL,64")
@@ -125,11 +125,11 @@ class Keysight_VNA_P50xxA(Instrument):
         self.write("SENS{}:SWE:TIME:AUTO ON".format(self._ci))
     
     def get_tracedata(self, format="AmpPha"):
-        self.write("FORM REAL,32") #for now use Real 32 bit data format
+        self.write("FORM:DATA REAL,64") #for now use Real 32 bit data format
         self.write('FORM:BORD SWAPPED') #byte order for GPIB data transfer
 
         data=self.ask_for_values("CALC{}:MEAS:DATA:SDATA?".format(self._ci))
-        dataRe=np.array(data[::2])
+        dataRe=np.array(data[0::2])
         dataIm=np.array(data[1::2])
 
         if format=="AmpPha":
@@ -153,13 +153,13 @@ class Keysight_VNA_P50xxA(Instrument):
 
 
     def get_freqpoints(self):
-        self.write("FORM REAL,32")
+        self.write("FORM:DATA REAL,64")
         self.write('FORM:BORD SWAPPED')
 
         if self.cw_mode:
             return self.get_cwfreq()
         else:
-            return self.ask_for_values("CALC{}:MEAS:DATA:X?".format(self._ci))
+            return self.ask_for_values("CALC{}:MEAS:RDAT? A".format(self._ci))
 
     ### GETs / SETs ###
     def do_get_Average(self):
@@ -205,22 +205,48 @@ class Keysight_VNA_P50xxA(Instrument):
             raise ValueError("VNA not in CW mode.")
         return
 
-    def do_get_edel(self):
-        #needs to first select the active measurement with CALC{}:PAR:SEL. All meas available through CALC{}:PAR:CAT?
-        ch_sel=self.ask("CALC{}:PAR:SEL?".format(self._ci)).strip("\n")
-        if ch_sel == '""':
-            ch_=self.ask("CALC{}:PAR:CAT?".format(self._ci)) #for now we select the first measurement chnl
-            self.write("CALC{}:PAR:SEL {}".format(self._ci,ch_.strip('"').split(",")[0]))
-        self._edel=self.ask("CALC{}:CORR:EDEL:TIME?".format(self._ci))
-        return self._edel
-    def do_set_edel(self, value):
-        ch_sel=self.ask("CALC{}:PAR:SEL?".format(self._ci)).strip("\n")
-        if ch_sel == '""':
-            ch_=self.ask("CALC{}:PAR:CAT?".format(self._ci)) 
-            self.write("CALC{}:PAR:SEL {}".format(self._ci,ch_.strip('"').split(",")[0]))
-        self.write("CALC{}:CORR:EDEL:TIME {}".format(self._ci, value))
-        self._edel=value
-        return
+    def do_set_edel(self, val):  # JB 2021
+
+         '''
+         Set electrical delay
+
+         '''
+         logging.debug(__name__ + ' : setting port extension to %s sec' % ( val))
+         #self.write('SENS1:CORR:EXT:PORT%i:TIME %.12f' % (channel, val))
+         self.write("CALC:MEAS:CORR:EDEL:TIME %.12f"%(val))
+         self._edel=val
+         return
+         
+     
+    def do_get_edel(self):   # JB 2021
+
+         '''
+         Get electrical delay
+
+         '''
+         logging.debug(__name__ + ' : getting port extension')
+         #self._edel = float(self.ask('SENS1:CORR:EXT:PORT%i:TIME?'% channel))
+         self._edel = float(self.ask("CALC:MEAS:CORR:EDEL:TIME?"))
+         return self._edel
+         
+    def do_set_edel_status(self, status):   # AS 04/2019
+
+         '''
+         Set electrical delay
+
+         '''
+         logging.debug(__name__ + ' : setting port extension status to %s' % (status))
+         self.write('SENS:CORR:EXT:STAT %i' % (status))
+         
+     
+    def do_get_edel_status(self):   # AS 04/2019
+
+         '''
+         Get electrical delay
+
+         '''
+         logging.debug(__name__ + ' :  port extension status')
+         return  self.ask('SENS:CORR:EXT:STAT?').strip() == "1"
 
     def do_get_nop(self):
         return self.ask("SENS{}:SWE:POIN?".format(self._ci))
@@ -292,12 +318,13 @@ class Keysight_VNA_P50xxA(Instrument):
 
     def start_measurement(self):
         self.avg_clear()
-        for i in range(self.get_averages()):
-            while(True):
-                if(int(self.ask("TRIG:STAT:READ? MAN"))) : break
-                sleep(0.05)
-            self.write("INIT:IMM")
-            sleep(0.1)
+        #for i in range(self.get_averages()):
+            #while(True):
+             
+                #if(int(self.ask("TRIG:STAT:READ? MAN"))) : break
+                #sleep(0.05)
+        self.write("INIT:IMM")
+        sleep(0.1)
 
 
     def post_measurement(self):

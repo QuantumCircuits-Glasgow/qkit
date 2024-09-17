@@ -21,7 +21,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+import qkit
 from qkit.core.instrument_base import Instrument
 from qkit import visa
 import types
@@ -29,6 +29,11 @@ import logging
 import numpy
 import struct
 import time
+
+
+
+
+
 
 import pyvisa.constants as vc
 
@@ -38,7 +43,7 @@ class Tabor_WX1284C(Instrument):
     This is the python driver for the Tabor Electronics Arbitrary Waveform Generator WX1284C/WX2184C
     '''
 
-    def __init__(self, name, address, chpair=None, reset=False, numchannels = 4):
+    def __init__(self, name, address, chpair= None, reset=False, numchannels = 4):
         '''
         Initializes the AWG WX1284C
         Input:
@@ -82,7 +87,7 @@ class Tabor_WX1284C(Instrument):
         
         
         
-        self._ins_VISA_INSTR = False#(self._visainstrument.resource_class == "INSTR") #check whether we have INSTR or SOCKET type
+        self._ins_VISA_INSTR = True#(self._visainstrument.resource_class == "INSTR") #check whether we have INSTR or SOCKET type
         
         self._awg_version = self.ask(":SYST:INF:MOD?") #gives model
         self._values = {}
@@ -375,24 +380,16 @@ class Tabor_WX1284C(Instrument):
             self.set('ch%i_marker_output'%i,True)
             self.set('ch%i_marker_high'%i,1)
 
-
-    def ask(self,cmd):
-        for i in range(15):
-            try:
-                logging.debug(__name__ + "(" +self.get_name()+" ask command:"+cmd[:100]+":")
-                return self._visainstrument.ask(cmd).strip()
-            except visa.VisaIOError as e:
-                logging.debug(__name__ + "(" +self.get_name()+"): VisaIOError, retry ->%s<-"%e)
-        raise ValueError(__name__ + "(" +self.get_name()+"): ask('%s') not successful after 15 retries"%(cmd[0:100]))
-
-    def write(self,cmd):
-        for i in range(15):
-            try:
-                logging.debug(__name__ + "(" +self.get_name()+" write command:"+cmd[:100]+":")
-                return self._visainstrument.write(cmd)
-            except visa.VisaIOError as e:
-                logging.debug(__name__ + "(" +self.get_name()+") :VisaIOError, retry ->%s<-"%e)
-        raise ValueError(__name__ + "(" +self.get_name()+") : write('%s') not successful after 15 retries"%(cmd[0:100]))
+    def write(self,msg):
+       return self._visainstrument.write(msg)
+     
+    if qkit.visa.qkit_visa_version == 1:
+         def ask(self,msg):
+             return self._visainstrument.ask(msg)
+    else:
+         def ask(self, msg):
+             return self._visainstrument.query(msg)
+    
 
     def write_raw(self,cmd):
         if visa.qkit_visa_version == 1:
@@ -1115,7 +1112,25 @@ class Tabor_WX1284C(Instrument):
 
         self.write_raw(b':TRAC#%i%i%s' %(int(numpy.log10(len(ws))+1), len(ws), ws))
 
-
+    def do_set_waveshape(self,shape):
+        self.write(':FUNC:SHAP %s' %(shape))
+    
+    def do_set_phase(self, Degrees, shapetype):
+        print(shapetype)
+        if shapetype == 'SIN':
+            self.write(':SIN:PHAS%i' %(Degrees))
+        elif shapetype == 'TRI':
+            self.write('TRI:PHAS%i' %(Degrees))
+        else:
+            print('Type ' + str(shapetype) + ' does not allow phase change, try duty cycle for other waveshapes.' )
+        
+    def do_set_frequency(self,freq):
+        self.write(':OUTP:FREQ %s' %(freq))    
+        
+        
+        
+        
+        
     def define_sequence(self,channel, segments=None,loops=None,jump_flags=None):
         '''
         specifies the sequence table for sequenced mode.

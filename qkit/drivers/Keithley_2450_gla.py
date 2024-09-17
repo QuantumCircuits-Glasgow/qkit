@@ -37,10 +37,10 @@ class Keithley_2450_gla(Instrument):
         self._address = address
         self._visainstrument = visa.instrument(self._address)
         self._visainstrument.read_termination="\n"
-        self._visainstrument.timeout = 100000 #big timeout required to wait for long sweeps
+        self._visainstrument.timeout = 100000000 #big timeout required to wait for long sweeps
         self.rvc_mode   = False #resistance via current
         self.four_wire  = False
-        self.meas_delay = 0.1 #delay between measurements in sweeps
+        self.meas_delay = 0.2 #delay between measurements in sweeps
         self.bufferElementTable = {#table of the possible options for bufferElements when used (specified in manual)
             "DATE": "The date when the data point was measured",
             "FORM":"The measured value as it appears on the front panel",
@@ -504,6 +504,88 @@ class Keithley_2450_gla(Instrument):
                                             .format(bias = bias,start = start,stop = stop, step = step, delay = delay,count = count))
         self._visainstrument.write(":INIT")
         self._visainstrument.write("*WAI") #waits until sweep is finished until executing next command
+        
+    
+
+        #time.sleep(delay*numSteps*3)
+        measuredArray = self._visainstrument.query(":TRAC:DATA? 1, {numSteps}".format(numSteps=numSteps))
+        sourceArray = self._visainstrument.query(":TRAC:DATA? 1, {numSteps}, 'defbuffer1', SOUR".format(numSteps=numSteps))
+        measuredArray = [float(i) for i in measuredArray.strip("\n").split(",")]
+        sourceArray = [float(i) for i in sourceArray.strip("\n").split(",")]
+        return sourceArray,measuredArray
+    
+    
+    
+    
+    def List_test(self):
+        self._visainstrument.write(':SOUR:CONF:LIST:CRE "TEMPLIST"')
+    
+    def take_IV_butbetter(self, start, stop, step): #Sweeps +ve and -ve values as the science gods intended
+        self._visainstrument.write(":TRAC:CLE 'defbuffer1'")#first clear the buffer
+        
+        self._visainstrument.write(':SOUR:CONF:LIST:CRE "TEMPLIST"')
+        
+        #setting up sweep parameters
+        
+        #needed for reading out data
+        sweepMode = self.get_sweep_mode()
+        bias = self.get_bias_mode()#so that we correctly write the sweep command
+        if sweepMode == 0:# VV mode
+            self._visainstrument.write(':SENS:FUNC "VOLT"')
+            print("Sweeping voltage, measuring voltage")
+        elif sweepMode == 1:# IV mode
+            self._visainstrument.write(':SENS:FUNC "VOLT"')
+            print("Sweeping current, measuring voltage")
+        elif sweepMode == 2:# VI mode
+            self._visainstrument.write(':SENS:FUNC "CURR"')
+            print("Sweeping voltage, measuring current")
+        elif sweepMode == 3:# II mode
+            self._visainstrument.write(':SENS:FUNC "CURR"')
+            print("Sweeping current, measuring current")
+        else:
+            print("Invalid sweep mode passed in")
+            return ValueError("Invalid sweep mode")
+        
+        
+        Listarray = []
+        
+               
+        a = numpy.arange(start, stop+step, step)
+        b = numpy.arange(-stop, start+step, step)
+        for x in a:
+                Listarray=numpy.append(Listarray,x)
+        for x in reversed(a):
+                Listarray=numpy.append(Listarray,x)
+        for x in reversed(b):
+                Listarray=numpy.append(Listarray,x)
+        for x in b:
+                Listarray=numpy.append(Listarray,x)
+                 
+                    
+       
+        
+        x =0
+        
+        self._visainstrument.write(':SOUR:LIST:CURR {listarray}'.format(listarray = Listarray[x]))  
+        x=x+1
+        
+            
+        while x<len(Listarray): 
+            
+            self._visainstrument.write(':SOUR:LIST:CURR:APP {listarray}'.format(listarray = Listarray[x]))
+            
+            x= x+1
+            
+            
+            
+        
+        numSteps = x
+        self._visainstrument.write(':SOUR:SWE:{bias}:LIST 1, 0, 1'
+                                            .format(bias = bias))
+        self._visainstrument.write(":INIT")
+        self._visainstrument.write("*WAI") #waits until sweep is finished until executing next command
+        
+
 
         #time.sleep(delay*numSteps*3)
         measuredArray = self._visainstrument.query(":TRAC:DATA? 1, {numSteps}".format(numSteps=numSteps))
@@ -512,7 +594,11 @@ class Keithley_2450_gla(Instrument):
         sourceArray = [float(i) for i in sourceArray.strip("\n").split(",")]
         return sourceArray,measuredArray
               
-
+    
+        
+                
+            
+            
 if __name__ == "__main__":
     KEITH = Keithley_2450_gla(name = "Keithley_2450_gla", address="10.22.197.8")
     print("DC current: {:.4g}A".format(KEITH.get_current_dc()))

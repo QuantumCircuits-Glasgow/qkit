@@ -1,20 +1,3 @@
-# Agilent_VNA_E5071C driver, P. Macha, modified by M. Weides July 2013, J. Braumueller 2015
-# Adapted to Keysight VNA by A. Schneider and L. Gurenhaupt 2016
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 import qkit
 from qkit.core.instrument_base import Instrument
 from qkit import visa
@@ -23,7 +6,7 @@ import logging
 from time import sleep
 import numpy
 
-class Keysight_VNA_E5071C(Instrument):
+class Keysight_VNA_E5080A(Instrument):
     '''
     This is the python driver for the Anritsu MS4642A Vector Network Analyzer
 
@@ -68,14 +51,14 @@ class Keysight_VNA_E5071C(Instrument):
             minval=2, maxval=20001,
             tags=['sweep'])
             
-        self.add_parameter('bandwidth',     type=float, minval=0,   maxval=1e9, units='Hz')
-        self.add_parameter('averages',      type=int,   minval=1,   maxval=1024)
+        self.add_parameter('bandwidth',     type=float, minval=1,   maxval=40e3, units='Hz')
+        self.add_parameter('averages',      type=int,   minval=1,   maxval=65536)
         self.add_parameter('Average',       type=bool)
-        self.add_parameter('centerfreq',    type=float, minval=0, maxval=20e9,  units='Hz')
-        self.add_parameter('cwfreq',        type=float, minval=0, maxval=20e9,  units='Hz')
-        self.add_parameter('startfreq',     type=float, minval=0, maxval=20e9,  units='Hz')
-        self.add_parameter('stopfreq',      type=float, minval=0, maxval=20e9,  units='Hz')
-        self.add_parameter('span',          type=float, minval=0, maxval=20e9,  units='Hz')
+        self.add_parameter('centerfreq',    type=float, minval=9e3, maxval=9e9,  units='Hz')
+        self.add_parameter('cwfreq',        type=float, minval=9e3, maxval=9e9,  units='Hz')
+        self.add_parameter('startfreq',     type=float, minval=9e3, maxval=9e9,  units='Hz')
+        self.add_parameter('stopfreq',      type=float, minval=9e3, maxval=9e9,  units='Hz')
+        self.add_parameter('span',          type=float, minval=9e3, maxval=9e9,  units='Hz')
         self.add_parameter('power',         type=float, minval=-85, maxval=10,  units='dBm')
         self.add_parameter('startpower',    type=float, minval=-85, maxval=10,  units='dBm')
         self.add_parameter('stoppower',     type=float, minval=-85, maxval=10,  units='dBm')
@@ -112,7 +95,9 @@ class Keysight_VNA_E5071C(Instrument):
         self.add_function('post_measurement')
 
         self.get_all()
-    
+        
+        
+        
     def get_all(self):
         self.get_nop()
         self.get_power()
@@ -134,20 +119,16 @@ class Keysight_VNA_E5071C(Instrument):
         self.get_cwfreq()
         self.get_edel()
         
-    ###
-    #Communication with device
-    ###
+    def Initial_Clear(self):
+         self.write("SYST:PRES")   
     
     
-    def hold(self, status):
-        self.write(":TRIG:SOUR INT")
-        if status:
-            self.write(':INIT%i:CONT OFF'%(self._ci))
-        else:
-            self.write(':INIT%i:CONT ON'%(self._ci))
-
+    def hold(self, value):
+        if value: self.write("SENS{}:SWE:MODE HOLD".format(self._ci))
+        else: self.write("SENS{}:SWE:MODE CONT".format(self._ci))
+    
     def get_hold(self):
-        return self.ask(':INIT%i:CONT?'%(self._ci))
+        return self.ask('SENS{}:SWE:MODE?'%(self._ci))
     
     def init(self):
         if self._zerospan:
@@ -158,17 +139,22 @@ class Keysight_VNA_E5071C(Instrument):
               self.write('INIT1;*wai')
           else:
               self.write('INIT1;*wai')
-
+              
+              
     def def_trig(self):
-        self.write(':TRIG:AVER ON')
-        self.write(':TRIG:SOUR bus')
+        self.write(':SENS:AVER ON')
+        self.write(':TRIG:SOUR MAN')
+        
         
     def avg_clear(self):
         self.write(':SENS%i:AVER:CLE' %(self._ci))
-
+        
+        
     def avg_status(self):
         return 0 == (int(self.ask('STAT:OPER:COND?')) & (1<<4))
-        
+    
+    
+    
     def get_tracedata(self, format = 'AmpPha', single=False, averages=1.):
         '''
         Get the data of the current trace
@@ -182,16 +168,16 @@ class Keysight_VNA_E5071C(Instrument):
         
         if single==True:
             #print('single shot readout')
-            self.write('TRIG:SOUR INT') #added MW July 2013. start single sweep.
+            self.write('TRIG:SOUR IMM') #added MW July 2013. start single sweep.
             self.write('INIT%i:CONT ON'%(self._ci)) #added MW July 2013. start single sweep.
             self.hold(True)
             sleep(float(self.ask('SENS1:SWE:TIME?')))
         
         #sleep(0.1) # required to avoid timing issues    MW August 2013   ???
         
-        self.write('FORM:DATA REAL')
-        self.write('FORM:BORD SWAPPED')
-        data = self.ask_for_values('CALC%i:SEL:DATA:SDAT?'%(self._ci), fmt = 3)
+        self.write('FORM:DATA REAL, 32')
+        self.write('FORM:BORD SWAP')
+        data=self.ask_for_values("CALC{}:MEAS:DATA:SDATA?".format(self._ci))
         data_size = numpy.size(data)
         datareal = numpy.array(data[0:data_size:2])
         dataimag = numpy.array(data[1:data_size:2])
@@ -215,36 +201,25 @@ class Keysight_VNA_E5071C(Instrument):
       
     def get_freqpoints(self, query = False):
       if query:
-           self.write("FORM:DATA REAL; FORM:BORD SWAPPED;")
-           self._freqpoints = self.ask_for_values(':SENS%i:FREQ:DATA?'%(self._ci), format = visa.double)
+           self.write("FORM:DATA REAL, 32; FORM:BORD SWAP;")
+           self._freqpoints = self.ask_for_values('CALC{}:MEAS:RDAT? A"'%(self._ci))
       elif self.get_cw():
            self._freqpoints = numpy.atleast_1d(self.get_cwfreq())
       else:
            self._freqpoints = numpy.linspace(self._start,self._stop,self._nop)
       return self._freqpoints
-
-    ###
-    # SET and GET functions
-    ###
-    
-    def do_set_sweep_mode(self, mode):
-        '''
-        select the sweep mode from 'hold', 'cont', single'
-        single means only one single trace, not all the averages even if averages
-         larger than 1 and Average==True
-        '''
-        if mode == 'hold':
-            self.write(':INIT%i:CONT OFF'%(self._ci))
-        elif mode == 'cont':
-            self.write(':INIT%i:CONT ON'%(self._ci))
-        elif mode == 'single':
-            self.write(':INIT%i:CONT ON'%(self._ci))
-            self.write(':INIT%i:CONT OFF'%(self._ci))
+     
+        
+     
+    def do_set_sweep_mode(self, value):
+        if value in ["CONT","HOLD","SING","GRO"]: return self.write("SENS{}:SWE:MODE {}".format(self._ci, value))
         else:
-            logging.warning('invalid mode')
+            raise ValueError('Sweep mode unknown. Use: ["CONT","HOLD","SING","GRO"]')
+        return
             
+    
     def do_get_sweep_mode(self):
-        return int(self.ask(':INIT%i:CONT?'%(self._ci)))
+        return self.ask("SENS{}:SWE:MODE?".format(self._ci))
     
     def do_set_nop(self, nop):
         '''
@@ -276,7 +251,7 @@ class Keysight_VNA_E5071C(Instrument):
           """
           self._nop = nop
           self.get_freqpoints() #Update List of frequency points
-        
+          
     def do_get_nop(self):
         '''
         Get Number of Points (nop) for sweep
@@ -292,6 +267,8 @@ class Keysight_VNA_E5071C(Instrument):
         else:
           self._nop = int(self.ask(':SENS%i:SWE:POIN?' %(self._ci)))
         return self._nop
+    
+    
     
     def do_set_Average(self, status):
         '''
@@ -311,7 +288,8 @@ class Keysight_VNA_E5071C(Instrument):
             status = 'OFF'
             self.write('SENS%i:AVER:STAT %s' % (self._ci,status))
         else:
-            raise ValueError('set_Average(): can only set True or False')
+            raise ValueError('set_Average(): can only set True or False')    
+            
     def do_get_Average(self):
         '''
         Get status of Average
@@ -324,7 +302,8 @@ class Keysight_VNA_E5071C(Instrument):
         '''
         logging.debug(__name__ + ' : getting average status')
         return bool(int(self.ask('SENS%i:AVER:STAT?' %(self._ci))))
-        
+    
+    
     def do_set_averages(self, av):
         '''
         Set number of averages
@@ -355,7 +334,8 @@ class Keysight_VNA_E5071C(Instrument):
           return int(self.ask('SWE%i:POIN?' % self._ci))
         else:
           return int(self.ask('SENS%i:AVER:COUN?' % self._ci))
-          
+      
+        
     def do_set_power(self,pow):
         '''
         Set probe power
@@ -371,7 +351,7 @@ class Keysight_VNA_E5071C(Instrument):
             self.set_startpower(pow)
             self.set_stoppower(pow)
         else:
-            self.write('SOUR%i:POW:PORT1:LEV:IMM:AMPL %.1f' % (self._ci,pow))
+            self.write('SOUR%i:POW1:LEV:IMM:AMPL %.1f' % (self._ci,pow))
     def do_get_power(self):
         '''
         Get probe power
@@ -386,7 +366,7 @@ class Keysight_VNA_E5071C(Instrument):
         if self.get_cw():
             return self.get_startpower()
         else:
-            return float(self.ask('SOUR%i:POW:PORT1:LEV:IMM:AMPL?' % (self._ci)))
+            return float(self.ask('SOUR%i:POW1:LEV:IMM:AMPL?' % (self._ci)))
 
     def do_set_startpower(self,pow):
         '''
@@ -399,7 +379,7 @@ class Keysight_VNA_E5071C(Instrument):
             None
         '''
         logging.debug(__name__ + ' : setting startpower to %s dBm' % pow)
-        self.write('SOUR%i:POW:START %.1f' % (self._ci,pow))
+        self.write('SOUR%i:POW:STAR %.1f' % (self._ci,pow))
     def do_get_startpower(self):
         '''
         Get probe power
@@ -411,7 +391,7 @@ class Keysight_VNA_E5071C(Instrument):
             pow (float) : Power in dBm
         '''
         logging.debug(__name__ + ' : getting startpower')
-        return float(self.ask('SOUR%i:POW:START?' % (self._ci)))
+        return float(self.ask('SOUR%i:POW:STAR?' % (self._ci)))
 
     def do_set_stoppower(self,pow):
         '''
@@ -439,22 +419,23 @@ class Keysight_VNA_E5071C(Instrument):
         return float(self.ask('SOUR%i:POW:STOP?' % (self._ci)))
         
     def do_set_centerfreq(self,cf):
-        '''
-        Set the center frequency
+       '''
+       Set the center frequency
 
-        Input:
-            cf (float) :Center Frequency in Hz
+       Input:
+           cf (float) :Center Frequency in Hz
 
-        Output:
-            None
-        '''
-        logging.debug(__name__ + ' : setting center frequency to %s' % cf)
-        if self.get_cw(False):
-          self.set_cwfreq(cf)
-        self.write('SENS%i:FREQ:CENT %f' % (self._ci,cf))
-        self.get_startfreq()
-        self.get_stopfreq()
-        self.get_span()
+       Output:
+           None
+       '''
+       logging.debug(__name__ + ' : setting center frequency to %s' % cf)
+       if self.get_cw(False):
+         self.set_cwfreq(cf)
+       self.write('SENS%i:FREQ:CENT %f' % (self._ci,cf))
+       self.get_startfreq()
+       self.get_stopfreq()
+       self.get_span()
+       
     def do_get_centerfreq(self):
         '''
         Get the center frequency
@@ -505,7 +486,8 @@ class Keysight_VNA_E5071C(Instrument):
         #logging.debug(__name__ + ' : getting center frequency')
         span = self.ask('SENS%i:FREQ:SPAN?' % (self._ci) ) #float( self.ask('SENS1:FREQ:SPAN?'))
         return span
-
+    
+    
     def do_get_sweeptime_averages(self):###JB
         '''
         Get sweeptime
@@ -531,8 +513,8 @@ class Keysight_VNA_E5071C(Instrument):
         logging.debug(__name__ + ' : getting sweep time')
         self._sweep=float(self.ask('SENS1:SWE:TIME?'))
         return self._sweep
-
-
+    
+    
     def do_set_edel(self, val):  # JB 2021
 
         '''
@@ -541,7 +523,7 @@ class Keysight_VNA_E5071C(Instrument):
         '''
         logging.debug(__name__ + ' : setting port extension to %s sec' % ( val))
         #self.write('SENS1:CORR:EXT:PORT%i:TIME %.12f' % (channel, val))
-        self.write("CALC:CORR:EDEL:TIME %.12f"%(val))
+        self.write("CALC:MEAS:CORR:EDEL:TIME %.12f"%(val))
         self._edel=val
         return
         
@@ -554,7 +536,7 @@ class Keysight_VNA_E5071C(Instrument):
         '''
         logging.debug(__name__ + ' : getting port extension')
         #self._edel = float(self.ask('SENS1:CORR:EXT:PORT%i:TIME?'% channel))
-        self._edel = float(self.ask("CALC:CORR:EDEL:TIME?"))
+        self._edel = float(self.ask("CALC:MEAS:CORR:EDEL:TIME?"))
         return self._edel
         
     def do_set_edel_status(self, status):   # AS 04/2019
@@ -575,8 +557,8 @@ class Keysight_VNA_E5071C(Instrument):
         '''
         logging.debug(__name__ + ' :  port extension status')
         return  self.ask('SENS:CORR:EXT:STAT?').strip() == "1"
-        
-        
+    
+    
     def do_set_startfreq(self,val):
         '''
         Set Start frequency
@@ -637,7 +619,7 @@ class Keysight_VNA_E5071C(Instrument):
         logging.debug(__name__ + ' : getting stop frequency')
         self._stop = float(self.ask('SENS%i:FREQ:STOP?' %(self._ci) ))
         return  self._stop
-
+    
     def do_set_bandwidth(self,band):
         '''
         Set Bandwidth
@@ -685,7 +667,7 @@ class Keysight_VNA_E5071C(Instrument):
         if sweep_type == 'POW': ret = True
         else: ret = False
         return ret
-
+    
     def do_set_zerospan(self,val):
         '''
         Zerospan is a virtual "zerospan" mode. In Zerospan physical span is set to
@@ -731,24 +713,23 @@ class Keysight_VNA_E5071C(Instrument):
         Output:
             val (bool) : True or False
         '''
-        return self._zerospan
-
-
+        return self._zerospan    
+    
     def do_set_trigger_source(self,source):
         '''
         Set Trigger Mode
 
         Input:
-            source (string) : INTernal | MANual | EXTernal | REMote
+            source (string) : IMMediate | MANual | EXTernal |
 
         Output:
             None
         '''
         logging.debug(__name__ + ' : setting trigger source to "%s"' % source)
-        if source.upper() in ['INT', 'MAN', 'EXT', 'BUS']:
+        if source.upper() in ['IMM', 'MAN', 'EXT']:
             self.write('TRIG:SEQ:SOUR %s' % source.upper())
         else:
-            raise ValueError('set_trigger_source(): must be INTernal | MANual | EXTernal | REMote')
+            raise ValueError('set_trigger_source(): must be IMMEDIATE | MANual | EXTernal')
 
     def do_get_trigger_source(self):
         '''
@@ -762,8 +743,7 @@ class Keysight_VNA_E5071C(Instrument):
         '''
         logging.debug(__name__ + ' : getting trigger source')
         return str(self.ask('TRIG:SEQ:SOUR?')).rstrip()
-        
-
+    
     def do_set_channel_index(self,val):
         '''
         Set the index of the channel to address.
@@ -792,7 +772,7 @@ class Keysight_VNA_E5071C(Instrument):
         '''
         logging.debug(__name__ + ' : getting channel index')
         return self._ci
-    
+        
     def do_set_active_trace(self, trace):
         """
         Sets the active trace, which can then be readout
@@ -809,7 +789,7 @@ class Keysight_VNA_E5071C(Instrument):
         """
         # TODO: ask device
         return self._active_trace
-
+    
     def do_get_sweep_type(self):
         '''
         Get the Sweep Type
@@ -843,14 +823,15 @@ class Keysight_VNA_E5071C(Instrument):
         Output:
             None            
         '''
-        if swtype in ('LIN','LOG','SEGM','POW'):
+        if swtype in ('LIN','LOG','SEGM','POW', 'CW'):
             
             logging.debug(__name__ + ' : Setting sweep type to %s'%(swtype))
             return self.write('SENS%i:SWE:TYPE %s' %(self._ci,swtype))
             
         else:
             logging.debug(__name__ + ' : Illegal argument %s'%(swtype))
-
+            
+            
     def do_get_meas_parameter(self):
         '''
         Gets the current measurement parameter
@@ -860,7 +841,7 @@ class Keysight_VNA_E5071C(Instrument):
             String, one of:
                 S11|S21|S31|S41|S12|S22|S32|S42|S13|S23|S33|S43|S14|S24|S34|S44|A|B|C|D|R1|R2|R3|R4|AUX1|AUX2
         '''
-        return self.ask("CALC{}:PAR:DEF?".format(self._ci))
+        return self.ask(":CALC:MEAS{}:PAR?".format(self._ci))
 
     def do_set_meas_parameter(self, value):
         '''
@@ -871,9 +852,9 @@ class Keysight_VNA_E5071C(Instrument):
         Output:
            None
         '''
-        self.write("CALC{}:PAR:DEF {}".format(self._ci,value))
+        self.write(":CALC:MEAS{}:PAR {}".format(self._ci,value))
         return
-
+    
     def write(self,msg):
         return self._visainstrument.write(msg)
     
@@ -891,39 +872,41 @@ class Keysight_VNA_E5071C(Instrument):
             dtype = format if format is not None else fmt if fmt is not None else qkit.visa.single
             dtype = qkit.visa.dtypes[dtype]
             return self._visainstrument.query_binary_values(msg,datatype=dtype,container=numpy.array)
-    
-    
-    
-    
+        
+        
     def pre_measurement(self):
-        '''
-        Set everything needed for the measurement
-        '''
-        self.write(":TRIG:SOUR BUS")#Only wait for software triggers
-        self.write(":TRIG:AVER ON")# Tell the instrument to do the specific number of averages on every trigger.
-        
-        
-    def post_measurement(self):
-        '''
-        After a measurement, the VNA is in hold mode, and it can be difficult to start a measurement again from front panel.
-        This function brings the VNA back to normal measuring operation.
-        '''
-        self.write(":TRIG:SOUR INT") #Only wait for software triggers
-        self.write(":TRIG:AVER OFF")# Tell the instrument to do the specific number of averages on every trigger.
-        self.hold(False)
-        
-      
+        self.write("TRIG:SOUR MAN")
+        self.write("SENS{}:AVER ON".format(self._ci))
+
     def start_measurement(self):
-        '''
-        This function is called at the beginning of each single measurement in the spectroscopy script.
-        Here, it resets the averaging
-        '''
         self.avg_clear()
-        self.write('*TRG') #go
+    
+        #for i in range(self.get_averages()):
+            #while(True):
+             
+                #if(int(self.ask("TRIG:STAT:READ? MAN"))) : break
+                #sleep(0.05)
+        timer=float(self.ask('SENS1:SWE:TIME?'))
+        self.write("INIT:IMM")
+        sleep(timer)
+
+
+    def post_measurement(self):
+       self.write("SENS:SWE:MODE HOLD")
+       self.write("SENS{}:AVER OFF".format(self._ci))
+       self.hold(False)
 
     
     def ready(self):
         '''
         This is a proxy function, returning True when the VNA has finished the required number of averages.
+        Averaging must be on (even if it is just one average)
+        Trace1 -> 0b10
+        Trace2 -> 0b100
+        ...
+        Trace14 ->0b100 0000 0000 0000
         '''
-        return (int(self.ask(':STAT:OPER:COND?')) & 32)==32
+        
+    
+        return (int(self.ask("STAT:OPER:AVER1:COND?")) & 0b10) 
+

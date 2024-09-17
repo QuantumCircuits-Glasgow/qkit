@@ -113,7 +113,9 @@ class Anritsu_MS2830A(Instrument):
     
     
     ##new below
-
+    def reset(self):
+        self.write('*RST')
+        
     def do_set_resolutionBW(self, BW):
         '''
         sets the resolution bandwidth
@@ -124,7 +126,7 @@ class Anritsu_MS2830A(Instrument):
         '''
         gets the resolution bandwidth
         '''
-        return float(self._visainstrument.ask(':BWID?'))
+        return float(self._visainstrument.query(':BWID?'))
 
     def do_set_videoBW(self, BW):
         '''
@@ -136,13 +138,13 @@ class Anritsu_MS2830A(Instrument):
         '''
         gets the video bandwidth
         '''
-        return float(self._visainstrument.ask(':BWID:VID?'))
+        return float(self._visainstrument.query(':BWID:VID?'))
 
     def do_get_sweeptime(self):
         '''
         gets the center frequency
         '''
-        return float(self._visainstrument.ask('swe:time?'))
+        return float(self._visainstrument.query('swe:time?'))
 
     
     def do_set_centerfreq(self, centerfreq):
@@ -155,7 +157,7 @@ class Anritsu_MS2830A(Instrument):
         '''
         gets the center frequency
         '''
-        return float(self._visainstrument.ask('freq:cent?'))
+        return float(self._visainstrument.query('freq:cent?'))
 
     def do_set_freqspan(self, freqspan):
         '''
@@ -169,25 +171,25 @@ class Anritsu_MS2830A(Instrument):
         get the frequency span
         
         '''
-        return float(self._visainstrument.ask('freq:span?'))
+        return float(self._visainstrument.query('freq:span?'))
 
     def do_set_startfreq(self, freq):
         self._visainstrument.write('freq:star %e'%(freq))
 
     def do_get_startfreq(self):
-        return float(self._visainstrument.ask('freq:star?'))
+        return float(self._visainstrument.query('freq:star?'))
 
     def do_set_stopfreq(self, freq):
         self._visainstrument.write('freq:stop %e'%(freq))
 
     def do_get_stopfreq(self):
-        return float(self._visainstrument.ask('freq:stop?'))
+        return float(self._visainstrument.query('freq:stop?'))
         
     def do_set_nop(self, nop):
         self._visainstrument.write('swe:poin %i'%(nop))
 
     def do_get_nop(self):
-        return int(self._visainstrument.ask('swe:poin?'))
+        return int(self._visainstrument.query('swe:poin?'))
         
     def do_set_powerunit(self,unit):
         '''
@@ -200,7 +202,7 @@ class Anritsu_MS2830A(Instrument):
         '''
         gets the power unit for powers
         '''
-        return self._visainstrument.ask('unit:pow?')
+        return self._visainstrument.query('unit:pow?')
         
         
     def do_get_averages(self):
@@ -213,7 +215,7 @@ class Anritsu_MS2830A(Instrument):
             number of averages
         '''
         
-        return int(self._visainstrument.ask(':AVER:COUNT?'))
+        return int(self._visainstrument.query(':AVER:COUNT?'))
 
     def do_get_sweeptime_averages(self):
         if self.get_Average():
@@ -234,14 +236,14 @@ class Anritsu_MS2830A(Instrument):
         gets frequency of marker
         
         '''
-        return float(self._visainstrument.ask('calc:mark%i:x?'%(marker)))
+        return float(self._visainstrument.query('calc:mark%i:x?'%(marker)))
     
     def get_marker_level(self,marker):
         '''
         gets power level of indicated marker
         
         '''
-        return float(self._visainstrument.ask('calc:mark%i:y?'%(marker)))
+        return float(self._visainstrument.query('calc:mark%i:y?'%(marker)))
         
 #    def set_continuous_sweep_mode(self,value):
         '''
@@ -255,7 +257,7 @@ class Anritsu_MS2830A(Instrument):
         returns an array with the frequencies of the points returned by get_trace()
         ideally suitable as x-axis for plots
         '''
-        return linspace(self.get_startfreq(),self.get_stopfreq(),self.get_nop())
+        return numpy.linspace(self.get_startfreq(),self.get_stopfreq(),self.get_nop())
     
     def enable_marker(self,marker,state='ON'):
         '''
@@ -289,5 +291,5 @@ class Anritsu_MS2830A(Instrument):
         self._visainstrument.write(command)    
     
     def ask(self,command):
-        return self._visainstrument.ask(command)    
+        return self._visainstrument.query(command)    
 

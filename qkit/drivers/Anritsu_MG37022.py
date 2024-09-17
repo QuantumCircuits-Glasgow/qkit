@@ -288,3 +288,6 @@ class Anritsu_MG37022(Instrument):
     else:
         def ask(self, msg):
             return self._visainstrument.query(msg)
+
+    def reset(self):
+        self.write('*RST')        
