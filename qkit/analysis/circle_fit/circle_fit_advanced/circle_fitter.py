@@ -41,7 +41,7 @@ class CircleFitter(object):
                   frequencies f_data
     """
     
-    def __init__(self, f_data, z_data_raw=None,delay=None):
+    def __init__(self, f_data, z_data_raw=None,delay=None,power=0):
         '''
         z_data_raw : complex Sij data
         f_data : frequency data
@@ -53,7 +53,7 @@ class CircleFitter(object):
         self.z_data_norm = None
         self.delay = delay
         self.fitresults = {}
-        
+        self.power = power
         self.fit_delay_max_iterations = 15
     
     @classmethod
@@ -80,23 +80,41 @@ class CircleFitter(object):
             1. - 2.*Ql / (complexQc * cls.n_ports * (1. + 2j*Ql*(f/fr-1.)))
         )
     
-    def fit_result(self,plot=True):
+    def fit_result(self,plot=True,prefit=None):
         """
         Returns the fit results as a dictionary.
 
         """
         print("delay in autofit",self.delay)
-        self.autofit(fixed_delay=self.delay)
+        self.autofit(fixed_delay=self.delay,prefit=None)
         if plot:
             self.plotall()
         return self.fitresults
 
-    def autofit(self, calc_errors=True, fixed_delay=None, isolation=15):
+    def autofit(self, calc_errors=True, fixed_delay=None, isolation=15,prefit=None):
         """
         Automatically calibrate data, normalize it and extract quality factors.
         If the autofit fails or the results look bad, please discuss with
         author.
+
+        no need to pass delay if given during init,
+
+        prefit, gets the fit results from the previous fit, and uses it as a guess for the current fit 
+        suitable for higher powers, where the Ql changes and the Qc changes, and the radius changes
         """
+        if prefit is not None:
+            a=prefit["a"]
+            alpha=prefit["alpha"]
+            theta=prefit["theta"]
+            fr=prefit["fr"]
+            Ql=prefit["Ql"]
+            Qc=prefit["Qc"]
+            delay=prefit["delay"]
+            self.fitresults.update(prefit)
+            self.delay=delay # update delay from the prev fit
+            guess=(fr,Ql,delay)
+        else:
+            guess=None
         
         if fixed_delay is None:
             pass
@@ -111,8 +129,8 @@ class CircleFitter(object):
             z_data = self.z_data_raw - np.complex(self.xc,self.yc)
         # Find first estimate of parameters
             # fr, Ql, theta, self.delay_excess = self._fit_phase(z_data) # put this into auto delay calculation, no need TODO
-        logging.info(f'the delay is {self.delay} ns, \n fitresults : {self.fitresults}')
-        self._calibrate() # finds all the parameters after phase fit, and delay fit ;6 parameters
+        logging.info(f'the delay entered is {self.delay:.2f} ns, \n fitresults : {self.fitresults}')
+        self._calibrate(phase_guess=guess) # finds all the parameters after phase fit, and delay fit ;6 parameters
         self._normalize()
         self._extract_Qs(calc_errors=calc_errors)
         self.calc_fano_range(isolation=isolation)
@@ -125,6 +143,15 @@ class CircleFitter(object):
         self.z_data_sim_norm = self.Sij(
             self.f_data, self.fr, self.Ql, self.Qc, self.phi
         )
+
+        photons=self.get_photons_in_resonator(power=self.power,diacorr=False)
+        single_photon_power=self.get_single_photon_limit(diacorr=False)
+
+        self.fitresults.update({
+            "sigma":self.sigma,
+            "photons":photons,
+            "single_photon_power":single_photon_power
+        })
     
     def _fit_delay(self):
         """
@@ -181,32 +208,63 @@ class CircleFitter(object):
         
         # Store result in dictionary (also for backwards-compatibility)
         self.fitresults["delay"] = self.delay
+
+
+    def _SNR(self,data,r=None,c=[0,0]):
+        '''
+        calculates the SNR of the resonator
+        when the data is centered
+        '''
+        if r is None:
+            r=np.mean(data)
+        dist=abs(data-(c[0]+1j*c[1]))
+        self.sigma=np.std(dist-r)
+        return np.abs(r)/self.sigma
+
+
+
     
-    def _calibrate(self):
+    def _calibrate(self,phase_guess=None):
         """
         Finds the parameters for normalization of the scattering data. See
         Sij for explanation of parameters.
+
+        (fr,Ql,delay) are found from the phase fit guess and passed from higher powers
         """
         
         # Correct for delay and translate circle to origin
         z_data = self.z_data_raw * np.exp(2j*np.pi*self.delay*self.f_data)
+
+        self.z_data_corr = z_data.copy() # store the corrected data
         # z_data_smooth=soft_averager(z_data.real,2)+(1j*soft_averager(z_data.imag,2))
+        if logging.getLogger().getEffectiveLevel() <= logging.INFO:
+            plt.figure()
+            plt.scatter(np.real(self.z_data_raw),np.imag(self.z_data_raw))
+            plt.scatter(np.real(z_data),np.imag(z_data))
+            plt.gca().set_aspect('equal', adjustable='box')
+            plt.title("Raw data delay calibrated")
+            plt.show()
+
+        #Hence the data should be delay corrected to fit the circle
         xc, yc, r0 = self._fit_circle(z_data)
+        
         
         # xc, yc, r0 = self._fit_circle(z_data_smooth)
         zc = np.complex(xc, yc)
-        z_data -= zc
-        
+        z_data -= zc # shift to the center
         # Find off-resonant point by fitting offset phase
         # (centered circle corresponds to lossless resonator in reflection)
-        self.fr, self.Ql, theta, self.delay_remaining = self._fit_phase(z_data)
+        # fr, Ql, theta, self.delay_remaining HAVE TO BE FIT  for all powers, we can see how Ql changes --> changes the Qc, and radius
+        
+        self.fr, self.Ql, theta, self.delay_remaining = self._fit_phase(z_data,phase_guess)
         self.theta = self._periodic_boundary(theta)
-        beta = self._periodic_boundary(theta - np.pi)
+        beta = self._periodic_boundary(self.theta-np.pi)
         offrespoint = zc + r0*np.cos(beta) + 1j*r0*np.sin(beta)
         self.offrespoint = offrespoint
-        self.a = np.absolute(offrespoint)
+        self.a = np.abs(offrespoint)
         self.alpha = np.angle(offrespoint)
         self.phi = self._periodic_boundary(beta - self.alpha)
+        self.SNR = self._SNR(z_data, r=r0)
         
         # Store radius for later calculation
         self.r0 =r0/ self.a
@@ -222,7 +280,8 @@ class CircleFitter(object):
             "theta": self.theta, #beta=theta0 -pi
             "phi": self.phi, #impeadance coupling mismatch ; beta- alpha
             "fr": self.fr,
-            "Ql": self.Ql
+            "Ql": self.Ql,
+            "SNR":self.SNR,
         })
     
     def _normalize(self):
@@ -243,6 +302,10 @@ class CircleFitter(object):
         
         self.absQc = self.Ql / (self.n_ports*self.r0)
         # For Qc, take real part of 1/(complex Qc) (diameter correction method)
+        if self.absQc > self.Ql:
+            logging.warning(
+                "Calculated Qc is larger than loaded Q! This is unphysical. Qi will be negative !"
+            )
         self.Qc = self.absQc / np.cos(self.phi)
         self.Qi = 1. / (1./self.Ql - 1./self.Qc)
         self.Qi_no_dia_corr = 1. / (1./self.Ql - 1./self.absQc)
@@ -341,7 +404,7 @@ class CircleFitter(object):
         
         # Calculate error on radius of circle
         R_mid = self.r0 * np.cos(self.phi)
-        R_err = self.r0 * np.sqrt(b**2 - np.sin(self.phi)**2)
+        R_err = self.r0 * np.sqrt(np.abs(b**2 - np.sin(self.phi)**2))
         R_min = R_mid - R_err
         R_max = R_mid + R_err
         
@@ -471,46 +534,56 @@ class CircleFitter(object):
             phase_smooth = gaussian_filter1d(phase, 30)
             phase_derivative = np.gradient(phase_smooth)
             fr_guess = self.f_data[np.argmax(np.abs(phase_derivative))]
-            Ql_guess = 2*fr_guess / (self.f_data[-1] - self.f_data[0])
+            Ql_guess = 2*fr_guess / (self.f_data[-1] - self.f_data[0]) #2 F_max / delta_f
             # Estimate delay from background slope of phase (substract roll-off)
             slope = phase[-1] - phase[0] + roll_off
             delay_guess = -slope / (2*np.pi*(self.f_data[-1]-self.f_data[0]))
         else:
-            fr_guess, Ql_guess, delay_guess = guesses
+            fr_guess, Ql_guess, delay_guess  = guesses
         # This one seems stable and we do not need a manual guess for it
         theta_guess = 0.5*(np.mean(phase[:5]) + np.mean(phase[-5:]))
         
         # Fit model with less parameters first to improve stability of fit
         
-        # def residuals_Ql(params):
-        #     Ql, = params
-        #     return residuals_full((fr_guess, Ql, theta_guess, delay_guess))
-        # def residuals_fr_theta(params):
-        #     fr, theta = params
-        #     return residuals_full((fr, Ql_guess, theta, delay_guess))
-        # def residuals_delay(params):
-        #     delay, = params
-        #     return residuals_full((fr_guess, Ql_guess, theta_guess, delay))
-        # def residuals_fr_Ql(params):
-        #     fr, Ql = params
-        #     return residuals_full((fr, Ql, theta_guess, delay_guess))
+        def residuals_Ql(params,freq=self.f_data,phase=phase):
+            Ql, = params
+            return residuals_full((fr_guess, Ql, theta_guess, delay_guess),freq,phase)
+        def residuals_fr_theta(params,freq=self.f_data,phase=phase):
+            fr, theta = params
+            return residuals_full((fr, Ql_guess, theta, delay_guess),freq,phase)
+        def residuals_delay(params,freq=self.f_data,phase=phase):
+            delay, = params
+            return residuals_full((fr_guess, Ql_guess, theta_guess, delay),freq,phase)
+        def residuals_fr_Ql(params,freq=self.f_data,phase=phase):
+            fr, Ql = params
+            return residuals_full((fr, Ql, theta_guess, delay_guess),freq,phase)
         def residuals_full(params,freq=self.f_data,phase=phase):
             return self._phase_dist(
                 phase - CircleFitter.phase_centered(freq, *params)
             )
 
-        # p_final = spopt.leastsq(residuals_Ql, [Ql_guess])
-        # Ql_guess, = p_final[0]
-        # p_final = spopt.leastsq(residuals_fr_theta, [fr_guess, theta_guess])
-        # fr_guess, theta_guess = p_final[0]
-        # p_final = spopt.leastsq(residuals_delay, [delay_guess])
-        # delay_guess, = p_final[0]
-        # p_final = spopt.leastsq(residuals_fr_Ql, [fr_guess, Ql_guess])
-        # fr_guess, Ql_guess = p_final[0]
+        # first only try to fit Ql
+        p_final = spopt.least_squares(residuals_Ql, [Ql_guess],args=(self.f_data,phase),method='dogbox')
+        logging.info(f'Ql fit results: {p_final.x}')
+        Ql_guess, = p_final.x
+
+        p_final = spopt.least_squares(residuals_fr_theta, [fr_guess, theta_guess],args=(self.f_data,phase),method='dogbox')
+        logging.info(f'fr, theta fit results: {p_final.x}')
+        fr_guess, theta_guess = p_final.x
+
+        p_final = spopt.least_squares(residuals_delay, [delay_guess],args=(self.f_data,phase),method='dogbox')
+        logging.info(f'delay fit results: {p_final.x}')
+        delay_guess, = p_final.x
+
+        p_final = spopt.least_squares(residuals_fr_Ql, [fr_guess, Ql_guess],args=(self.f_data,phase),method='dogbox')
+        logging.info(f'fr, Ql fit results: {p_final.x}')
+        fr_guess, Ql_guess = p_final.x
+
         p_final = spopt.least_squares(residuals_full, [
             fr_guess, Ql_guess, theta_guess, delay_guess
         ],args=(self.f_data,phase),method='dogbox')
-        print(p_final)
+        
+        logging.info(f'phase fit results: {p_final.x}')
         return p_final.x
         
     @classmethod
@@ -621,11 +694,17 @@ class CircleFitter(object):
         real_norm=self.z_data_norm.real
         imag_norm=self.z_data_norm.imag
 
-        fig,axs=plt.subplots(2, 2,gridspec_kw={'width_ratios': [1,1],'height_ratios': [1,1]},figsize=(8,7))
+        corr_real=self.z_data_corr.real
+        corr_imag=self.z_data_corr.imag
+        c=self.fitresults['c']
+        offrespoint=self.offrespoint
+
+        fig,axs=plt.subplots(3,2,gridspec_kw={'width_ratios': [1,1],'height_ratios': [1,1,1]},figsize=(8,11))
         axs[0,0].axvline(0, c="k", ls="--", lw=1)
         axs[0,0].axhline(0, c="k", ls="--", lw=1)
         axs[0,0].plot(real,imag,label='rawdata')
         axs[0,0].plot(real2,imag2,label='fit')
+        
         axs[0,0].set_aspect("equal",adjustable='datalim')
         axs[0,0].set_xlabel('Re(S21)',fontsize = 12)
         axs[0,0].set_ylabel('Im(S21)',fontsize = 12)
@@ -635,13 +714,17 @@ class CircleFitter(object):
         axs[0,1].set_aspect("equal",adjustable='datalim')
         axs[0,1].axvline(0, c="k", ls="--", lw=1)
         axs[0,1].axhline(0, c="k", ls="--", lw=1)
-        axs[0,1].scatter(real,imag_cannonical,label='raw_canonical',s=3,color='b')
-        axs[0,1].scatter(real_norm,imag_norm,label='norm-data',s=2,color='r')
+        # axs[0,1].scatter(real2,imag2,label='sim-data',s=3,color='b')
+        axs[0,1].scatter(real_norm,imag_norm,label='norm-data-final',s=2,color='r')
+        axs[0,1].plot(self.z_data_sim_norm.real,self.z_data_sim_norm.imag,'m-',label='sim-n x r - rot')
+        axs[0,1].plot(self.z_data_sim_norm.real,self.z_data_sim_norm.imag,'y-',linewidth=100*self.a*self.sigma,alpha=0.5)
+
         axs[0,1].set_xlabel('Re(S21)',fontsize = 12)
         axs[0,1].set_ylabel('Im(S21)',fontsize = 12)
-        axs[0,1].legend(loc=1)
+        axs[0,1].legend(loc=1,fontsize=8)
 
-
+        # imag_cannonical=imag-self.offrespoint.imag
+        
         axs[1,0].plot(self.f_data*1e-9,np.absolute(self.z_data_raw),label='rawdata')
         axs[1,0].plot(self.f_data*1e-9,np.absolute(self.z_data_sim),label='fit')
         axs[1,0].set_xlabel('f (GHz)',fontsize = 12)
@@ -653,6 +736,49 @@ class CircleFitter(object):
         axs[1,1].set_xlabel('f (GHz)',fontsize = 12)
         axs[1,1].set_ylabel('arg(|S21|)',fontsize = 12)
         axs[1,1].legend()
+
+        a=np.exp(1j*self.fitresults['alpha'])  #alpha
+        imp = np.exp(-1j*self.fitresults['phi'])
+        r=self.fitresults['r0']
+
+        axs[2,0].axvline(0, c="k", ls="--", lw=1)
+        axs[2,0].axhline(0, c="k", ls="--", lw=1)
+        axs[2,0].scatter(corr_real,corr_imag,label=f'corr-a={a:.2e}',s=2,color='r')
+        axs[2,0].scatter(np.real(c),np.imag(c),color='r',s=50,edgecolors='y',linewidths=1)
+        axs[2,0].scatter(np.real(self.offrespoint),np.imag(self.offrespoint),marker='X',color='k',s=100,edgecolors='y',linewidths=2)#
+        axs[2,0].plot([0,np.real(self.offrespoint)],[0,np.imag(self.offrespoint)],'b--')#
+
+        axs[2,0].set_aspect("equal",adjustable='datalim')
+        axs[2,0].legend(loc=3,fontsize = 8)
+
+
+
+        final=self.z_data_corr/a/self.a
+        norm=(self.z_data_corr-offrespoint)/a #angle rotated alpha
+        # norm=self.z_data_corr
+        
+        # norm_scale=norm * imp
+        norm_rot=norm.copy()*imp + 1
+        # norm_rot=norm_rot * a
+
+        axs[2,1].set_aspect("equal",adjustable='datalim')
+        axs[2,1].axvline(1, c="k", ls="--", lw=1)
+        axs[2,1].axhline(0, c="k", ls="--", lw=1)
+        # axs[2,1].scatter(final.real,final.imag,label='data-normed',s=3,color='b')
+        # axs[2,1].scatter(c.real,c.imag,marker='X',s=100,color='g')
+        axs[2,1].scatter(norm_rot.real,norm_rot.imag,label='data/alpha/phi',s=3,color='k')
+        # axs[2,1].plot(self.z_data_sim_norm.real,self.z_data_sim_norm.imag,'m-',label='sim-n x r - rot')
+
+        # axs[2,1].scatter(norm_rot.real,norm_rot.imag,label='data-n x r - rot',s=3,color='k')
+
+
+
+        # axs[2,1].scatter(norm.real/self.r0/2,norm.imag/self.r0/2,label='corr-data-normed',s=3,color='g')
+
+
+        axs[2,1].set_xlabel('Re(S21)',fontsize = 12)
+        axs[2,1].set_ylabel('Im(S21)',fontsize = 12)
+        axs[2,1].legend(loc=1,fontsize = 8)
 
         fig.tight_layout()
         plt.show()
@@ -724,12 +850,13 @@ class CircleFitter(object):
             logging.warning('Please perform the fit first',UserWarning)
             return None
         
-    def get_photons_in_resonator(self,power,unit='dBm',diacorr=True):
+    def get_photons_in_resonator(self,power=0,unit='dBm',diacorr=True):
         '''
         returns the average number of photons
         for a given power in units of W
         unit can be 'dBm' or 'watt'
         '''
+        logging.info('power: %s',power)
         if self.fitresults!={}:
             if unit=='dBm':
                 power = dBm2Watt(power)
