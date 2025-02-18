@@ -48,7 +48,7 @@ class Keysight_VNA_P50xxA(Instrument):
             units="s", minval=-10, maxval=10)
         self.add_parameter("nop", flag=Instrument.FLAG_GETSET, type=int,
             units="", minval=1, maxval=1e5, tags=["sweep"])
-        self.add_parameter("power", flag=Instrument.FLAG_GETSET, type=float,minval=-60,maxval=+12,
+        self.add_parameter("power", flag=Instrument.FLAG_GETSET, type=float,minval=-100,maxval=+20,
             units="dBm")
         self.add_parameter("rf_output", flag=Instrument.FLAG_GETSET, type=bool,
             units="")

@@ -13,7 +13,7 @@ import numpy
 import time,sys
 import atexit
 
-class Keithley_2450(Instrument):
+class Keithley_2450_gla(Instrument):
     '''
     This is the driver for the Keithley 2450 Source Meter
     Set ip address manually on instrument, e.g. TCPIP::10.22.197.50::5025::SOCKET
@@ -37,7 +37,7 @@ class Keithley_2450(Instrument):
         self._address = address
         self._visainstrument = visa.instrument(self._address)
         self._visainstrument.read_termination="\n"
-        self._visainstrument.timeout = 1000000 #big timeout required to wait for long sweeps
+        self._visainstrument.timeout = 100000 #big timeout required to wait for long sweeps
         self.rvc_mode   = False #resistance via current
         self.four_wire  = False
         self.meas_delay = 0.1 #delay between measurements in sweeps
@@ -58,12 +58,6 @@ class Keithley_2450(Instrument):
         self.possibleModes = ["CURR","VOLT","RES"]#keithley can only be in these modes
         self.possibleBoundaries=["MIN","MAX","DEF"]
         #self.setup(address) #used for GPIB connections
-    def query(self,command):
-        return self._visainstrument.query(command)
-    
-    def write(self,command):
-        self._visainstrument.write(command)
-
 
     def reset(self):
         '''
@@ -491,7 +485,6 @@ class Keithley_2450(Instrument):
             Measured sense values.
         """
         self._visainstrument.write(":TRAC:CLE 'defbuffer1'")#first clear the buffer
-        logging.debug("CLEARING BUFFER----------->")
         try:
             start = sweep[0]
             stop = sweep[1]
@@ -520,14 +513,13 @@ class Keithley_2450(Instrument):
         else:
             print("Invalid sweep mode passed in")
             return ValueError("Invalid sweep mode")
-        self._visainstrument.write('TRACe:FILL:MODE CONT')#fill mode
-        self._visainstrument.write(':SOUR:SWE:{bias}:LIN:STEP {start}, {stop}, {step}, {delay}, {count}, BEST, OFF,OFF'.format(bias = bias,start = start,stop = stop, step = step, delay = delay,count = count))
+
+        self._visainstrument.write(':SOUR:SWE:{bias}:LIN:STEP {start}, {stop}, {step}, {delay}, {count}, AUTO'
+                                            .format(bias = bias,start = start,stop = stop, step = step, delay = delay,count = count))
         self._visainstrument.write(":INIT")
         self._visainstrument.write("*WAI") #waits until sweep is finished until executing next command
 
         #time.sleep(delay*numSteps*3)
-        logging.debug("steps = {numSteps}".format(numSteps=numSteps))
-
         measuredArray = self._visainstrument.query(":TRAC:DATA? 1, {numSteps}".format(numSteps=numSteps))
         sourceArray = self._visainstrument.query(":TRAC:DATA? 1, {numSteps}, 'defbuffer1', SOUR".format(numSteps=numSteps))
         measuredArray = [float(i) for i in measuredArray.strip("\n").split(",")]

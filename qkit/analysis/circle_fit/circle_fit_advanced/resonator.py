@@ -627,7 +627,7 @@ class PowerResonator(object):
     def __init__(self,Sij,f:list,power=[0,],**kwargs):
 
         self.Rs=[]
-        print(power)
+        logging.info(f"Power Resonator Model : {type(self)} \n   powers : {power} dBm \n")
         if np.size(power)>=1:
                 #  print(np.shape(Sij)[1])
                 #  print(np.size(power))

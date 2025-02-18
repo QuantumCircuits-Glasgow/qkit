@@ -21,7 +21,7 @@ import logging
 from time import sleep, time
 import sys
 import threading
-
+from qkit.analysis.circle_fit.circle_fit_2019 import circuit
 import qkit
 if qkit.module_available("matplotlib"):
     import matplotlib.pylab as plt
@@ -346,6 +346,7 @@ class spectrum(object):
 
         if self.comment:
             self._data_file.add_comment(self.comment)
+            logging.info(self.comment)
 
         if self.qviewkit_singleInstance and self.open_qviewkit and self._qvk_process:
             self._qvk_process.terminate()  # terminate an old qviewkit instance
@@ -360,6 +361,8 @@ class spectrum(object):
         measure method to record a single (averaged) VNA trace, S11 or S21 according to the setting on the VNA
         rescan: If True (default), the averages on the VNA are cleared and a new measurement is started.
                 If False, it will directly take the data from the VNA without waiting.
+
+        returns the filepath of the measurement file for further processing
         '''
         self._scan_dim = 1
 
@@ -427,11 +430,24 @@ class spectrum(object):
         self._data_pha.append(data_pha)
         self._data_real.append(data_real)
         self._data_imag.append(data_imag)
-        if self._fit_resonator:
-            self._do_fit_resonator()
+        
 
         qkit.flow.end()
-        self._end_measurement()
+
+        logging.info('Measurement finished, data saved in ' + self._data_file.get_filepath())
+        
+        file= self._end_measurement()
+        if self._fit_resonator:
+            #self._do_fit_resonator()
+            self.cir=circuit.notch_port(self._freqpoints,data_amp*np.exp(1j*data_pha))
+            power=self.vna.do_get_power()
+            self.cir.autofit()
+            self.cir.plotall()
+            plt.suptitle(f'{power} dBm')
+
+        return file # return the filepath of the measurement file
+
+        
 
     def measure_2D(self, web_visible=True):
         '''
@@ -477,7 +493,8 @@ class spectrum(object):
             self._qvk_process = qviewkit.plot(self._data_file.get_filepath(),datasets=list(self._data_file.hf.hf.attrs['default_ds']))
         if self._fit_resonator:
             self._resonator = resonator(self._data_file.get_filepath())
-        self._measure()
+        return self._measure()
+
 
     def measure_3D(self, web_visible=True):
         '''
@@ -540,7 +557,7 @@ class spectrum(object):
                 points = len(self.x_vec) * len(self.y_vec)
             self._p = Progress_Bar(points, '3D VNA sweep ' + self.dirname, self.vna.get_sweeptime_averages())
 
-        self._measure()
+        return self._measure()
 
     def set_cw_time_measurement(self, status):
         """
@@ -665,14 +682,15 @@ class spectrum(object):
                         self._p.iterate()
                     qkit.flow.sleep()
         finally:
-            self._end_measurement()
+            file=self._end_measurement()
             qkit.flow.end()
+            return file # return the filepath of the measurement file
 
     def _end_measurement(self):
         '''
         the data file is closed and filepath is printed
         '''
-        print(self._data_file.get_filepath())
+        logging.INFO("Data saved to : ",str(self._data_file.get_filepath()))
         # qviewkit.save_plots(self._data_file.get_filepath(),comment=self._plot_comment) #old version where we have to wait for the plots
         t = threading.Thread(target=qviewkit.save_plots, args=[self._data_file.get_filepath(), self._plot_comment])
         t.start()
@@ -681,12 +699,15 @@ class spectrum(object):
         self.dirname = None
         if self.averaging_start_ready: self.vna.post_measurement()
 
+        return self._data_file.get_filepath()
+
     def set_resonator_fit(self, fit_resonator=True, fit_function='', f_min=None, f_max=None):
         '''
         sets fit parameter for resonator
 
         fit_resonator (bool): True or False, default: True (optional)
-        fit_function (string): function which will be fitted to the data (optional)
+        fit_function (string): function which will be fitted to the data (optional) 'lorentzian': 0, 'skewed_lorentzian': 1, 'circle_fit_reflection': 2, 'circle_fit_notch': 3,
+                           'fano': 4, 'all_fits': 5
         f_min (float): lower frequency boundary for the fitting function, default: None (optional)
         f_max (float): upper frequency boundary for the fitting function, default: None (optional)
         fit types: 'lorentzian','skewed_lorentzian','circle_fit_reflection', 'circle_fit_notch','fano'
@@ -790,7 +811,7 @@ class spectrum(object):
     def edel_correction_data(self, data_pha):
         if hasattr(self.vna,"_edel"):
             #phase correction for electrical delay
-            slope_corr=float(self.vna._edel)*2*np.pi
+            slope_corr=self.vna._edel*2*np.pi
 
             data_pha=np.unwrap(data_pha)
             for i,f in enumerate(self._freqpoints):
@@ -858,7 +879,7 @@ class Landscape:
 
         try:
             if curve_f == 'lin_spline':
-                f = interp1d(x_fit, y_fit)
+                f = interp1d(x_fit, y_fit, fill_value="extrapolate")
                 center_points = f(self.spec.x_vec)
             elif curve_f == 'spline':
                 center_points =  UnivariateSpline(x_fit, y_fit)(self.spec.x_vec)
@@ -929,9 +950,9 @@ class Landscape:
                 popt, pcov = curve_fit(fit_fct, x_fit, z_fit/multiplier, p0=p0)
                 self.xzlandscape_func = lambda x: multiplier * fit_fct(x, *popt)
 
-            self.xz_freqpoints = np.arange(self.xzlandscape_func(self.spec.x_vec[0])-self.z_span/2,
-                                           self.xzlandscape_func(self.spec.x_vec[-1])+self.z_span/2,
-                                           self.vna.get_span()/self.vna.get_nop())
+            self.xz_freqpoints = np.arange(np.min(self.xzlandscape_func(self.spec.x_vec)) - self.z_span / 2,
+                                           np.max(self.xzlandscape_func(self.spec.x_vec)) + self.z_span / 2,
+                                           self.vna.get_span() / self.vna.get_nop())
         except Exception as message:
             print('fit not successful:', message)
 

@@ -134,7 +134,7 @@ class FittedResonator(PowerResonator):
                 self.Qi_absqc[i] = result["Qi_no_dia_corr"]
                 self.Qi_absqc_err[i] = result["Qi_no_dia_corr_err"]
 
-                self.photon_number[i]=self.photon_from_P(power,self.fr[i],self.Ql[i],np.abs(self.Qc[i]))
+                self.photon_number[i]=self.photon_from_P(power,self.fr[i],self.Ql[0],np.abs(self.Qc[0]))
                 self.centers.append(result["c"])
                 self.radii.append(result["r0"])
 
