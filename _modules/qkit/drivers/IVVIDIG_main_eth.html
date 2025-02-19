@@ -1,0 +1,437 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.IVVIDIG_main_eth &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.IVVIDIG_main_eth</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.IVVIDIG_main_eth</h1><div class="highlight"><pre>
+<span></span><span class="c1"># IVVI.py class, to perform the communication between the Wrapper and the device</span>
+<span class="c1"># Pieter de Groot &lt;pieterdegroot@gmail.com&gt;, 2008</span>
+<span class="c1"># Martijn Schaafsma &lt;qtlab@mcschaafsma.nl&gt;, 2008</span>
+<span class="c1"># Reinier Heeres &lt;reinier@heeres.eu&gt;, 2008</span>
+<span class="c1">#</span>
+<span class="c1"># extended by Tim Wolz to access the IVVI via Ethernet.</span>
+<span class="c1"># Data is sent as a string via Ethernet to a Raspberry Pi, </span>
+<span class="c1"># where it is converted to asci code and sent to the IVVI</span>
+<span class="c1"># Ethernet connection based on the lazy pirate pattern by Daniel Lundin &lt;dln(at)eintr(dot)org&gt; </span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zmq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">zmq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+
+<div class="viewcode-block" id="IVVIDIG_main_eth">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.IVVIDIG_main_eth.IVVIDIG_main_eth">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">IVVIDIG_main_eth</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is the python driver for the IVVI-rack with S5a data module control via a Raspberry Pi Ethernet to Serial Bridge based on ZMQ</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">    Initialize with</span>
+<span class="sd">    &lt;name&gt; = instruments.create(&#39;&lt;name&gt;&#39;, &#39;IVVIDIG&#39;, address=&#39;111.111.111.111&#39;)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="s1">&#39;10.22.197.115&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialzes the IVVIDIG, and communicates with the Rasbpi</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            name (string)        : name of the instrument</span>
+<span class="sd">            address (string)     : Rasbpi&#39;s IP-Adress</span>
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Initializing instrument IVVIDIG&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="o">=</span> <span class="mi">6543</span>
+
+        <span class="c1">#FIXME: numdacs is now variable!?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numdacs</span> <span class="o">=</span> <span class="mi">16</span>
+
+        <span class="c1"># Add functions</span>
+        <span class="c1">#self.add_function(&#39;get_dac&#39;)</span>
+        <span class="c1">#self.add_function(&#39;set_dac&#39;)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">REQUEST_TIMEOUT</span> <span class="o">=</span> <span class="mi">2500</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">REQUEST_RETRIES</span> <span class="o">=</span> <span class="mi">3</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_open_zmq_connection</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Closes up the IVVI driver, i.e., terminates the zmq connection</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Deleting IVVI instrument&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_close_zmq_connection</span><span class="p">()</span>
+
+		
+    <span class="k">def</span><span class="w"> </span><span class="nf">_open_zmq_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Connects to the raspberry via zmq/tcp</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Connecting to Raspberry Pi&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">REQ</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;tcp://</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">))</span> <span class="c1"># raspi address</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">poll</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Poller</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poll</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="n">zmq</span><span class="o">.</span><span class="n">POLLIN</span><span class="p">)</span>
+        
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_close_zmq_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Closes the zmq connection</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Closing serial connection&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">term</span><span class="p">()</span>
+
+
+
+    <span class="c1"># Conversion of data</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mvoltage_to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mvoltage</span><span class="p">,</span> <span class="n">dacrange</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Converts a mvoltage on a 0mV-4000mV scale to a 16-bit integer equivalent</span>
+<span class="sd">        output is a list of two bytes</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            mvoltage (float) : a mvoltage in the 0mV-4000mV range</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            (dataH, dataL) (int, int) : The high and low value byte equivalent</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Converting </span><span class="si">%f</span><span class="s1"> mVolts to bytes&#39;</span> <span class="o">%</span> <span class="n">mvoltage</span><span class="p">)</span>
+        <span class="n">dr</span> <span class="o">=</span> <span class="n">dacrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">dacrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">dacrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">bytevalue</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">mvoltage</span><span class="o">-</span><span class="n">ds</span><span class="p">)</span><span class="o">*</span><span class="mi">65535</span><span class="o">/</span><span class="n">dr</span><span class="p">))</span>
+        <span class="n">dataH</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bytevalue</span><span class="o">/</span><span class="mi">256</span><span class="p">)</span>
+        <span class="n">dataL</span> <span class="o">=</span> <span class="n">bytevalue</span> <span class="o">-</span> <span class="n">dataH</span><span class="o">*</span><span class="mi">256</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">dataH</span><span class="p">,</span> <span class="n">dataL</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_bytes_to_mvoltage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">dacrange</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Converts a list of bytes to a list containing</span>
+<span class="sd">        the corresponding mvoltages</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Converting bytes to mvoltages&#39;</span><span class="p">)</span>
+        <span class="n">dr</span> <span class="o">=</span> <span class="n">dacrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">dacrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">dacrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">((</span><span class="nb">bytes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">256</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mf">65535.0</span><span class="o">*</span><span class="n">dr</span><span class="p">)</span> <span class="o">+</span> <span class="n">ds</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="c1"># Communication with device</span>
+<div class="viewcode-block" id="IVVIDIG_main_eth.get_dac">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.IVVIDIG_main_eth.IVVIDIG_main_eth.get_dac">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">dacrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the value of the specified dac</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            channel (int) : 1 based index of the dac</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            voltage (float) : dacvalue in mV</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : reading voltage from dac_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">channel</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">allbytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dac_bytes</span><span class="p">()</span>
+            <span class="nb">bytes</span> <span class="o">=</span> <span class="p">(</span><span class="n">allbytes</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">channel</span><span class="p">],</span> <span class="n">allbytes</span><span class="p">[</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">channel</span><span class="p">])</span>
+            <span class="n">mvoltage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bytes_to_mvoltage</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">dacrange</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">mvoltage</span>
+        <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">detail</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error. Device might be disconnected: &#39;</span><span class="p">,</span><span class="n">detail</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="IVVIDIG_main_eth.get_dac_raw">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.IVVIDIG_main_eth.IVVIDIG_main_eth.get_dac_raw">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dac_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the values of all dacs in the binary format</span>
+
+<span class="sd">        Input:</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            voltage (int) : array with dacvalues as binary numbers</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : reading voltage from all dacs&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">allbytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dac_bytes</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">allbytes</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">detail</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error. Device might be disconnected: &#39;</span><span class="p">,</span><span class="n">detail</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="IVVIDIG_main_eth.get_dac_all">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.IVVIDIG_main_eth.IVVIDIG_main_eth.get_dac_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dac_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dacrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the values of all dacs</span>
+
+<span class="sd">        Input:</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            voltage (float) : array with dacvalues in mV</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : reading voltage from all dacs&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">allbytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dac_bytes</span><span class="p">()</span>
+            <span class="n">mvoltage</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span> <span class="p">:</span>
+                <span class="nb">bytes</span> <span class="o">=</span> <span class="p">(</span><span class="n">allbytes</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">channel</span><span class="p">],</span> <span class="n">allbytes</span><span class="p">[</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">channel</span><span class="p">])</span>
+                <span class="n">mvoltage</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bytes_to_mvoltage</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">dacrange</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">mvoltage</span>
+        <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">detail</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error. Device might be disconnected: &#39;</span><span class="p">,</span><span class="n">detail</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IVVIDIG_main_eth.set_dac">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.IVVIDIG_main_eth.IVVIDIG_main_eth.set_dac">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_dac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">mvoltage</span><span class="p">,</span> <span class="n">dacrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the specified dac to the specified voltage</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            mvoltage (float) : output voltage in mV</span>
+<span class="sd">            channel (int)    : 1 based index of the dac</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            reply (string) : errormessage</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : setting voltage of dac_</span><span class="si">%s</span><span class="s1"> to </span><span class="si">%.01f</span><span class="s1"> mV&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">mvoltage</span><span class="p">))</span>
+        <span class="p">(</span><span class="n">DataH</span><span class="p">,</span> <span class="n">DataL</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mvoltage_to_bytes</span><span class="p">(</span><span class="n">mvoltage</span><span class="p">,</span> <span class="n">dacrange</span><span class="p">)</span>
+        <span class="c1">###message = &quot;%c%c%c%c%c%c%c%c&quot; % (8, 0, 2, 1, 3, sl_ch, DataH, DataL)</span>
+        <span class="c1">#print(DataH,DataL)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">DataH</span><span class="p">,</span> <span class="n">DataL</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_and_read</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">detail</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error. Device might be disconnected: &#39;</span><span class="p">,</span><span class="n">detail</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">reply</span></div>
+
+    
+<div class="viewcode-block" id="IVVIDIG_main_eth.reset_dac">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.IVVIDIG_main_eth.IVVIDIG_main_eth.reset_dac">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_dac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dacrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets all dacs to 0 mV</span>
+<span class="sd">        Attention: It is assumed that all dacs have the same dacrange</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">        </span>
+<span class="sd">        Output:</span>
+<span class="sd">            reply (string) : errormessage</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : setting voltage of all dacs to 0 mV&#39;</span><span class="p">)</span>
+            <span class="p">(</span><span class="n">DataH</span><span class="p">,</span> <span class="n">DataL</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mvoltage_to_bytes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dacrange</span><span class="p">)</span>
+            <span class="c1">###message = &quot;%c%c%c%c%c%c%c%c&quot; % (8, 0, 2, 1, 3, sl_ch, DataH, DataL)</span>
+            <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">16</span><span class="p">):</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">DataH</span><span class="p">,</span> <span class="n">DataL</span><span class="p">)</span>
+                <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_and_read</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">reply</span>
+        <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">detail</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error. Device might be disconnected: &#39;</span><span class="p">,</span><span class="n">detail</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_dac_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reads from device and returns all dacvoltages in a list</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            voltages (float[]) : list containing all dacvoltages (in mV)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : getting dac voltages from instrument&#39;</span><span class="p">)</span>
+        <span class="c1">###message = &quot;%c%c%c%c&quot; % (4, 0, self._numdacs*2+2, 2)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_and_read</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">reply</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_send_and_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Performs the communication with the device</span>
+<span class="sd">        Raises an error if one occurred</span>
+<span class="sd">        Returns a list of bytes</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            message (string)    : string conform the IVVI protocol</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            data_out_numbers (int[]) : return message</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : do communication with instrument&#39;</span><span class="p">)</span>
+        
+        
+        
+        <span class="n">retries_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">REQUEST_RETRIES</span>
+        <span class="k">while</span> <span class="n">retries_left</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+            <span class="n">expect_reply</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">while</span> <span class="n">expect_reply</span><span class="p">:</span>
+                <span class="n">socks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poll</span><span class="o">.</span><span class="n">poll</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">REQUEST_TIMEOUT</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">socks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">)</span> <span class="o">==</span> <span class="n">zmq</span><span class="o">.</span><span class="n">POLLIN</span><span class="p">:</span>
+                    <span class="n">data_out_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_out_string</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">retries_left</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="n">expect_reply</span> <span class="o">=</span> <span class="kc">False</span>
+                        
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No response from server, retrying&quot;</span><span class="p">)</span>
+                    <span class="c1"># Socket is confused. Close and remove it.</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">LINGER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">poll</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">)</span>
+                    <span class="n">retries_left</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">retries_left</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Server seems to be offline, abandoning&quot;</span><span class="p">)</span>
+                        <span class="k">break</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reconnecting and resending &quot;</span> <span class="o">+</span> <span class="n">message</span><span class="p">)</span>
+                    <span class="c1"># Create new connection</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_open_zmq_connection</span><span class="p">()</span>
+
+        <span class="n">data_out_numbers</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">data_out_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)]</span>
+        <span class="c1">#data_out_numbers = [ord(s) for s in data_out_string]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">data_out_numbers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_out_numbers</span><span class="p">)</span> <span class="o">!=</span> <span class="n">data_out_numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Error while reading : </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">data_out_numbers</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data_out_numbers</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

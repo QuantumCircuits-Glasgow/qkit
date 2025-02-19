@@ -1,0 +1,717 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.Yokogawa_GS200 &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.Yokogawa_GS200</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.Yokogawa_GS200</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Yokogawa_GS200.py driver for Yokogawa GS200 DC voltag/current source</span>
+<span class="c1"># adapted from GS820 driver, Lukas Gruenhaupt @KIT 07/2017</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">visa</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">distutils.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">LooseVersion</span>
+
+<div class="viewcode-block" id="Yokogawa_GS200">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Yokogawa_GS200</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is the driver for the Yokogawa GS200 multi channel source measure unit</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">    Initialize with</span>
+<span class="sd">    &lt;name&gt; = instruments.create(&#39;&lt;name&gt;&#39;, &#39;Yokogawa_GS200&#39;, address=&#39;&lt;GBIP address&gt;&#39;,</span>
+<span class="sd">        reset=&lt;bool&gt;)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initializes the Yokogawa GS200, and communicates with the wrapper.</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            name (string)    : name of the instrument</span>
+<span class="sd">            address (string) : GPIB address</span>
+<span class="sd">            reset (bool)     : resets to default values</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Initialize wrapper functions</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Initializing instrument Yokogawa_GS200&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Add some global constants</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span> <span class="o">=</span> <span class="n">visa</span><span class="o">.</span><span class="n">instrument</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span>
+        
+        <span class="c1"># Set termination characters (nessecarry for Ethernet communication)</span>
+        <span class="k">if</span>  <span class="n">LooseVersion</span><span class="p">(</span><span class="n">visa</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="s2">&quot;1.5.0&quot;</span><span class="p">):</span>            <span class="c1"># pyvisa 1.4</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">term_chars</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>                                                                  <span class="c1"># pyvisa 1.8</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read_termination</span>  <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write_termination</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="c1"># Add parameters to wrapper</span>
+
+<span class="c1">#        self.add_parameter(&#39;source_function&#39;,</span>
+<span class="c1">#            flags=Instrument.FLAG_GETSET | Instrument.FLAG_GET_AFTER_SET,</span>
+<span class="c1">#            type=str, units=&#39;&#39;)</span>
+
+<span class="c1">#        </span>
+<span class="c1">#        self.add_parameter(&#39;operation_mode&#39;,</span>
+<span class="c1">#            flags=Instrument.FLAG_SET,</span>
+<span class="c1">#            type=str, units=&#39;&#39;)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;source_mode&#39;</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;source_range&#39;</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span> <span class="p">,</span>
+            <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+           
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span> <span class="p">,</span>
+            <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">,</span> 
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<span class="c1">#        self.add_parameter(&#39;voltage_protection&#39;, </span>
+<span class="c1">#            flags=Instrument.FLAG_GETSET | Instrument.FLAG_GET_AFTER_SET,</span>
+<span class="c1">#            type=float, units=&#39;V&#39;)</span>
+<span class="c1">#</span>
+<span class="c1">#        self.add_parameter(&#39;current_protection&#39;, </span>
+<span class="c1">#            flags=Instrument.FLAG_GETSET | Instrument.FLAG_GET_AFTER_SET,</span>
+<span class="c1">#            type=float, units=&#39;A&#39;)</span>
+<span class="c1">#            </span>
+<span class="c1">#        self.add_parameter(&#39;4W&#39;,</span>
+<span class="c1">#            flags=Instrument.FLAG_GETSET ,</span>
+<span class="c1">#            units=&#39;&#39;, type=str)</span>
+<span class="c1">#</span>
+<span class="c1">#        self.add_parameter(&#39;ramp_wait_time&#39;, </span>
+<span class="c1">#            flags=Instrument.FLAG_GET,</span>
+<span class="c1">#            type=float, units = &#39;s&#39;)</span>
+
+        <span class="c1"># Add functions to wrapper</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_all&#39;</span><span class="p">)</span>
+        <span class="c1">#self.add_function(&#39;set_range_auto&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_defaults&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;ramp_current&#39;</span><span class="p">)</span>
+        <span class="c1">#self.add_function(&#39;ramp_ch2_current&#39;)</span>
+
+        
+        <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">()</span>
+
+<span class="c1"># functions</span>
+            
+<div class="viewcode-block" id="Yokogawa_GS200.reset">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>     
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Resets instrument to default values</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+<span class="sd">    </span>
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Resetting instrument&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;*RST&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span></div>
+
+      
+<div class="viewcode-block" id="Yokogawa_GS200.get_all">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.get_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reads all relevant parameters from instrument</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Get all relevant data from device&#39;</span><span class="p">)</span></div>
+
+        
+        <span class="c1">#self._ask(&#39;:outp?&#39;)</span>
+        
+        
+        <span class="c1">#self.get_sync()</span>
+        <span class="c1">#self.get(&#39;source_function&#39;)</span>
+        
+        <span class="c1">#self.get_sync()</span>
+        
+
+
+<span class="c1">#        self.get(&#39;sense_range&#39;)</span>
+<span class="c1">#        self.get(&#39;sense_mode&#39;)</span>
+<span class="c1">#        self.get(&#39;source_trig&#39;)</span>
+<span class="c1">#        self.get(&#39;sense_trig&#39;)</span>
+<span class="c1">#        self.get(&#39;source_delay&#39;)</span>
+<span class="c1">#        self.get(&#39;sense_delay&#39;)</span>
+<span class="c1">#        self.get(&#39;4W&#39;)</span>
+        <span class="c1">#self.get(&#39;level&#39;)</span>
+<span class="c1">#        self.get(&#39;output&#39;)</span>
+           
+<div class="viewcode-block" id="Yokogawa_GS200.do_get_output">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.do_get_output">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets output state</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Get status of output&#39;</span><span class="p">)</span>
+        <span class="n">ans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;:outp?&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">ans</span><span class="o">==</span><span class="s1">&#39;zero&#39;</span><span class="p">:</span>    <span class="c1"># TODO what is this</span>
+            <span class="k">return</span> <span class="s1">&#39;off&#39;</span>
+        
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">ans</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Attention: Output is set on; Be careful!&#39;</span><span class="p">)</span>      <span class="c1">#warning if output is on! No fast current changes if coil is attached</span>
+            <span class="k">return</span> <span class="s1">&#39;on&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;off&#39;</span></div>
+
+        
+<div class="viewcode-block" id="Yokogawa_GS200.do_set_output">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.do_set_output">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets outputs of channels in &quot;on&quot; or &quot;off&quot; position.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;on&#39;</span><span class="p">,</span><span class="s1">&#39;off&#39;</span><span class="p">]:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set output to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;:outp:stat </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Invalid value </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Yokogawa_GS200.do_get_source_mode">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.do_get_source_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_source_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Get source function mode&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;:sour:func?&#39;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Yokogawa_GS200.do_set_source_mode">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.do_set_source_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_source_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set source function mode to CURR or VOLT&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;curr&#39;</span><span class="p">,</span><span class="s1">&#39;volt&#39;</span><span class="p">]:</span>
+            
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set mode to </span><span class="si">%s</span><span class="s1"> mode&#39;</span> <span class="o">%</span> <span class="n">mode</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;:sour:func </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mode</span><span class="p">)</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Invalid mode </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mode</span><span class="p">)</span></div>
+
+    
+            
+    
+<span class="c1">#    </span>
+<span class="c1">#    def set_range_auto(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Switch autorange on.</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Set range to auto mode&#39;)</span>
+<span class="c1">#        self._visainstrument.write(&#39;:chan%d:sens:rang:auto on&#39; % channel)</span>
+<span class="c1">#        </span>
+<div class="viewcode-block" id="Yokogawa_GS200.set_defaults">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.set_defaults">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set to driver defaults:</span>
+<span class="sd">            </span>
+<span class="sd">            TODO</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;:syst:beep 0&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_source_mode</span><span class="p">(</span><span class="s1">&#39;curr&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;source_range&#39;</span><span class="p">,</span> <span class="s1">&#39;10e-3&#39;</span><span class="p">)</span></div>
+
+        
+        
+<span class="c1">#        self.set(&#39;4W&#39;, &#39;off&#39;)</span>
+
+<span class="c1">#        self.set(&#39;sense_mode&#39;, &#39;volt&#39;)</span>
+<span class="c1">#        self.set(&#39;sense_range&#39;, &#39;200mV&#39;)</span>
+<span class="c1">#        self.set(&#39;source_delay&#39;, 15e-6)</span>
+<span class="c1">#        self.set(&#39;sense_delay&#39;, 0.3)</span>
+<span class="c1">#        self.set(&#39;source_trig&#39;, &#39;ext&#39;)</span>
+<span class="c1">#        self.set(&#39;sense_trig&#39;, &#39;sour&#39;)</span>
+    
+
+<span class="c1">#        </span>
+<span class="c1"># # parameters</span>
+<span class="c1">#        </span>
+<span class="c1"># </span>
+<span class="c1">#    def do_set_sync(self, val):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Turns &quot;on&quot;/&quot;off&quot; the interchannel synchronization.</span>
+<span class="c1">#        The first channel is always &quot; The master&quot;, second - &quot;the slave&quot;</span>
+<span class="c1">#        &#39;&#39;&#39;    </span>
+<span class="c1">#        logging.debug(&#39;Sets the channels in synchronized regime&#39;)</span>
+<span class="c1">#        if val in [&#39;on&#39;,&#39;off&#39;]:</span>
+<span class="c1">#            logging.debug(&#39;Set mode to %s&#39; % val)</span>
+<span class="c1">#            self._visainstrument.write(&#39;:sync:chan %s&#39; % val)</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            logging.error(&#39;Invalid value %s&#39; % val)</span>
+<span class="c1">#            </span>
+<span class="c1">#    def do_get_sync(self):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Gets synchronization mode.</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Gets synchronization mode&#39;)</span>
+<span class="c1">#        ans = self._visainstrument.ask(&#39;:sync:chan?&#39;)</span>
+<span class="c1">#        </span>
+<span class="c1">#        if int(ans):</span>
+<span class="c1">#            return &#39;on&#39;</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            return &#39;off&#39;</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="Yokogawa_GS200.do_set_source_range">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.do_set_source_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_source_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        sets source range to definite channel </span>
+<span class="sd">         </span>
+<span class="sd">        Input:</span>
+<span class="sd">            val (string)  :</span>
+<span class="sd">            channel (int) : </span>
+<span class="sd">        </span>
+<span class="sd">        Output:</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set source range to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_func_par_value</span><span class="p">(</span><span class="s1">&#39;sour&#39;</span><span class="p">,</span> <span class="s1">&#39;rang&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span></div>
+
+       
+       
+
+<div class="viewcode-block" id="Yokogawa_GS200.do_get_source_range">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.do_get_source_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_source_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get source range </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Get source range&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_func_par</span><span class="p">(</span><span class="s1">&#39;sour&#39;</span><span class="p">,</span> <span class="s1">&#39;rang&#39;</span><span class="p">)</span></div>
+
+<span class="c1">#        </span>
+<span class="c1">#        </span>
+<span class="c1">#    def do_set_sense_range(self, val, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Set sense range to the specified channel</span>
+<span class="c1">#</span>
+<span class="c1">#        Input:</span>
+<span class="c1">#            val (string)      : </span>
+<span class="c1">#            channel (int)     : </span>
+<span class="c1">#</span>
+<span class="c1">#        Output:</span>
+<span class="c1">#            None</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Set sense range to %s&#39; % val)</span>
+<span class="c1">#        if (val == &#39;auto&#39;):</span>
+<span class="c1">#            self.set_range_auto(channel)</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            self._set_func_par_value(channel, &#39;sens&#39;, &#39;rang&#39;, val)</span>
+<span class="c1">#</span>
+<span class="c1">#    def do_get_sense_range(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Get sense range for the current mode.</span>
+<span class="c1">#        </span>
+<span class="c1">#        Input:</span>
+<span class="c1">#            channel(int): </span>
+<span class="c1">#        Output:</span>
+<span class="c1">#            range (string) : </span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get sense range&#39;)</span>
+<span class="c1">#        return self._get_func_par(channel, &#39;sens&#39;, &#39;rang&#39;)</span>
+<span class="c1">#        </span>
+<span class="c1">#</span>
+<span class="c1">#        </span>
+<span class="c1">#    def do_set_sweep_mode(self, mode, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Set source mode to current regime.</span>
+<span class="c1">#        &#39;&#39;&#39;    </span>
+<span class="c1">#        if mode in [&#39;fix&#39;]:</span>
+<span class="c1">#            logging.debug(&#39;Set mode to %s sweep mode&#39;, mode)</span>
+<span class="c1">#            self._set_func_par_value(channel, &#39;sour&#39;, &#39;mode&#39;, mode)</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            logging.error(&#39;invalid sweep mode %s&#39; % mode)</span>
+<span class="c1">#        self.get_all()</span>
+<span class="c1">#</span>
+<span class="c1">#    def do_get_sweep_mode(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Get source mode </span>
+<span class="c1">#        </span>
+<span class="c1">#        Input:</span>
+<span class="c1">#            channel (int) : </span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get source sweep mode&#39;)</span>
+<span class="c1">#        return self._get_func_par(channel, &#39;sour&#39;, &#39;mode&#39;)</span>
+<span class="c1">#</span>
+<span class="c1">#    def do_set_sense_mode(self, mode, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Set sense mode to current regime.</span>
+<span class="c1">#        &#39;&#39;&#39;    </span>
+<span class="c1">#        if mode in [&#39;curr&#39;,&#39;volt&#39;]:</span>
+<span class="c1">#            logging.debug(&#39;Set sense mode to %s mode&#39;, mode)</span>
+<span class="c1">#            self._set_func_par_value(channel, &#39;sens&#39;, &#39;func&#39;, mode)</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            logging.error(&#39;invalid mode %s&#39; % mode)</span>
+<span class="c1">#        self.get_all()</span>
+<span class="c1">#        </span>
+<span class="c1">#    def do_get_sense_mode(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Get sense mode for the current mode.</span>
+<span class="c1">#        </span>
+<span class="c1">#        Input:</span>
+<span class="c1">#            channel (int) : </span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get sense mode&#39;)</span>
+<span class="c1">#        return self._get_func_par(channel, &#39;sens&#39;, &#39;func&#39;)</span>
+<span class="c1">#        </span>
+<span class="c1">#    def do_set_source_trig(self, trig, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Set source trigger.</span>
+<span class="c1">#        &#39;&#39;&#39;    </span>
+<span class="c1">#        if trig in [&#39;ext&#39;,&#39;sens&#39;, &#39;aux&#39;]:</span>
+<span class="c1">#            logging.debug(&#39;Set source trig to %s trigger&#39;, trig)</span>
+<span class="c1">#            self._set_func_par_value(channel, &#39;sour&#39;, &#39;trig&#39;, trig)</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            logging.error(&#39;invalid trig %s&#39; % trig)</span>
+<span class="c1">#        self.get_all()</span>
+<span class="c1">#</span>
+<span class="c1">#    def do_get_source_trig(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Get source trigger</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get source trigger&#39;)</span>
+<span class="c1">#        return self._get_func_par(channel, &#39;sour&#39;, &#39;trig&#39;)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#    def do_set_sense_trig(self, trig, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Set sense trigger.</span>
+<span class="c1">#        &#39;&#39;&#39;    </span>
+<span class="c1">#        if trig in [&#39;ext&#39;,&#39;sour&#39;, &#39;aux&#39;]:</span>
+<span class="c1">#            logging.debug(&#39;Set sense trig to %s trigger&#39;, trig)</span>
+<span class="c1">#            self._set_func_par_value(channel, &#39;sens&#39;, &#39;trig&#39;, trig)</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            logging.error(&#39;invalid trig %s&#39; % trig)</span>
+<span class="c1">#        self.get_all()</span>
+<span class="c1">#</span>
+<span class="c1">#    def do_get_sense_trig(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Get sense trigger</span>
+<span class="c1">#        </span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get sense trigger&#39;)</span>
+<span class="c1">#        return self._get_func_par(channel, &#39;sens&#39;, &#39;trig&#39;)</span>
+<span class="c1">#        </span>
+<span class="c1">#    def do_set_source_delay(self, val, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Set source delay</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Set source delay to %s&#39; % val)</span>
+<span class="c1">#        self._set_func_par_value(channel, &#39;sour&#39;, &#39;del&#39;, val)</span>
+<span class="c1">#</span>
+<span class="c1">#    def do_get_source_delay(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Get source delay</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get source delay&#39;)</span>
+<span class="c1">#        return float(self._get_func_par(channel, &#39;sour&#39;,&#39;del&#39;))</span>
+<span class="c1">#        </span>
+<span class="c1">#    def do_set_sense_delay(self, val, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Set sense delay</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Set sense delay to %s&#39; % val)</span>
+<span class="c1">#        self._set_func_par_value(channel, &#39;sens&#39;, &#39;del&#39;, val)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#    def do_get_sense_delay(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Get sense delay</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get sense delay&#39;)</span>
+<span class="c1">#        return float(self._get_func_par(channel, &#39;sens&#39;,&#39;del&#39;))</span>
+<span class="c1">#        </span>
+<span class="c1">#    def do_set_4W(self, val, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Sets measurement mode to 4-wire or 2-wire mode.</span>
+<span class="c1">#        Value should be on or off. </span>
+<span class="c1">#        &quot;On&quot; devotes to 4-wire mode. &quot;Off&quot; devotes to 2-wire mode.</span>
+<span class="c1">#        In the instrument appropriate command is &quot;:sens:rem on/off&quot;</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        if val in [&#39;on&#39;,&#39;off&#39;]:</span>
+<span class="c1">#            logging.debug(&#39;Set 4W to %s&#39; % val)</span>
+<span class="c1">#            self._set_func_par_value(channel, &#39;sens&#39;, &#39;rem&#39;, val)</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            logging.error(&#39;Invalid value %s&#39; % val)</span>
+<span class="c1">#</span>
+<span class="c1">#    def do_get_4W(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Gets measurement mode</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get 4-wire measurement mode&#39;)</span>
+<span class="c1">#        ans = self._get_func_par(channel, &#39;sens&#39;, &#39;rem&#39;)</span>
+<span class="c1">#        </span>
+<span class="c1">#        if int(ans):</span>
+<span class="c1">#            return &#39;on&#39;</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            return &#39;off&#39;</span>
+<span class="c1">#        </span>
+<div class="viewcode-block" id="Yokogawa_GS200.do_set_level">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.do_set_level">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set measuring level</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Set measuring level&#39;</span><span class="p">)</span>
+        <span class="c1">#if self.get(&#39;ch%d_output&#39; % channel, query = False) == &#39;off&#39;:</span>
+        <span class="c1">#    self.set(&#39;ch%d_output&#39; % channel, &#39;on&#39;)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;:sour:lev </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Yokogawa_GS200.do_get_level">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.do_get_level">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get measuring level</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Get measuring level&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;:sour:lev?&#39;</span><span class="p">)</span></div>
+
+        
+<span class="c1">#</span>
+<span class="c1">#    def do_get_value(self, channel):</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        Gets measured value</span>
+<span class="c1">#        &#39;&#39;&#39;</span>
+<span class="c1">#        logging.debug(&#39;Get measured value&#39;)</span>
+<span class="c1">#        return float(self._visainstrument.ask(&#39;:chan%d:fetc?&#39; % channel))</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="Yokogawa_GS200.ramp_current">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Yokogawa_GS200.Yokogawa_GS200.ramp_current">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ramp_current</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">target</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">showvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Ramps the current starting from the actual value to a target value</span>
+<span class="sd">        Attention: all values are given in A</span>
+<span class="sd">        &#39;step&#39; determines the step size</span>
+<span class="sd">        &#39;wait&#39; determines the sleep time after every step</span>
+<span class="sd">        &#39;showvalue&#39; print current value - default is False</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_level</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">showvalue</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:g}</span><span class="s2">mA&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">start</span><span class="o">*</span><span class="mf">1e3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="n">target</span> <span class="o">&lt;</span> <span class="n">start</span><span class="p">):</span> <span class="n">step</span> <span class="o">=</span> <span class="o">-</span><span class="n">step</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">step</span><span class="p">)[</span><span class="mi">1</span><span class="p">:],</span> <span class="p">[</span><span class="n">target</span><span class="p">])</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">showvalue</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:g}</span><span class="s2">mA&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mf">1e3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_level</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span></div>
+
+            
+<span class="c1"># core communication</span>
+  
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sends a visa command &lt;msg&gt;</span>
+<span class="sd">        </span>
+<span class="sd">        Input:</span>
+<span class="sd">            msg (str)</span>
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sends a visa command &lt;msg&gt; and returns the read answer &lt;ans&gt;</span>
+<span class="sd">        </span>
+<span class="sd">        Input:</span>
+<span class="sd">            msg (str)</span>
+<span class="sd">        Output:</span>
+<span class="sd">            ans (str)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        
+        
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_func_par_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">par</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        For internal use only!!</span>
+<span class="sd">        Changes the value of the parameter for the function specified</span>
+<span class="sd">        </span>
+<span class="sd">        Input:</span>
+<span class="sd">            ch (int)</span>
+<span class="sd">            func (string) :</span>
+<span class="sd">            par (string)  :</span>
+<span class="sd">            val (depends) :</span>
+<span class="sd">        </span>
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="s1">&#39;:</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">par</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Set instrument to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">string</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+       
+       
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_func_par</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">par</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        For internal use only!!</span>
+<span class="sd">        Reads the value of the parameter for the function specified</span>
+<span class="sd">        from the instrument</span>
+<span class="sd">        </span>
+<span class="sd">        Input:</span>
+<span class="sd">            ch (int)      :</span>
+<span class="sd">            func (string) :</span>
+<span class="sd">            par (string)  :</span>
+<span class="sd">        </span>
+<span class="sd">        Output:</span>
+<span class="sd">            val (string) :</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="s1">&#39;:</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">?&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span>
+        <span class="n">ans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : ask instrument for </span><span class="si">%s</span><span class="s1"> (result </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">ans</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ans</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

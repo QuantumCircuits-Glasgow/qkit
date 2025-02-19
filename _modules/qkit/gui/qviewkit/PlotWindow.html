@@ -1,0 +1,972 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.gui.qviewkit.PlotWindow &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.gui.qviewkit.PlotWindow</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.gui.qviewkit.PlotWindow</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: hannes.rotzinger@kit.edu / 2015,2016,2017 </span>
+<span class="sd">         marco.pfirrmann@kit.edu / 2016, 2017</span>
+<span class="sd">Qlicense: GPL</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># support both PyQt4 and 5</span>
+<span class="n">in_pyqt5</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span><span class="n">QObject</span><span class="p">,</span><span class="n">pyqtSlot</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span><span class="n">QPlainTextEdit</span><span class="p">,</span><span class="n">QMenu</span><span class="p">,</span><span class="n">QAction</span><span class="p">,</span> <span class="n">QWidgetAction</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QActionGroup</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QBrush</span><span class="p">,</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QFont</span>
+    <span class="c1">#from PyQt5 import Qt</span>
+    <span class="n">in_pyqt5</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">in_pyqt5</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt4</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt4.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span><span class="n">QObject</span><span class="p">,</span><span class="n">pyqtSlot</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt4.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span><span class="n">QPlainTextEdit</span><span class="p">,</span><span class="n">QMenu</span><span class="p">,</span><span class="n">QAction</span><span class="p">,</span> <span class="n">QWidgetAction</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QBrush</span><span class="p">,</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QActionGroup</span><span class="p">,</span> <span class="n">QFont</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;import of PyQt5 and PyQt4 failed. Install one of those.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyqtgraph</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.gui.qviewkit.plot_view</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ui_Form</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.storage.hdf_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">ds_types</span><span class="p">,</span> <span class="n">view_types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.gui.qviewkit.PlotWindow_lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">_display_1D_view</span><span class="p">,</span> <span class="n">_display_1D_data</span><span class="p">,</span> <span class="n">_display_2D_data</span><span class="p">,</span> <span class="n">_display_table</span><span class="p">,</span> <span class="n">_display_text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.gui.qviewkit.PlotWindow_lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_ds</span><span class="p">,</span> <span class="n">_get_ds_url</span><span class="p">,</span> <span class="n">_get_name</span><span class="p">,</span> <span class="n">_get_unit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.lib.misc</span><span class="w"> </span><span class="kn">import</span> <span class="n">str3</span>
+
+<div class="viewcode-block" id="PlotWindow">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlotWindow</span><span class="p">(</span><span class="n">QWidget</span><span class="p">,</span><span class="n">Ui_Form</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PlotWindow class organizes the correct display of data in a h5 file.</span>
+
+<span class="sd">    This class coordinates the display of the data between the UI with it&#39;s </span>
+<span class="sd">    selector slots in Ui_Form and the plot functions in PlotWindow_lib. Here we</span>
+<span class="sd">    handle the trigger events; update, open, and close the plot windows.</span>
+<span class="sd">    Depending on the selector slot settings the associated plot function in the</span>
+<span class="sd">    lib is called.</span>
+<span class="sd">    We inherit from PyQt&#39;s QWidget class as well as the Ui_Form class.</span>
+<span class="sd">    </span>
+<span class="sd">    Heart and soul here is update_plots() which is connected to a timer trigger</span>
+<span class="sd">    and checks the settings of all user slots and calls the correct lib</span>
+<span class="sd">    function to display the data. The window starts with some default</span>
+<span class="sd">    configuration for the dataset types.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PlotWindow.myquit">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.myquit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">myquit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">exit</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">parent</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">dataset_url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Inits PlotWindow with a parent (QMainWindow.treeWidget), data</span>
+<span class="sd">        (qviewkit.main.DATA object), and a dataset_url to be opened.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span> <span class="o">=</span> <span class="n">dataset_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span> <span class="o">=</span> <span class="n">parent</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">PlotWindow</span> <span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">Ui_Form</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># move forward ...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowState</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">WindowActive</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
+
+        <span class="s2">&quot;This variable controlles if a window is new, see update_plots().&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="s2">&quot;connect update_plots to the DatasetWindow&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">refresh_signal</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_plots</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PlotWindow.closeEvent">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.closeEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="s2">&quot;overwrite the closeEvent handler&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">_toBe_deleted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">_remove_plot_widgets</span><span class="p">()</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PlotWindow.update_plots">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.update_plots">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks the signal slots and changes the plotting attributes to be </span>
+<span class="sd">        evaluated by PlotWindow_lib.</span>
+<span class="sd">        </span>
+<span class="sd">        This function coordinates the changing input from the signal slots and</span>
+<span class="sd">        updates the attributes that are parsed to the plotting lib functions.</span>
+<span class="sd">        update_plots() is either periodically called e.g. by the timer or once </span>
+<span class="sd">        on startup.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the PlotWindow class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the given object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print &quot;PWL update_plots:&quot;, self.obj_parent.h5file</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">h5file</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="c1"># The axis names are parsed to plot_view&#39;s Ui_Form class to label the UI selectors </span>
+        <span class="n">x_ds_name</span> <span class="o">=</span> <span class="n">_get_name</span><span class="p">(</span><span class="n">_get_ds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x_ds_url&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)))</span>
+        <span class="n">y_ds_name</span> <span class="o">=</span> <span class="n">_get_name</span><span class="p">(</span><span class="n">_get_ds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;y_ds_url&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)))</span>
+        <span class="n">z_ds_name</span> <span class="o">=</span> <span class="n">_get_name</span><span class="p">(</span><span class="n">_get_ds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;z_ds_url&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;xy_0&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+                <span class="n">x_ds_name_view</span> <span class="o">=</span> <span class="n">_get_name</span><span class="p">(</span><span class="n">_get_ds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span><span class="n">_get_ds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="n">str3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;xy_0&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x_ds_url&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)))</span>
+                <span class="n">y_ds_name_view</span> <span class="o">=</span> <span class="n">_get_name</span><span class="p">(</span><span class="n">_get_ds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span><span class="n">_get_ds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="n">str3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;xy_0&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;y_ds_url&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">x_ds_name_view</span> <span class="o">=</span> <span class="s1">&#39;_none_&#39;</span>
+            <span class="n">y_ds_name_view</span> <span class="o">=</span> <span class="s1">&#39;_none_&#39;</span>
+
+        <span class="n">selector_label</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_ds_name</span><span class="p">,</span> <span class="n">y_ds_name</span><span class="p">,</span> <span class="n">z_ds_name</span><span class="p">,</span> <span class="n">x_ds_name_view</span><span class="p">,</span> <span class="n">y_ds_name_view</span><span class="p">]</span>    
+
+        <span class="c1">## At first window creation the attributes are set to state zero.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="c1"># A few state variables:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceValueChanged</span>  <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceZValueChanged</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXValueChanged</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYValueChanged</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">VTraceZValueChanged</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">VTraceXValueChanged</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">VTraceYValueChanged</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># the following calls rely on ds_type and setup the layout of the plot window.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span><span class="p">,</span> <span class="n">selector_label</span><span class="p">)</span>
+
+            <span class="n">window_title</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">window_title</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setDefaultView</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_signal_slots</span><span class="p">()</span>
+        
+        <span class="c1">## We check here for the view type given by either default setting or</span>
+        <span class="c1">## user input. Creates the canvas and calls the associated plot </span>
+        <span class="c1">## function from the lib. For code constistence the variable names are</span>
+        <span class="c1">## the same in all view types.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">==</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D-V&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">PlotWidget</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addQvkMenu</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">sceneObj</span><span class="o">.</span><span class="n">contextMenu</span><span class="p">[:</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">_display_1D_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">==</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">PlotWidget</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addQvkMenu</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">sceneObj</span><span class="o">.</span><span class="n">contextMenu</span><span class="p">[:</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">_display_1D_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">==</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;2D&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="o">=</span> <span class="n">ImageViewMplColorMaps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="p">,</span> <span class="n">view</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">PlotItem</span><span class="p">())</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">addQvkMenu</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">contextMenu</span><span class="p">[:</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">setAspectLocked</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">_display_2D_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">==</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">TableWidget</span><span class="p">(</span><span class="n">sortable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="o">+</span><span class="s1">&#39;_table&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">setFormat</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.6g</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">_display_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">==</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;txt&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChangeBox</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChangeBox</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span> <span class="o">=</span> <span class="n">QPlainTextEdit</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                <span class="n">_display_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsView</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This should not be here: View Type:&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view_type</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PlotWindow: Value Error; Dataset not yet available&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PlotWindow: OS Error; Probably a read/write conflict occured&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_signal_slots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Depending on the dataset type the possible signal slots are created</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the PlotWindow class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the given object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;vector&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;coordinate&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChangeVector</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;matrix&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChangeMatrix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBTraceXNum</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBTraceYNum</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXValue</span><span class="o">.</span><span class="n">returnPressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBTraceXValue</span><span class="p">)</span>            
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYValue</span><span class="o">.</span><span class="n">returnPressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBTraceYValue</span><span class="p">)</span> 
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;box&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChangeBox</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBTraceXNum</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBTraceYNum</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceZSelector</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBTraceZNum</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXValue</span><span class="o">.</span><span class="n">returnPressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBTraceXValue</span><span class="p">)</span>            
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYValue</span><span class="o">.</span><span class="n">returnPressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBTraceYValue</span><span class="p">)</span>            
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceZValue</span><span class="o">.</span><span class="n">returnPressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setBTraceZValue</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;view&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">VTraceXSelector</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setVTraceXNum</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">VTraceYSelector</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setVTraceYNum</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">VTraceXValue</span><span class="o">.</span><span class="n">returnPressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setVTraceXValue</span><span class="p">)</span>           
+            <span class="bp">self</span><span class="o">.</span><span class="n">VTraceYValue</span><span class="o">.</span><span class="n">returnPressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setVTraceYValue</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PlotWindow.keyPressEvent">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.keyPressEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ev</span><span class="p">):</span>
+        <span class="c1">#print(&quot;Received Key Press Event!! You Pressed: &quot;+ event.text())</span>
+        <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Key_S</span><span class="p">:</span>
+            <span class="c1">#print &#39;# &#39;,ev.key()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_coord</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setDefaultView</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the display attributes to a ds_type sensitive default case.</span>
+<span class="sd">        </span>
+<span class="sd">        The default attributs for the ds_types are:</span>
+<span class="sd">        coordinate -&gt; 1d, data vs. x_coord</span>
+<span class="sd">        vector -&gt; 1d, data vs. x_coord</span>
+<span class="sd">        matrix -&gt; 2d, color coded data with y_coord and x_coord</span>
+<span class="sd">        box -&gt; 2d, color coded data with y_coord and x_coord at the mid-point</span>
+<span class="sd">            of the z-coord.</span>
+<span class="sd">        The default settings for the user signal slots are set up in their </span>
+<span class="sd">        respective functions.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the PlotWindow class.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the given object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1">## Some look-up dicts for manipulation and plot styles.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_styles</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;line&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;linepoint&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;point&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulations</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dB&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;wrap&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;remove_zeros&#39;</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span>
+                              <span class="s1">&#39;sub_offset_avg_x&#39;</span><span class="p">:</span><span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;sub_offset_avg_y&#39;</span><span class="p">:</span><span class="mi">32</span><span class="p">,</span> <span class="s1">&#39;norm_data_avg_x&#39;</span><span class="p">:</span><span class="mi">64</span><span class="p">,</span> <span class="s1">&#39;norm_data_avg_y&#39;</span><span class="p">:</span><span class="mi">128</span><span class="p">,</span> <span class="s1">&#39;histogram&#39;</span><span class="p">:</span><span class="mi">256</span><span class="p">}</span> <span class="c1">#BITMASK for manipulation</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_style</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceNum</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;view_type&quot;</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_setting_changed</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s2">&quot;coordinate&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_defaultCoord</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s2">&quot;vector&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_defaultVector</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s2">&quot;matrix&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;2D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_defaultMatrix</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;2D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_defaultBox</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;txt&#39;</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_type</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s2">&quot;view&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D-V&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_defaultView</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_defaultOld</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_defaultCoord</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_defaultVector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_defaultMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceXNum</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceYNum</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_defaultBox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceZSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceZSelector</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceZSelector</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceZNum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceXNum</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceYNum</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_defaultView</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VTraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VTraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VTraceXNum</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VTraceYNum</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_defaultOld</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">plot_style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_styles</span><span class="p">[</span><span class="s1">&#39;line&#39;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelector</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span><span class="n">shape</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;2D&#39;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;2D&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PlotTypeSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setTraceNum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceNum</span> <span class="o">=</span> <span class="n">num</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">TraceValueChanged</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+    <span class="c1">#######</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setVTraceXValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">xval</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VTraceXValue</span><span class="o">.</span><span class="n">displayText</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_VtraceX_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xval</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VTraceXValueChanged</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setVTraceXNum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VTraceXNum</span> <span class="o">=</span> <span class="n">num</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">VTraceXValueChanged</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setVTraceYValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">xval</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VTraceYValue</span><span class="o">.</span><span class="n">displayText</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_VtraceY_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xval</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VTraceYValueChanged</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setVTraceYNum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VTraceYNum</span> <span class="o">=</span> <span class="n">num</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">TraceYValueChanged</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setBTraceXValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">xval</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TraceXValue</span><span class="o">.</span><span class="n">displayText</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_traceX_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xval</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceXValueChanged</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setBTraceXNum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceXNum</span> <span class="o">=</span> <span class="n">num</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">TraceXValueChanged</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setBTraceYValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">xval</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TraceYValue</span><span class="o">.</span><span class="n">displayText</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_traceY_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xval</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceYValueChanged</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setBTraceYNum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceYNum</span> <span class="o">=</span> <span class="n">num</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">TraceYValueChanged</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setBTraceZValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">xval</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TraceZValue</span><span class="o">.</span><span class="n">displayText</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_traceZ_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xval</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceZValueChanged</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setBTraceZNum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TraceZNum</span> <span class="o">=</span> <span class="n">num</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">TraceZValueChanged</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_onPlotTypeChangeVector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_onPlotTypeChangeMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;2D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_onPlotTypeChangeBox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_onPlotTypeChanged</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;2D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceZSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;2D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceZSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;2D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceZSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceZSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceZSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_type</span> <span class="o">=</span> <span class="n">view_types</span><span class="p">[</span><span class="s1">&#39;1D&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceXSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceYSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TraceZSelector</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_addXPlotChange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_addYPlotChange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_XY_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">ds_tree_items</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addXPlotSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addYPlotSelector</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addXPlotSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addYPlotSelector</span><span class="o">.</span><span class="n">setItemText</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="c1">#print i,key</span>
+
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_getXValueFromTraceNum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ds</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+        <span class="n">x_ds</span> <span class="o">=</span> <span class="n">_get_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x_ds_url&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">x_ds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;__none__&quot;</span>
+        <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;box&#39;</span><span class="p">]:</span>
+            <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_ds</span><span class="p">)[:</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fill&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_ds</span><span class="p">)[:</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">xunit</span> <span class="o">=</span> <span class="n">_get_unit</span><span class="p">(</span><span class="n">x_ds</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xval</span> <span class="o">=</span> <span class="n">x_data</span><span class="p">[</span><span class="n">num</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span><span class="ne">IndexError</span><span class="p">):</span>
+            <span class="n">xval</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">xval</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">xunit</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_getYValueFromTraceNum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ds</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+        <span class="n">y_ds</span> <span class="o">=</span> <span class="n">_get_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;y_ds_url&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ds_type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;box&#39;</span><span class="p">]:</span>
+            <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_ds</span><span class="p">)[:</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fill&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_ds</span><span class="p">)[:</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">yunit</span> <span class="o">=</span> <span class="n">_get_unit</span><span class="p">(</span><span class="n">y_ds</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">yval</span> <span class="o">=</span> <span class="n">y_data</span><span class="p">[</span><span class="n">num</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span><span class="ne">IndexError</span><span class="p">):</span>
+            <span class="n">yval</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">yval</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">yunit</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_getZValueFromTraceNum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ds</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+        <span class="n">z_ds</span> <span class="o">=</span> <span class="n">_get_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;z_ds_url&#39;</span><span class="p">))</span>
+        <span class="n">z_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z_ds</span><span class="p">)[:</span><span class="n">ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+        <span class="n">zunit</span> <span class="o">=</span> <span class="n">_get_unit</span><span class="p">(</span><span class="n">z_ds</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">zval</span> <span class="o">=</span> <span class="n">z_data</span><span class="p">[</span><span class="n">num</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span><span class="ne">IndexError</span><span class="p">):</span>
+            <span class="n">zval</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">zval</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">zunit</span><span class="p">)</span>
+        
+
+<div class="viewcode-block" id="PlotWindow.addQvkMenu">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.addQvkMenu">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">addQvkMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">menu</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add custom entry in the right-click menu.</span>
+<span class="sd">        </span>
+<span class="sd">        The data manipulation option are displayed in the menu. Each entry is</span>
+<span class="sd">        connected with a trigger event and the information about the clicked</span>
+<span class="sd">        entry is parsed to the plot lib via the plot_style or the manipulation</span>
+<span class="sd">        attribute.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            self: Object of the PlotWindow class.</span>
+<span class="sd">            menu: Menu of the respective pyqtgraph plot class</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            No return variable. The function operates on the given object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">(</span><span class="s2">&quot;Qviewkit&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span> <span class="o">=</span> <span class="n">QActionGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">setExclusive</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">point</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Point&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">point</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setPointMode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">point</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Line&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">line</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">line</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setLineMode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">pointLine</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Point+Line&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">pointLine</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">pointLine</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setPointLineMode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linestyle_selector</span><span class="o">.</span><span class="n">pointLine</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        
+        <span class="n">phase_wrap</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;(un)wrap phase data&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">phase_wrap</span><span class="p">)</span>
+        <span class="n">phase_wrap</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setPhaseWrap</span><span class="p">)</span>
+        
+        <span class="n">linear_correction</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;linearly correct data&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">linear_correction</span><span class="p">)</span>
+        <span class="n">linear_correction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setLinearCorrection</span><span class="p">)</span>
+
+        <span class="n">offset_correction_x</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;data-&lt;data:x&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">offset_correction_x</span><span class="p">)</span>
+        <span class="n">offset_correction_x</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setOffsetCorrectionX</span><span class="p">)</span>
+        
+        <span class="n">offset_correction_y</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;data-&lt;data:y&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">offset_correction_y</span><span class="p">)</span>
+        <span class="n">offset_correction_y</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setOffsetCorrectionY</span><span class="p">)</span>
+
+        <span class="n">norm_correction_x</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;data/&lt;data:x&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">norm_correction_x</span><span class="p">)</span>
+        <span class="n">norm_correction_x</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setNormDataCorrectionX</span><span class="p">)</span>
+        
+        <span class="n">norm_correction_y</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;data/&lt;data:y&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">norm_correction_y</span><span class="p">)</span>
+        <span class="n">norm_correction_y</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setNormDataCorrectionY</span><span class="p">)</span>
+
+        <span class="n">dB_scale</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;dB / linear&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">dB_scale</span><span class="p">)</span>
+        <span class="n">dB_scale</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setdBScale</span><span class="p">)</span>
+
+        <span class="n">histogram</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Histogram&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">histogram</span><span class="p">)</span>
+        <span class="n">histogram</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setHistogram</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulation_menu</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dB&#39;</span><span class="p">:</span> <span class="n">dB_scale</span><span class="p">,</span>
+                                  <span class="s1">&#39;wrap&#39;</span><span class="p">:</span> <span class="n">phase_wrap</span><span class="p">,</span>
+                                  <span class="s1">&#39;linear&#39;</span><span class="p">:</span> <span class="n">linear_correction</span><span class="p">,</span>
+                                  <span class="s1">&#39;sub_offset_avg_x&#39;</span><span class="p">:</span> <span class="n">offset_correction_x</span><span class="p">,</span>
+                                  <span class="s1">&#39;sub_offset_avg_y&#39;</span><span class="p">:</span> <span class="n">offset_correction_y</span><span class="p">,</span>
+                                  <span class="s1">&#39;norm_data_avg_x&#39;</span><span class="p">:</span> <span class="n">norm_correction_x</span><span class="p">,</span>
+                                  <span class="s1">&#39;norm_data_avg_y&#39;</span><span class="p">:</span> <span class="n">norm_correction_y</span><span class="p">,</span>
+                                  <span class="s1">&#39;histogram&#39;</span><span class="p">:</span> <span class="n">histogram</span><span class="p">}</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateManipulationMenu</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        
+        <span class="n">notefont</span> <span class="o">=</span> <span class="n">QFont</span><span class="p">(</span><span class="s2">&quot;Helvetica&quot;</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">12</span><span class="p">)</span>
+        <span class="n">note</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s2">&quot;Manipulations are executed in the order shown here.&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">,</span><span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">notefont</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">note</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">setTearOffEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Qviewkit &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="n">menu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">menu</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qvkMenu</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="PlotWindow.updateManipulationMenu">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.updateManipulationMenu">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updateManipulationMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulation_menu</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manipulation_menu</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulations</span><span class="p">[</span><span class="n">m</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="PlotWindow.setPointMode">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setPointMode">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setPointMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_styles</span><span class="p">[</span><span class="s1">&#39;point&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_setting_changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PlotWindow.setLineMode">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setLineMode">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setLineMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_styles</span><span class="p">[</span><span class="s1">&#39;line&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_setting_changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PlotWindow.setPointLineMode">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setPointLineMode">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setPointLineMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_styles</span><span class="p">[</span><span class="s1">&#39;linepoint&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_setting_changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PlotWindow.setdBScale">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setdBScale">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setdBScale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulations</span><span class="p">[</span><span class="s1">&#39;dB&#39;</span><span class="p">]</span>
+        <span class="c1">#print &quot;{:08b}&quot;.format(self.manipulation)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+      
+<div class="viewcode-block" id="PlotWindow.setPhaseWrap">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setPhaseWrap">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setPhaseWrap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulations</span><span class="p">[</span><span class="s1">&#39;wrap&#39;</span><span class="p">]</span>
+        <span class="c1">#print &quot;{:08b}&quot;.format(self.manipulation)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PlotWindow.setLinearCorrection">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setLinearCorrection">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setLinearCorrection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulations</span><span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">]</span>
+        <span class="c1">#print &quot;{:08b}&quot;.format(self.manipulation)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+            
+<div class="viewcode-block" id="PlotWindow.setOffsetCorrectionX">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setOffsetCorrectionX">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setOffsetCorrectionX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulations</span><span class="p">[</span><span class="s1">&#39;sub_offset_avg_x&#39;</span><span class="p">]</span>
+        <span class="c1">#print &quot;{:08b}&quot;.format(self.manipulation)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PlotWindow.setOffsetCorrectionY">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setOffsetCorrectionY">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setOffsetCorrectionY</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulations</span><span class="p">[</span><span class="s1">&#39;sub_offset_avg_y&#39;</span><span class="p">]</span>
+        <span class="c1">#print &quot;{:08b}&quot;.format(self.manipulation)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PlotWindow.setNormDataCorrectionX">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setNormDataCorrectionX">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setNormDataCorrectionX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulations</span><span class="p">[</span><span class="s1">&#39;norm_data_avg_x&#39;</span><span class="p">]</span>
+        <span class="c1">#print &quot;{:08b}&quot;.format(self.manipulation)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PlotWindow.setNormDataCorrectionY">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setNormDataCorrectionY">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setNormDataCorrectionY</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulations</span><span class="p">[</span><span class="s1">&#39;norm_data_avg_y&#39;</span><span class="p">]</span>
+        <span class="c1">#print &quot;{:08b}&quot;.format(self.manipulation)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PlotWindow.setHistogram">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.PlotWindow.setHistogram">[docs]</a>
+    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setHistogram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulation</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">manipulations</span><span class="p">[</span><span class="s1">&#39;histogram&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_windowJustCreated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_parent</span><span class="o">.</span><span class="n">pw_refresh_signal</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+</div>
+
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<div class="viewcode-block" id="ImageViewMplColorMaps">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.ImageViewMplColorMaps">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImageViewMplColorMaps</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">ImageView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to manually inclued the matplotlib 2.0 colormaps.</span>
+<span class="sd">    </span>
+<span class="sd">    The class implements the matplotlib 2.0 colormaps &#39;viridis&#39;, &#39;inferno&#39;, </span>
+<span class="sd">    &#39;plasma&#39;, and &#39;magma&#39; to the available colors scales in our 2d plots.</span>
+<span class="sd">    They are not (yet?) available in the standard pyqtgraph package. However, </span>
+<span class="sd">    there is a pull request #446, issued Feb 2017 by github user &quot;WFrsh&quot; to add</span>
+<span class="sd">    them to the standard available gradient dict.</span>
+<span class="sd">    The code is a combination by his added rgb color maps and a monkey patch by</span>
+<span class="sd">    user &quot;honkomonk&quot; posted in the comment section of pull request #561.</span>
+<span class="sd">    </span>
+<span class="sd">    The color gradients for the maps are hard coded here and added to the</span>
+<span class="sd">    available dict of colormaps. The &#39;viridis&#39; map is set as default.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ImageView&#39;</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">imageItem</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageViewMplColorMaps</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">imageItem</span><span class="o">=</span><span class="n">imageItem</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradientEditorItem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">histogram</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">gradient</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">activeCm</span> <span class="o">=</span> <span class="s2">&quot;viridis&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mplColorMaps</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;ticks&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="p">(</span><span class="mi">87</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">109</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="mi">187</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">84</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="p">(</span><span class="mi">249</span><span class="p">,</span> <span class="mi">142</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">252</span><span class="p">,</span> <span class="mi">254</span><span class="p">,</span> <span class="mi">164</span><span class="p">,</span> <span class="mi">255</span><span class="p">))],</span> <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="s1">&#39;rgb&#39;</span><span class="p">}),</span>
+                    <span class="p">(</span><span class="s1">&#39;plasma&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;ticks&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">134</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="p">(</span><span class="mi">126</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">167</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="mi">203</span><span class="p">,</span> <span class="mi">71</span><span class="p">,</span> <span class="mi">119</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="p">(</span><span class="mi">248</span><span class="p">,</span> <span class="mi">149</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">239</span><span class="p">,</span> <span class="mi">248</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mi">255</span><span class="p">))],</span> <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="s1">&#39;rgb&#39;</span><span class="p">}),</span>
+                    <span class="p">(</span><span class="s1">&#39;magma&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;ticks&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">123</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="mi">182</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">121</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="p">(</span><span class="mi">251</span><span class="p">,</span> <span class="mi">136</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">251</span><span class="p">,</span> <span class="mi">252</span><span class="p">,</span> <span class="mi">191</span><span class="p">,</span> <span class="mi">255</span><span class="p">))],</span> <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="s1">&#39;rgb&#39;</span><span class="p">}),</span>
+                    <span class="p">(</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;ticks&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">68</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">84</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="p">(</span><span class="mi">58</span><span class="p">,</span> <span class="mi">82</span><span class="p">,</span> <span class="mi">139</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">144</span><span class="p">,</span> <span class="mi">140</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="p">(</span><span class="mi">94</span><span class="p">,</span> <span class="mi">201</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">253</span><span class="p">,</span> <span class="mi">231</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">255</span><span class="p">))],</span> <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="s1">&#39;rgb&#39;</span><span class="p">}),</span>
+                    <span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">registerCmap</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ImageViewMplColorMaps.registerCmap">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.ImageViewMplColorMaps.registerCmap">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">registerCmap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add matplotlib cmaps to the GradientEditors context menu&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradientEditorItem</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+        <span class="n">savedLength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradientEditorItem</span><span class="o">.</span><span class="n">length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradientEditorItem</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">100</span>
+        
+        
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mplColorMaps</span><span class="p">:</span>
+            <span class="n">px</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="n">px</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradientEditorItem</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mplColorMaps</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradientEditorItem</span><span class="o">.</span><span class="n">getGradient</span><span class="p">()</span>
+            <span class="n">brush</span> <span class="o">=</span> <span class="n">QBrush</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">fillRect</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> <span class="n">brush</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+            <span class="n">label</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">px</span><span class="p">)</span>
+            <span class="n">label</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">act</span> <span class="o">=</span><span class="n">QWidgetAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gradientEditorItem</span><span class="p">)</span>
+            <span class="n">act</span><span class="o">.</span><span class="n">setDefaultWidget</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">act</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmapClicked</span><span class="p">)</span>
+            <span class="n">act</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradientEditorItem</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">act</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradientEditorItem</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">savedLength</span></div>
+
+
+
+<div class="viewcode-block" id="ImageViewMplColorMaps.cmapClicked">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.PlotWindow.ImageViewMplColorMaps.cmapClicked">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cmapClicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;onclick handler for our custom entries in the GradientEditorItem&#39;s context menu&quot;&quot;&quot;</span>
+        <span class="n">act</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sender</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gradientEditorItem</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mplColorMaps</span><span class="p">[</span><span class="n">act</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activeCm</span> <span class="o">=</span> <span class="n">act</span><span class="o">.</span><span class="n">name</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

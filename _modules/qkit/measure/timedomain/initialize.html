@@ -1,0 +1,454 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.timedomain.initialize &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.measure.timedomain.initialize</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.measure.timedomain.initialize</h1><div class="highlight"><pre>
+<span></span><span class="c1"># initialize.py</span>
+<span class="c1"># collected and adapted by Andre Schneider (S1) 2018/05</span>
+
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.measure.timedomain</span><span class="w"> </span><span class="kn">import</span> <span class="n">gate_func</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.measure.timedomain</span><span class="w"> </span><span class="kn">import</span> <span class="n">sequence_library</span> <span class="k">as</span> <span class="n">sl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.measure.timedomain</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualAWG</span> <span class="k">as</span> <span class="n">virtual_awg</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
+
+<div class="viewcode-block" id="InitializeTimeDomain">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InitializeTimeDomain</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sample</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span> <span class="o">=</span> <span class="n">sample</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vawg</span> <span class="o">=</span> <span class="n">virtual_awg</span><span class="o">.</span><span class="n">VirtualAWG</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="p">)</span>
+        
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span> <span class="c1">#typical values are given in (brackets)</span>
+            <span class="s1">&#39;T_rep&#39;</span><span class="p">:</span>                <span class="s2">&quot; repetition rate [s] (200e-6)&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;exc_T&#39;</span><span class="p">:</span>                <span class="s2">&quot; maximum window for manipulation [s]  (20e-6)&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;readout_tone_length&#39;</span><span class="p">:</span>  <span class="s2">&quot; length of readout tone [s]  (400e-09)&quot;</span><span class="p">,</span>
+
+            <span class="s1">&#39;clock&#39;</span><span class="p">:</span>                <span class="s2">&quot; samplerate for manipulation awg [S/s] (1.2e9)&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;readout_clock&#39;</span><span class="p">:</span>        <span class="s2">&quot; samplerate for readout dac [S/s] (1.2e9)&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;spec_samplerate&#39;</span><span class="p">:</span>      <span class="s2">&quot; samplerate for readout adc [S/s] (1.25e9)&quot;</span><span class="p">,</span>
+
+            <span class="s1">&#39;f01&#39;</span><span class="p">:</span>                  <span class="s2">&quot; qubit transition frequency [Hz] (5.469e9)&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;fr&#39;</span><span class="p">:</span>                   <span class="s2">&quot; resonator readout frequency [Hz] (9e9)&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;iq_frequency&#39;</span><span class="p">:</span>         <span class="s2">&quot; IQ frequency for manipulation [Hz] (80e6)&quot;</span><span class="p">,</span>
+
+            <span class="s1">&#39;mw_power&#39;</span><span class="p">:</span>             <span class="s2">&quot; power for the qubit microwave source&quot;</span><span class="p">,</span>
+            
+            <span class="s1">&#39;awg&#39;</span><span class="p">:</span>                  <span class="s2">&quot; Instrument: qubit manipulation awg&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;qubit_mw_src&#39;</span><span class="p">:</span>         <span class="s2">&quot; Instrument: qubit manipulation microwave source&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;readout_awg&#39;</span><span class="p">:</span>          <span class="s2">&quot; Instrument: readout awg&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;readout_mw_src&#39;</span><span class="p">:</span>       <span class="s2">&quot; Instrument: readout microwave source&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;mspec&#39;</span><span class="p">:</span>                <span class="s2">&quot; Instrument virtual_measure_spec&quot;</span>
+    <span class="p">}</span>
+    <span class="n">optional_params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;readout_iq_frequency&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot; IQ frequency for readout [Hz]&quot;</span><span class="p">,</span> <span class="mf">30e6</span><span class="p">],</span>
+            <span class="s1">&#39;acqu_window&#39;</span><span class="p">:</span>          <span class="p">[</span><span class="s2">&quot; position of the adc recording window as array [start, end]. No longer needed to be divisible by 32. (samples)&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">96</span><span class="p">,</span> <span class="mi">545</span><span class="p">]],</span>
+            <span class="s1">&#39;overlap&#39;</span><span class="p">:</span>              <span class="p">[</span><span class="s2">&quot; Overlap between manipulation window and readout pulse.&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;readout_delay&#39;</span><span class="p">:</span>        <span class="p">[</span><span class="s2">&quot; Time offset of the readout pulse to adjust the timing of the devices&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;readout_pha&#39;</span><span class="p">:</span>          <span class="p">[</span><span class="s2">&quot; Phase of the readout tone&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;readout_relamp&#39;</span><span class="p">:</span>       <span class="p">[</span><span class="s2">&quot; relative amplitude of the different readout tones&quot;</span> <span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;spec_input_level&#39;</span><span class="p">:</span>     <span class="p">[</span><span class="s2">&quot; Input range in mV of the spectrum adc card. Restricted to card-dependant values&quot;</span><span class="p">,</span> <span class="mi">250</span><span class="p">]</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="InitializeTimeDomain.initialize">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.initialize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        doc-string tbd</span>
+
+<span class="sd">        you will need a valid sample file with the following parameters set:</span>
+<span class="sd">         </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="c1"># Check if we have all necessary parameters in our sample object:</span>
+        <span class="nb">breakpoint</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Please specify &#39;&quot;</span><span class="o">+</span><span class="n">p</span><span class="o">+</span><span class="s2">&quot;&#39; in your sample object:&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">p</span><span class="p">])</span>
+                <span class="nb">breakpoint</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">breakpoint</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not all vallues in your sample file are present. I can not continue. Sorry.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># If some parameters are not given, that have a good default, set them in the sample object, so that the user knows them.</span>
+        <span class="k">for</span> <span class="n">p</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optional_params</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1">#Init the spectrum card</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">spec_stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_segments</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_blocks</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_window</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">512</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_mw_src</span><span class="o">.</span><span class="n">has_parameter</span><span class="p">(</span><span class="s1">&#39;high_power&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_mw_src</span><span class="o">.</span><span class="n">set_high_power</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_qubit_mw_src</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_mw_src</span><span class="o">.</span><span class="n">set_power</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">set_power</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_mw_src</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1">#qubit awg presets</span>
+        <span class="k">if</span> <span class="kc">True</span><span class="p">:</span> <span class="c1">#Tabor AWG in 4ch mode</span>
+            <span class="c1"># Tabor is self triggered</span>
+            <span class="c1"># SYNC output of Tabor makes sync pulse to Tek</span>
+            <span class="c1"># TekMarker makes sync pulse for spec card #CHECK</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+            <span class="c1">#self.set_p1_runmode(&#39;SEQ&#39;)</span>
+            <span class="c1">#self.set_p2_runmode(&#39;USER&#39;)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;ch</span><span class="si">%i</span><span class="s1">_amplitude&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;ch</span><span class="si">%i</span><span class="s1">_output&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;ch</span><span class="si">%i</span><span class="s1">_marker_output&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;ch</span><span class="si">%i</span><span class="s1">_marker_high&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_common_clock</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_clock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">clock</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_awg</span><span class="o">.</span><span class="n">set_clock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_clock</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_awg_square</span><span class="p">([</span><span class="mf">100e-9</span><span class="p">])</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">_numchannels</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_p1_trigger_time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_p2_trigger_time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_p1_sync_output</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_p2_sync_output</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_trigger_time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set_sync_output</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span> <span class="o">&lt;</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">exc_T</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Your repetition rate T_rep is too small for the chosen window exc_T.&quot;</span><span class="p">)</span>
+            
+            <span class="k">if</span>  <span class="s2">&quot;Tektronix&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span> <span class="o">&lt;</span> <span class="mf">170e-6</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You are using the Tektronix AWG as readout. This has a bug and your repetition rate should be &gt;= 200us.&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;p</span><span class="si">%i</span><span class="s1">_runmode&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;USER&#39;</span><span class="p">)</span>   
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;p</span><span class="si">%i</span><span class="s1">_trigger_mode&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;TRIG&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;p</span><span class="si">%i</span><span class="s1">_trigger_source&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;TIM&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;p</span><span class="si">%i</span><span class="s1">_sequence_mode&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;STEP&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;p</span><span class="si">%i</span><span class="s1">_trigger_delay&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;p</span><span class="si">%i</span><span class="s1">_runmode&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;SEQ&#39;</span><span class="p">)</span>   
+            
+        <span class="c1">#put something into the manipulation awg</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">set_tone_amp</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">set_LO</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">fr</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_iq_frequency</span><span class="p">)</span>   <span class="c1">#set LO lower and use mixer as a up-converter. For multiplexing set LO to centerfreq - IQ freq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">set_tone_freq</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">fr</span><span class="p">))</span>   <span class="c1">#probe tone frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">set_tone_pha</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_pha</span><span class="p">))</span>   <span class="c1">#phase shift (usually not necessary)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">set_tone_relamp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_relamp</span><span class="p">))</span>   <span class="c1">#relative amplitude of tone</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_timings</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_gate_func</span><span class="p">(</span><span class="n">gate_func</span><span class="o">.</span><span class="n">Gate_Func</span><span class="p">(</span><span class="n">awg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="p">,</span><span class="n">sample</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="p">)</span><span class="o">.</span><span class="n">gate_fcn</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">spec_stop</span><span class="p">()</span>   <span class="c1">#stop card before modifying a setting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_samplerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">spec_samplerate</span><span class="p">)</span>   
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">spec_samplerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">()</span> <span class="c1">#We want to have the actual samplerate in the sample object</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_spec_input_level</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">spec_input_level</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="InitializeTimeDomain.update_timings">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.update_timings">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_timings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_dac_delay</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;p1_trigger_time&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;trigger_time&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_trigger_rate</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">T_rep</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">set_dac_duration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_tone_length</span><span class="p">)</span> <span class="c1">#length of the readout tone</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">set_dac_clock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">clock</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">set_dac_delay</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="InitializeTimeDomain.set_spec_input_level">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.set_spec_input_level">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_spec_input_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">level</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        possible levels depend on the card and are specified in mV.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">spec_stop</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_input_amp</span><span class="p">(</span><span class="n">level</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InitializeTimeDomain.record_single_trace">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.record_single_trace">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_single_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#record single probe tone signal and plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_window</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_averages</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_segments</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">samples</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(),</span><span class="mi">32</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samples</span><span class="p">()))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;samples (</span><span class="si">%.0f</span><span class="s1">MHz samplerate: 1sample = </span><span class="si">%.3g</span><span class="s1">ns)&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">()</span><span class="o">/</span><span class="mf">1e6</span><span class="p">,</span><span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">()</span><span class="o">*</span><span class="mf">1e9</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;amplitude&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">twiny</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;nanoseconds&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samples</span><span class="p">())</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">()</span><span class="o">*</span><span class="mf">1e9</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samples</span><span class="p">())</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">()</span><span class="o">*</span><span class="mf">1e9</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">128</span><span class="p">,</span><span class="mi">127</span><span class="p">)</span>
+        <span class="n">clips</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">==</span><span class="mi">127</span><span class="p">))</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">==-</span><span class="mi">128</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">clips</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Clipping detected, please reduce amplifier voltage (</span><span class="si">%r</span><span class="s2"> Clips)&quot;</span> <span class="o">%</span><span class="n">clips</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">clips</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;In 5 measurements, only </span><span class="si">%i</span><span class="s2"> points had the maximum amplitude. This sounds good, go on.&quot;</span><span class="o">%</span><span class="n">clips</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">15</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No signal detected. Check your wiring!&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">samples</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">64</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The amplitude never reached half of the maximum of the card. Think about adding an amplifier and check that you are using the smallest spec_input_level.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The amplitude seems reasonable. Check the image nevertheless.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_window</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">acqu_window</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="InitializeTimeDomain.record_averaged_trace">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.record_averaged_trace">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_averaged_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#record average signal and plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">spec_stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_spec_trigger_delay</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_samples</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_averages</span><span class="p">(</span><span class="mf">1e4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_segments</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">acquire</span><span class="p">())</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samples</span><span class="p">()))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;samples (</span><span class="si">%.0f</span><span class="s1">MHz samplerate: 1sample = </span><span class="si">%.3g</span><span class="s1">ns)&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">()</span><span class="o">/</span><span class="mf">1e6</span><span class="p">,</span><span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">()</span><span class="o">*</span><span class="mf">1e9</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samples</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">512</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(),</span><span class="mi">32</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(),</span><span class="mi">16</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">twiny</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;nanoseconds&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samples</span><span class="p">())</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">()</span><span class="o">*</span><span class="mf">1e9</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samples</span><span class="p">())</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">()</span><span class="o">*</span><span class="mf">1e9</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;amplitude&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_window</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">acqu_window</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="InitializeTimeDomain.align_pulses">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.align_pulses">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">align_pulses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">768</span><span class="p">):</span>
+        <span class="c1">#record single probe tone signal and plot</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">samples</span><span class="o">/</span><span class="mi">32</span><span class="p">)</span><span class="o">*</span><span class="mi">16</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">spec_stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_segments</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_averages</span><span class="p">(</span><span class="mf">1e4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_spec_trigger_delay</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_samples</span><span class="p">(</span><span class="n">samples</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_post_trigger</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">set_frequency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_mw_src</span><span class="o">.</span><span class="n">get_frequency</span><span class="p">())</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">get_samplerate</span><span class="p">()</span><span class="o">/</span><span class="mf">1e9</span>
+        <span class="n">pwr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">get_power</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">set_power</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_awg_square</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">50e-9</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">msp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">samples</span><span class="o">+</span><span class="mi">32</span><span class="p">,</span><span class="n">samples</span><span class="o">+</span><span class="mi">32</span><span class="p">),</span><span class="n">msp</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">samples</span><span class="o">+</span><span class="mi">32</span><span class="p">,</span><span class="n">samples</span><span class="o">+</span><span class="mi">32</span><span class="p">),</span><span class="n">msp</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;--k&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="o">-</span><span class="n">samples</span><span class="o">+</span><span class="mi">32</span><span class="p">,</span><span class="n">samples</span><span class="o">+</span><span class="mi">32</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;samples (</span><span class="si">%.0f</span><span class="s1">MHz samplerate: 1 sample = </span><span class="si">%.3g</span><span class="s1">ns)&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">sr</span><span class="o">*</span><span class="mf">1e3</span><span class="p">,</span><span class="mf">1.</span><span class="o">/</span><span class="n">sr</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;amplitude&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">twiny</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;nano seconds&#39;</span><span class="p">)</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span><span class="o">/</span><span class="n">sr</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="nb">round</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">),</span><span class="nb">round</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">),</span><span class="mi">100</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="n">duration</span><span class="o">+</span><span class="mi">32</span><span class="o">/</span><span class="n">sr</span><span class="p">,</span><span class="o">+</span><span class="n">duration</span><span class="o">+</span><span class="mi">32</span><span class="o">/</span><span class="n">sr</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">set_power</span><span class="p">(</span><span class="n">pwr</span><span class="p">)</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You can now change the self._sample.readout_delay parameter to align the two pulses. The readout pulse should start when the manipulation ends.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;If you are satisfied just press &lt;Enter&gt; or tell me the new delay.&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">inp</span> <span class="o">=</span> <span class="n">raw_input</span><span class="p">(</span><span class="s2">&quot;readout_delay (</span><span class="si">{:g}</span><span class="s2">s) = &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_delay</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">inp</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">inp</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mf">1e-3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Your delay is more than a mili second. I guess you are wrong.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_delay</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_timings</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">align_pulses</span><span class="p">()</span></div>
+
+        
+<div class="viewcode-block" id="InitializeTimeDomain.crop_recording_window">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.crop_recording_window">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">crop_recording_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">spec_stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_averages</span><span class="p">(</span><span class="mf">1e4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_window</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">512</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_segments</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">msp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">pltfunc</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">done</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">acqu_window</span> <span class="o">=</span> <span class="p">[</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_window</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sw</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_ew</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dw</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dw</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;acqu_window set to [</span><span class="si">{:d}</span><span class="s2">:</span><span class="si">{:d}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">msp</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">.2</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">end</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">msp</span><span class="p">),</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">.2</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">msp</span><span class="p">))</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sw</span> <span class="o">=</span>  <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="nb">max</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">msp</span><span class="p">),</span><span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">acqu_window</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">continuous_update</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ew</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="nb">max</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">msp</span><span class="p">),</span><span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">acqu_window</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">continuous_update</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dw</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Done!&quot;</span><span class="p">,</span><span class="n">indent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wgt</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">pltfunc</span><span class="p">,</span><span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sw</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ew</span><span class="p">,</span><span class="n">done</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mspec</span><span class="o">.</span><span class="n">set_window</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">acqu_window</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="InitializeTimeDomain.check_sidebands">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.check_sidebands">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_sidebands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">spectrum</span><span class="p">()</span>
+        <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">readout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">rec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span><span class="s1">&#39;--o&#39;</span><span class="p">)</span>
+        <span class="n">ylim</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">get_LO</span><span class="p">(),</span><span class="o">*</span><span class="n">ylim</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">fr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">fr</span><span class="p">)):</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">fr</span><span class="p">],</span><span class="n">ro</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">],</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="n">ms</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">mew</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ylim</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">spread</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">fr</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">get_LO</span><span class="p">()))</span><span class="o">*</span><span class="mf">1.2</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">get_LO</span><span class="p">()</span><span class="o">-</span><span class="n">spread</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">get_LO</span><span class="p">()</span><span class="o">+</span><span class="n">spread</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="InitializeTimeDomain.update_qubit_mw_src">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.initialize.InitializeTimeDomain.update_qubit_mw_src">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_qubit_mw_src</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">set_power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">mw_power</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">qubit_mw_src</span><span class="o">.</span><span class="n">set_frequency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">f01</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">iq_frequency</span><span class="p">)</span></div>
+
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_awg_square</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vawg</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">sl</span><span class="o">.</span><span class="n">rabi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="p">,</span> <span class="n">iq_frequency</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">times</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vawg</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">show_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

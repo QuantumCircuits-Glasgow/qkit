@@ -1,0 +1,308 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.gui.qviewkit.main &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.gui.qviewkit.main</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.gui.qviewkit.main</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: hannes.rotzinger@kit.edu / 2015,2016,2017</span>
+<span class="sd">         marco.pfirrmann@kit.edu / 2016, 2017</span>
+<span class="sd">@license: GPL</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">ctypes</span>
+        <span class="n">ctypes</span><span class="o">.</span><span class="n">windll</span><span class="o">.</span><span class="n">shcore</span><span class="o">.</span><span class="n">SetProcessDpiAwareness</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Fix Bug on Windows when using multiple screens with different scaling</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="c1"># support both PyQt4 and 5</span>
+<span class="n">in_pyqt5</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">in_pyqt4</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QObject</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">QApplication</span>
+    <span class="n">in_pyqt5</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;import of PyQt5 failed, trying PyQt4 (error: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">in_pyqt5</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt4.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QObject</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt4.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QApplication</span>
+        <span class="n">in_pyqt4</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;import of PyQt5 and PyQt4 failed. Install one of those.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.gui.qviewkit.PlotWindow</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlotWindow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lock</span>
+
+<div class="viewcode-block" id="DATA">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.main.DATA">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DATA</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for housekeeping the different windows in qviewkit.</span>
+
+<span class="sd">    This class handles the relationship; opening and closing of different</span>
+<span class="sd">    PlotWindow objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">open_plots</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">open_ds</span>    <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">dataset_info</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">ds_tree_items</span><span class="o">=</span> <span class="p">{}</span>
+    <span class="n">ds_cmd_open</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">toBe_deleted</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+    <span class="n">info_thread_continue</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="s2">&quot;a set of housekeeping functions...&quot;</span>
+
+<div class="viewcode-block" id="DATA.append_plot">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.main.DATA.append_plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">append_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">parent</span><span class="p">,</span><span class="n">window_id</span><span class="p">,</span><span class="n">ds</span><span class="p">):</span>
+        <span class="c1"># self, item, dataset</span>
+
+        <span class="n">window</span> <span class="o">=</span> <span class="n">PlotWindow</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span><span class="bp">self</span><span class="p">,</span><span class="n">ds</span><span class="p">)</span>
+
+        <span class="c1">#print(window, window_id)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_plots</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">window_id</span><span class="p">)]</span><span class="o">=</span><span class="n">window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_ds</span><span class="p">[</span><span class="n">ds</span><span class="p">]</span> <span class="o">=</span> <span class="n">window_id</span>
+
+        <span class="n">window</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>   <span class="c1"># non-modal</span>
+
+        <span class="k">return</span> <span class="n">window</span></div>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_toBe_deleted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ds</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_ds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toBe_deleted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remove_plot_widgets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">closeAll</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># helper func to close widgets</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">close_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_ds</span><span class="p">:</span>
+                <span class="n">window_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_ds</span><span class="p">[</span><span class="n">ds</span><span class="p">]</span>
+                <span class="n">window_id</span><span class="o">.</span><span class="n">setCheckState</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">Qt</span><span class="o">.</span><span class="n">Unchecked</span><span class="p">)</span>
+
+                <span class="c1"># make sure data is consitent</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">window_id</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_plots</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">open_plots</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">window_id</span><span class="p">)]</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">open_plots</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window_id</span><span class="p">))</span>
+
+
+                <span class="k">if</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_ds</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">open_ds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">closeAll</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_ds</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="n">close_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">toBe_deleted</span><span class="p">:</span>
+                <span class="n">close_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toBe_deleted</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="DATA.remove_plot">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.main.DATA.remove_plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">window_id</span><span class="p">,</span><span class="n">ds</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">window_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_plots</span><span class="p">:</span>
+            <span class="n">win</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_plots</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">window_id</span><span class="p">)</span>
+            <span class="n">win</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_ds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open_ds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DATA.plot_is_open">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.main.DATA.plot_is_open">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ds</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_ds</span></div>
+
+
+<div class="viewcode-block" id="DATA.has_dataset">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.main.DATA.has_dataset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ds</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_info</span></div>
+
+
+<div class="viewcode-block" id="DATA.set_info_thread_continue">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.main.DATA.set_info_thread_continue">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_info_thread_continue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">On</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info_thread_continue</span> <span class="o">=</span> <span class="n">On</span></div>
+
+<div class="viewcode-block" id="DATA.close_all">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.main.DATA.close_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">QApplication</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span></div>
+</div>
+
+
+
+<span class="c1"># Main entry to program.</span>
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.main.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main function to open a h5 file with qviewkit.</span>
+
+<span class="sd">    This function is called via command line. It opens the optional parsed</span>
+<span class="sd">    h5 file and the optional parsed datasets automatically.</span>
+<span class="sd">    The DatasetsWindow object creates a Qt based window with some UI buttons</span>
+<span class="sd">    for file handling and a populated tree of the datasets.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        &#39;-f&#39;,&#39;--file&#39;,     type=str, help=&#39;hdf filename to open&#39;</span>
+<span class="sd">        &#39;-ds&#39;,&#39;--datasets&#39;, type=str, help=&#39;(optional) datasets opened by default&#39;</span>
+
+<span class="sd">        &#39;-rt&#39;,&#39;--refresh_time&#39;, type=float, help=&#39;(optional) refresh time&#39;</span>
+<span class="sd">        &#39;-sp&#39;,&#39;--save_plot&#39;,  default=False,action=&#39;store_true&#39;, help=&#39;(optional) save default plots&#39;</span>
+<span class="sd">        &#39;-live&#39;,&#39;--live_plot&#39;,default=False,action=&#39;store_true&#39;, help=&#39;(optional) if set, plots are reloaded&#39;</span>
+<span class="sd">        &#39;-qinfo&#39;,&#39;--qkit_info&#39;,default=False,action=&#39;store_true&#39;, help=&#39;(optional) if set, listen to qkit infos&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># some configuration boilerplate</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">DATA</span><span class="p">()</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Qviewkit / qkit tool to visualize qkit-hdf files // HR@KIT 2015&quot;</span><span class="p">)</span>
+
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span><span class="s1">&#39;--file&#39;</span><span class="p">,</span>     <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;hdf filename to open&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-ds&#39;</span><span class="p">,</span><span class="s1">&#39;--datasets&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;(optional) datasets opened by default&#39;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-rt&#39;</span><span class="p">,</span><span class="s1">&#39;--refresh_time&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;(optional) refresh time&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-sp&#39;</span><span class="p">,</span><span class="s1">&#39;--save_plot&#39;</span><span class="p">,</span>  <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;(optional) save default plots&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-live&#39;</span><span class="p">,</span><span class="s1">&#39;--live_plot&#39;</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;(optional) if set, plots are reloaded&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-qinfo&#39;</span><span class="p">,</span><span class="s1">&#39;--qkit_info&#39;</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;(optional) if set, listen to qkit infos&#39;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+
+    <span class="c1"># create Qt application</span>
+    <span class="k">if</span> <span class="n">in_pyqt5</span><span class="p">:</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">QApplication</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">in_pyqt4</span><span class="p">:</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">QApplication</span><span class="p">(</span><span class="n">argv</span><span class="p">,</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># if activated, start info thread</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">qkit_info</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">qkit.gui.qviewkit.info_subsys</span><span class="w"> </span><span class="kn">import</span> <span class="n">info_thread</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="n">info_thread</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">it</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+
+    <span class="c1"># create main window</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">qkit.gui.qviewkit.DatasetsWindow</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetsWindow</span>
+    <span class="c1">#</span>
+    <span class="n">dsw</span> <span class="o">=</span> <span class="n">DatasetsWindow</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">dsw</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">dsw</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
+
+    <span class="c1"># Connect signal for app quit</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">lastWindowClosed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">quit</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

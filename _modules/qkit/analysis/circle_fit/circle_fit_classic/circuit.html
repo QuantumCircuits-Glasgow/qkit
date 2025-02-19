@@ -1,0 +1,686 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.analysis.circle_fit.circle_fit_classic.circuit &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.analysis.circle_fit.circle_fit_classic.circuit</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.analysis.circle_fit.circle_fit_classic.circuit</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spopt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">hbar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">plotting</span><span class="p">,</span> <span class="n">save_load</span><span class="p">,</span> <span class="n">Watt2dBm</span><span class="p">,</span> <span class="n">dBm2Watt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.circlefit</span><span class="w"> </span><span class="kn">import</span> <span class="n">circlefit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.calibration</span><span class="w"> </span><span class="kn">import</span> <span class="n">calibration</span>
+
+<span class="c1">##</span>
+<span class="c1">## z_data_raw denotes the raw data</span>
+<span class="c1">## z_data denotes the normalized data</span>
+<span class="c1">##        </span>
+    
+<div class="viewcode-block" id="reflection_port">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">reflection_port</span><span class="p">(</span><span class="n">circlefit</span><span class="p">,</span> <span class="n">save_load</span><span class="p">,</span> <span class="n">plotting</span><span class="p">,</span> <span class="n">calibration</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    normal direct port probed in reflection</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z_data_raw</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">porttype</span> <span class="o">=</span> <span class="s1">&#39;direct&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">f_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="o">=</span><span class="kc">None</span>
+        <span class="k">if</span> <span class="n">z_data_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_data_raw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z_data_raw</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_data</span><span class="o">=</span><span class="kc">None</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_S11</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">fr</span><span class="p">,</span><span class="n">k_c</span><span class="p">,</span><span class="n">k_i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        use either frequency or angular frequency units</span>
+<span class="sd">        for all quantities</span>
+<span class="sd">        k_l=k_c+k_i: total (loaded) coupling rate</span>
+<span class="sd">        k_c: coupling rate</span>
+<span class="sd">        k_i: internal loss rate</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">k_c</span><span class="o">-</span><span class="n">k_i</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="n">fr</span><span class="p">))</span><span class="o">/</span><span class="p">((</span><span class="n">k_c</span><span class="o">+</span><span class="n">k_i</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="n">fr</span><span class="p">))</span>
+    
+<div class="viewcode-block" id="reflection_port.get_delay">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_delay">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">ignoreslope</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">guess</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        ignoreslope option not used here</span>
+<span class="sd">        retrieves the cable delay assuming the ideal resonance has a circular shape</span>
+<span class="sd">        modifies the cable delay until the shape Im(S21) vs Re(S21) is circular</span>
+<span class="sd">        see &quot;do_calibration&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">maxval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">z_data</span><span class="p">))</span>
+        <span class="n">z_data</span> <span class="o">=</span> <span class="n">z_data</span><span class="o">/</span><span class="n">maxval</span>
+        <span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">Ql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_skewed_lorentzian</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignoreslope</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="n">A2</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">z_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">z_data</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="n">A2</span><span class="o">*</span><span class="p">(</span><span class="n">f_data</span><span class="o">-</span><span class="n">fr</span><span class="p">)))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">z_data</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span>  <span class="c1">#usually not necessary</span>
+        <span class="k">if</span> <span class="n">delay</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">guess</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+                <span class="n">delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_guess_delay</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">delay</span><span class="o">=</span><span class="mf">0.</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_delay</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">delay</span><span class="p">,</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">Ql</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">delay</span><span class="p">,</span> <span class="n">params</span> </div>
+
+    
+<div class="viewcode-block" id="reflection_port.do_calibration">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.do_calibration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">ignoreslope</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">guessdelay</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        calculating parameters for normalization</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">delay</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_delay</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">ignoreslope</span><span class="o">=</span><span class="n">ignoreslope</span><span class="p">,</span><span class="n">guess</span><span class="o">=</span><span class="n">guessdelay</span><span class="p">)</span>
+        <span class="n">z_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">z_data</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">f_data</span><span class="o">-</span><span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">delay</span><span class="o">*</span><span class="n">f_data</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">z_data</span><span class="p">))</span>
+        <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">r0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_circle</span><span class="p">(</span><span class="n">z_data</span><span class="p">)</span>
+        <span class="n">zc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">xc</span><span class="p">,</span><span class="n">yc</span><span class="p">)</span>
+        <span class="n">fitparams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase_fit</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_center</span><span class="p">(</span><span class="n">z_data</span><span class="p">,</span><span class="n">zc</span><span class="p">),</span><span class="mf">0.</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span><span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">theta</span><span class="p">,</span> <span class="n">Ql</span><span class="p">,</span> <span class="n">fr</span> <span class="o">=</span> <span class="n">fitparams</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_boundary</span><span class="p">(</span><span class="n">theta</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="c1">###</span>
+        <span class="n">offrespoint</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">((</span><span class="n">xc</span><span class="o">+</span><span class="n">r0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)),(</span><span class="n">yc</span><span class="o">+</span><span class="n">r0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta</span><span class="p">)))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_boundary</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">offrespoint</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="c1">#a = np.absolute(offrespoint)</span>
+        <span class="c1">#alpha = np.angle(zc)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">r0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">zc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">delay</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">Ql</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span></div>
+
+    
+<div class="viewcode-block" id="reflection_port.do_normalization">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.do_normalization">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_normalization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">delay</span><span class="p">,</span><span class="n">amp_norm</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">A2</span><span class="p">,</span><span class="n">frcal</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        transforming resonator into canonical position</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">z_data</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="n">A2</span><span class="o">*</span><span class="p">(</span><span class="n">f_data</span><span class="o">-</span><span class="n">frcal</span><span class="p">)))</span><span class="o">/</span><span class="n">amp_norm</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="n">alpha</span><span class="o">+</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">delay</span><span class="o">*</span><span class="n">f_data</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">z_data</span><span class="p">))</span></div>
+
+    
+<div class="viewcode-block" id="reflection_port.circlefit">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.circlefit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">circlefit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">fr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">Ql</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">refine_results</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">calc_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        S11 version of the circlefit</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">if</span> <span class="n">fr</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span> <span class="n">fr</span><span class="o">=</span><span class="n">f_data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">z_data</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">Ql</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span> <span class="n">Ql</span><span class="o">=</span><span class="mf">1e6</span>
+        <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">r0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_circle</span><span class="p">(</span><span class="n">z_data</span><span class="p">,</span><span class="n">refine_results</span><span class="o">=</span><span class="n">refine_results</span><span class="p">)</span>
+        <span class="n">phi0</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">yc</span><span class="o">/</span><span class="n">r0</span><span class="p">)</span>
+        <span class="n">theta0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_boundary</span><span class="p">(</span><span class="n">phi0</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="n">z_data_corr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span><span class="p">(</span><span class="n">z_data</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">xc</span><span class="p">,</span><span class="n">yc</span><span class="p">))</span>
+        <span class="n">theta0</span><span class="p">,</span> <span class="n">Ql</span><span class="p">,</span> <span class="n">fr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase_fit</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data_corr</span><span class="p">,</span><span class="n">theta0</span><span class="p">,</span><span class="n">Ql</span><span class="p">,</span><span class="n">fr</span><span class="p">)</span>
+        <span class="c1">#print(&quot;Ql from phasefit is: &quot; + str(Ql))</span>
+        <span class="n">Qi</span> <span class="o">=</span> <span class="n">Ql</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">r0</span><span class="p">)</span>
+        <span class="n">Qc</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">Ql</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">Qi</span><span class="p">)</span>
+    
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Qi&quot;</span><span class="p">:</span><span class="n">Qi</span><span class="p">,</span><span class="s2">&quot;Qc&quot;</span><span class="p">:</span><span class="n">Qc</span><span class="p">,</span><span class="s2">&quot;Ql&quot;</span><span class="p">:</span><span class="n">Ql</span><span class="p">,</span><span class="s2">&quot;fr&quot;</span><span class="p">:</span><span class="n">fr</span><span class="p">,</span><span class="s2">&quot;theta0&quot;</span><span class="p">:</span><span class="n">theta0</span><span class="p">}</span>
+    
+        <span class="c1">#calculation of the error</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="n">fr</span><span class="p">,</span><span class="n">Qc</span><span class="p">,</span><span class="n">Ql</span><span class="p">]</span>
+        <span class="c1">#chi_square, errors = rt.get_errors(rt.residuals_notch_ideal,f_data,z_data,p)</span>
+        <span class="k">if</span> <span class="n">calc_errors</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="n">chi_square</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_cov_fast_directrefl</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+            <span class="c1">#chi_square, cov = rt.get_cov(rt.residuals_notch_ideal,f_data,z_data,p)</span>
+    
+            <span class="k">if</span> <span class="n">cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">cov</span><span class="p">))</span>
+                <span class="n">fr_err</span><span class="p">,</span><span class="n">Qc_err</span><span class="p">,</span><span class="n">Ql_err</span> <span class="o">=</span> <span class="n">errors</span>
+                <span class="c1">#calc Qi with error prop (sum the squares of the variances and covariaces)</span>
+                <span class="n">dQl</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">((</span><span class="mf">1.</span><span class="o">/</span><span class="n">Ql</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">Qc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">Ql</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">dQc</span> <span class="o">=</span> <span class="o">-</span> <span class="mf">1.</span><span class="o">/</span><span class="p">((</span><span class="mf">1.</span><span class="o">/</span><span class="n">Ql</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">Qc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">Qc</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">Qi_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">dQl</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">dQc</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">dQl</span><span class="o">*</span><span class="n">dQc</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1">#with correlations</span>
+                <span class="n">errors</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Ql_err&quot;</span><span class="p">:</span><span class="n">Ql_err</span><span class="p">,</span> <span class="s2">&quot;Qc_err&quot;</span><span class="p">:</span><span class="n">Qc_err</span><span class="p">,</span> <span class="s2">&quot;fr_err&quot;</span><span class="p">:</span><span class="n">fr_err</span><span class="p">,</span><span class="s2">&quot;chi_square&quot;</span><span class="p">:</span><span class="n">chi_square</span><span class="p">,</span><span class="s2">&quot;Qi_err&quot;</span><span class="p">:</span><span class="n">Qi_err</span><span class="p">}</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">errors</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Error calculation failed!&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#just calc chisquared:</span>
+            <span class="n">fun2</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residuals_notch_ideal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">chi_square</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f_data</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">fun2</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;chi_square&quot;</span><span class="p">:</span><span class="n">chi_square</span><span class="p">}</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+    
+        <span class="k">return</span> <span class="n">results</span></div>
+
+        
+    
+<div class="viewcode-block" id="reflection_port.autofit">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.autofit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">autofit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        automatic calibration and fitting</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">delay</span><span class="p">,</span> <span class="n">amp_norm</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">Ql</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">frcal</span> <span class="o">=</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_calibration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_data_raw</span><span class="p">,</span><span class="n">ignoreslope</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">guessdelay</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_normalization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_data_raw</span><span class="p">,</span><span class="n">delay</span><span class="p">,</span><span class="n">amp_norm</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">A2</span><span class="p">,</span><span class="n">frcal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">circlefit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_data</span><span class="p">,</span><span class="n">fr</span><span class="p">,</span><span class="n">Ql</span><span class="p">,</span><span class="n">refine_results</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">calc_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_data_sim</span> <span class="o">=</span> <span class="n">A2</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="o">-</span><span class="n">frcal</span><span class="p">)</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_S11_directrefl</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="p">,</span><span class="n">fr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s2">&quot;fr&quot;</span><span class="p">],</span><span class="n">Ql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s2">&quot;Ql&quot;</span><span class="p">],</span><span class="n">Qc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s2">&quot;Qc&quot;</span><span class="p">],</span><span class="n">a</span><span class="o">=</span><span class="n">amp_norm</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_S11_directrefl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">fr</span><span class="o">=</span><span class="mf">10e9</span><span class="p">,</span><span class="n">Ql</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span><span class="n">Qc</span><span class="o">=</span><span class="mf">1000.</span><span class="p">,</span><span class="n">a</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="mf">.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        full model for notch type resonances</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">alpha</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">f</span><span class="o">*</span><span class="n">delay</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span> <span class="mf">2.</span><span class="o">*</span><span class="n">Ql</span><span class="o">/</span><span class="n">Qc</span> <span class="o">-</span> <span class="mf">1.</span> <span class="o">+</span> <span class="mi">2</span><span class="n">j</span><span class="o">*</span><span class="n">Ql</span><span class="o">*</span><span class="p">(</span><span class="n">fr</span><span class="o">-</span><span class="n">f</span><span class="p">)</span><span class="o">/</span><span class="n">fr</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="mf">1.</span> <span class="o">-</span> <span class="mi">2</span><span class="n">j</span><span class="o">*</span><span class="n">Ql</span><span class="o">*</span><span class="p">(</span><span class="n">fr</span><span class="o">-</span><span class="n">f</span><span class="p">)</span><span class="o">/</span><span class="n">fr</span> <span class="p">)</span>    
+        
+<div class="viewcode-block" id="reflection_port.get_single_photon_limit">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_single_photon_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_single_photon_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="s1">&#39;dBm&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns the amout of power in units of W necessary</span>
+<span class="sd">        to maintain one photon on average in the cavity</span>
+<span class="sd">        unit can be &#39;dbm&#39; or &#39;watt&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="o">!=</span><span class="p">{}:</span>
+            <span class="n">fr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;fr&#39;</span><span class="p">]</span>
+            <span class="n">k_c</span> <span class="o">=</span> <span class="n">fr</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;Qc&#39;</span><span class="p">]</span>
+            <span class="n">k_i</span> <span class="o">=</span> <span class="n">fr</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;Qi&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">unit</span><span class="o">==</span><span class="s1">&#39;dBm&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Watt2dBm</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">4.</span><span class="o">*</span><span class="n">k_c</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">hbar</span><span class="o">*</span><span class="n">fr</span><span class="o">*</span><span class="p">(</span><span class="n">k_c</span><span class="o">+</span><span class="n">k_i</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+            <span class="k">elif</span> <span class="n">unit</span><span class="o">==</span><span class="s1">&#39;watt&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">4.</span><span class="o">*</span><span class="n">k_c</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">hbar</span><span class="o">*</span><span class="n">fr</span><span class="o">*</span><span class="p">(</span><span class="n">k_c</span><span class="o">+</span><span class="n">k_i</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+                
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Please perform the fit first&#39;</span><span class="p">,</span><span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+        
+<div class="viewcode-block" id="reflection_port.get_photons_in_resonator">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.reflection_port.get_photons_in_resonator">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_photons_in_resonator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">power</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="s1">&#39;dBm&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns the average number of photons</span>
+<span class="sd">        for a given power (defaul unit is &#39;dbm&#39;)</span>
+<span class="sd">        unit can be &#39;dBm&#39; or &#39;watt&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="o">!=</span><span class="p">{}:</span>
+            <span class="k">if</span> <span class="n">unit</span><span class="o">==</span><span class="s1">&#39;dBm&#39;</span><span class="p">:</span>
+                <span class="n">power</span> <span class="o">=</span> <span class="n">dBm2Watt</span><span class="p">(</span><span class="n">power</span><span class="p">)</span>
+            <span class="n">fr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;fr&#39;</span><span class="p">]</span>
+            <span class="n">k_c</span> <span class="o">=</span> <span class="n">fr</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;Qc&#39;</span><span class="p">]</span>
+            <span class="n">k_i</span> <span class="o">=</span> <span class="n">fr</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;Qi&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="mf">4.</span><span class="o">*</span><span class="n">k_c</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">hbar</span><span class="o">*</span><span class="n">fr</span><span class="o">*</span><span class="p">(</span><span class="n">k_c</span><span class="o">+</span><span class="n">k_i</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">power</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Please perform the fit first&#39;</span><span class="p">,</span><span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+    
+<div class="viewcode-block" id="notch_port">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">notch_port</span><span class="p">(</span><span class="n">circlefit</span><span class="p">,</span> <span class="n">save_load</span><span class="p">,</span> <span class="n">plotting</span><span class="p">,</span> <span class="n">calibration</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    notch type port probed in transmission</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z_data_raw</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">porttype</span> <span class="o">=</span> <span class="s1">&#39;notch&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">f_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="o">=</span><span class="kc">None</span>
+        <span class="k">if</span> <span class="n">z_data_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_data_raw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z_data_raw</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_data_raw</span><span class="o">=</span><span class="kc">None</span>
+    
+<div class="viewcode-block" id="notch_port.get_delay">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_delay">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">ignoreslope</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">guess</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        retrieves the cable delay assuming the ideal resonance has a circular shape</span>
+<span class="sd">        modifies the cable delay until the shape Im(S21) vs Re(S21) is circular</span>
+<span class="sd">        see &quot;do_calibration&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">maxval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">z_data</span><span class="p">))</span>
+        <span class="n">z_data</span> <span class="o">=</span> <span class="n">z_data</span><span class="o">/</span><span class="n">maxval</span>
+        <span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">Ql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_skewed_lorentzian</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignoreslope</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="n">A2</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">z_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">z_data</span><span class="p">)</span><span class="o">-</span><span class="n">A2</span><span class="o">*</span><span class="p">(</span><span class="n">f_data</span><span class="o">-</span><span class="n">fr</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">z_data</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span>  <span class="c1">#usually not necessary</span>
+        <span class="k">if</span> <span class="n">delay</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">guess</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+                <span class="n">delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_guess_delay</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">delay</span><span class="o">=</span><span class="mf">0.</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_delay</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">delay</span><span class="p">,</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">Ql</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">delay</span><span class="p">,</span> <span class="n">params</span>    </div>
+
+    
+<div class="viewcode-block" id="notch_port.do_calibration">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.do_calibration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">ignoreslope</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">guessdelay</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        performs an automated calibration and tries to determine the prefactors a, alpha, delay</span>
+<span class="sd">        fr, Ql, and a possible slope are extra information, which can be used as start parameters for subsequent fits</span>
+<span class="sd">        see also &quot;do_normalization&quot;</span>
+<span class="sd">        the calibration procedure works for transmission line resonators as well</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">delay</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_delay</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">ignoreslope</span><span class="o">=</span><span class="n">ignoreslope</span><span class="p">,</span><span class="n">guess</span><span class="o">=</span><span class="n">guessdelay</span><span class="p">)</span>
+        <span class="n">z_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">z_data</span><span class="o">-</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">f_data</span><span class="o">-</span><span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">delay</span><span class="o">*</span><span class="n">f_data</span><span class="p">)</span>
+        <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">r0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_circle</span><span class="p">(</span><span class="n">z_data</span><span class="p">)</span>
+        <span class="n">zc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">xc</span><span class="p">,</span><span class="n">yc</span><span class="p">)</span>
+        <span class="n">fitparams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase_fit</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_center</span><span class="p">(</span><span class="n">z_data</span><span class="p">,</span><span class="n">zc</span><span class="p">),</span><span class="mf">0.</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span><span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">theta</span><span class="p">,</span> <span class="n">Ql</span><span class="p">,</span> <span class="n">fr</span> <span class="o">=</span> <span class="n">fitparams</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_boundary</span><span class="p">(</span><span class="n">theta</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="n">offrespoint</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">((</span><span class="n">xc</span><span class="o">+</span><span class="n">r0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)),(</span><span class="n">yc</span><span class="o">+</span><span class="n">r0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta</span><span class="p">)))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">offrespoint</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">offrespoint</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">delay</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">Ql</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span></div>
+
+    
+<div class="viewcode-block" id="notch_port.do_normalization">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.do_normalization">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_normalization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">delay</span><span class="p">,</span><span class="n">amp_norm</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">A2</span><span class="p">,</span><span class="n">frcal</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        removes the prefactors a, alpha, delay and returns the calibrated data, see also &quot;do_calibration&quot;</span>
+<span class="sd">        works also for transmission line resonators</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">z_data</span><span class="o">-</span><span class="n">A2</span><span class="o">*</span><span class="p">(</span><span class="n">f_data</span><span class="o">-</span><span class="n">frcal</span><span class="p">))</span><span class="o">/</span><span class="n">amp_norm</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="n">alpha</span><span class="o">+</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">delay</span><span class="o">*</span><span class="n">f_data</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="notch_port.circlefit">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.circlefit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">circlefit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">fr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">Ql</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">refine_results</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">calc_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        performs a circle fit on a frequency vs. complex resonator scattering data set</span>
+<span class="sd">        Data has to be normalized!!</span>
+<span class="sd">        INPUT:</span>
+<span class="sd">        f_data,z_data: input data (frequency, complex S21 data)</span>
+<span class="sd">        OUTPUT:</span>
+<span class="sd">        outpus a dictionary {key:value} consisting of the fit values, errors and status information about the fit</span>
+<span class="sd">        values: {&quot;phi0&quot;:phi0, &quot;Ql&quot;:Ql, &quot;absolute(Qc)&quot;:absQc, &quot;Qi&quot;: Qi, &quot;electronic_delay&quot;:delay, &quot;complexQc&quot;:complQc, &quot;resonance_freq&quot;:fr, &quot;prefactor_a&quot;:a, &quot;prefactor_alpha&quot;:alpha}</span>
+<span class="sd">        errors: {&quot;phi0_err&quot;:phi0_err, &quot;Ql_err&quot;:Ql_err, &quot;absolute(Qc)_err&quot;:absQc_err, &quot;Qi_err&quot;: Qi_err, &quot;electronic_delay_err&quot;:delay_err, &quot;resonance_freq_err&quot;:fr_err, &quot;prefactor_a_err&quot;:a_err, &quot;prefactor_alpha_err&quot;:alpha_err}</span>
+<span class="sd">        for details, see:</span>
+<span class="sd">            [1] (not diameter corrected) Jiansong Gao, &quot;The Physics of Superconducting Microwave Resonators&quot; (PhD Thesis), Appendix E, California Institute of Technology, (2008)</span>
+<span class="sd">            [2] (diameter corrected) M. S. Khalil, et. al., J. Appl. Phys. 111, 054510 (2012)</span>
+<span class="sd">            [3] (fitting techniques) N. CHERNOV AND C. LESORT, &quot;Least Squares Fitting of Circles&quot;, Journal of Mathematical Imaging and Vision 23, 239, (2005)</span>
+<span class="sd">            [4] (further fitting techniques) P. J. Petersan, S. M. Anlage, J. Appl. Phys, 84, 3392 (1998)</span>
+<span class="sd">        the program fits the circle with the algebraic technique described in [3], the rest of the fitting is done with the scipy.optimize least square fitting toolbox</span>
+<span class="sd">        also, check out [5] S. Probst et al. &quot;Efficient and reliable analysis of noisy complex scatterung resonator data for superconducting quantum circuits&quot; (in preparation)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">if</span> <span class="n">fr</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span> <span class="n">fr</span><span class="o">=</span><span class="n">f_data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">z_data</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">Ql</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span> <span class="n">Ql</span><span class="o">=</span><span class="mf">1e6</span>
+        <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> <span class="n">r0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_circle</span><span class="p">(</span><span class="n">z_data</span><span class="p">,</span><span class="n">refine_results</span><span class="o">=</span><span class="n">refine_results</span><span class="p">)</span>
+        <span class="n">phi0</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">yc</span><span class="o">/</span><span class="n">r0</span><span class="p">)</span>
+        <span class="n">theta0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodic_boundary</span><span class="p">(</span><span class="n">phi0</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="n">z_data_corr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span><span class="p">(</span><span class="n">z_data</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">xc</span><span class="p">,</span><span class="n">yc</span><span class="p">))</span>
+        <span class="n">theta0</span><span class="p">,</span> <span class="n">Ql</span><span class="p">,</span> <span class="n">fr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase_fit</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data_corr</span><span class="p">,</span><span class="n">theta0</span><span class="p">,</span><span class="n">Ql</span><span class="p">,</span><span class="n">fr</span><span class="p">)</span>
+        <span class="c1">#print(&quot;Ql from phasefit is: &quot; + str(Ql))</span>
+        <span class="n">absQc</span> <span class="o">=</span> <span class="n">Ql</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">r0</span><span class="p">)</span>
+        <span class="n">complQc</span> <span class="o">=</span> <span class="n">absQc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">((</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">phi0</span><span class="p">))</span>
+        <span class="n">Qc</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">complQc</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>   <span class="c1"># here, taking the real part of (1/complQc) from diameter correction method</span>
+        <span class="n">Qi_dia_corr</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">Ql</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">Qc</span><span class="p">)</span>
+        <span class="n">Qi_no_corr</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">Ql</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">absQc</span><span class="p">)</span>
+    
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Qi_dia_corr&quot;</span><span class="p">:</span><span class="n">Qi_dia_corr</span><span class="p">,</span><span class="s2">&quot;Qi_no_corr&quot;</span><span class="p">:</span><span class="n">Qi_no_corr</span><span class="p">,</span><span class="s2">&quot;absQc&quot;</span><span class="p">:</span><span class="n">absQc</span><span class="p">,</span><span class="s2">&quot;Qc_dia_corr&quot;</span><span class="p">:</span><span class="n">Qc</span><span class="p">,</span><span class="s2">&quot;Ql&quot;</span><span class="p">:</span><span class="n">Ql</span><span class="p">,</span><span class="s2">&quot;fr&quot;</span><span class="p">:</span><span class="n">fr</span><span class="p">,</span><span class="s2">&quot;theta0&quot;</span><span class="p">:</span><span class="n">theta0</span><span class="p">,</span><span class="s2">&quot;phi0&quot;</span><span class="p">:</span><span class="n">phi0</span><span class="p">}</span>
+    
+        <span class="c1">#calculation of the error</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="n">fr</span><span class="p">,</span><span class="n">absQc</span><span class="p">,</span><span class="n">Ql</span><span class="p">,</span><span class="n">phi0</span><span class="p">]</span>
+        <span class="c1">#chi_square, errors = rt.get_errors(rt.residuals_notch_ideal,f_data,z_data,p)</span>
+        <span class="k">if</span> <span class="n">calc_errors</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="n">chi_square</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_cov_fast_notch</span><span class="p">(</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+            <span class="c1">#chi_square, cov = rt.get_cov(rt.residuals_notch_ideal,f_data,z_data,p)</span>
+    
+            <span class="k">if</span> <span class="n">cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">cov</span><span class="p">))</span>
+                <span class="n">fr_err</span><span class="p">,</span><span class="n">absQc_err</span><span class="p">,</span><span class="n">Ql_err</span><span class="p">,</span><span class="n">phi0_err</span> <span class="o">=</span> <span class="n">errors</span>
+                <span class="c1">#calc Qi with error prop (sum the squares of the variances and covariaces)</span>
+                <span class="n">dQl</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">((</span><span class="mf">1.</span><span class="o">/</span><span class="n">Ql</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">absQc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">Ql</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">dabsQc</span> <span class="o">=</span> <span class="o">-</span> <span class="mf">1.</span><span class="o">/</span><span class="p">((</span><span class="mf">1.</span><span class="o">/</span><span class="n">Ql</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">absQc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">absQc</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">Qi_no_corr_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">dQl</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">dabsQc</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">dQl</span><span class="o">*</span><span class="n">dabsQc</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1">#with correlations</span>
+                <span class="c1">#calc Qi dia corr with error prop</span>
+                <span class="n">dQl</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="n">Ql</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi0</span><span class="p">)</span><span class="o">/</span><span class="n">absQc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span><span class="n">Ql</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">dabsQc</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi0</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="n">Ql</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi0</span><span class="p">)</span><span class="o">/</span><span class="n">absQc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span><span class="n">absQc</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">dphi0</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi0</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="n">Ql</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi0</span><span class="p">)</span><span class="o">/</span><span class="n">absQc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span><span class="n">absQc</span><span class="p">)</span>
+                <span class="c1">##err1 = ( (dQl*cov[2][2])**2 + (dabsQc*cov[1][1])**2 + (dphi0*cov[3][3])**2 )</span>
+                <span class="n">err1</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span><span class="n">dQl</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">dabsQc</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">dphi0</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span> <span class="p">)</span>
+                <span class="n">err2</span> <span class="o">=</span> <span class="p">(</span> <span class="n">dQl</span><span class="o">*</span><span class="n">dabsQc</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dQl</span><span class="o">*</span><span class="n">dphi0</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">dabsQc</span><span class="o">*</span><span class="n">dphi0</span><span class="o">*</span><span class="n">cov</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">Qi_dia_corr_err</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">err1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">err2</span><span class="p">)</span>  <span class="c1"># including correlations</span>
+                <span class="n">errors</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;phi0_err&quot;</span><span class="p">:</span><span class="n">phi0_err</span><span class="p">,</span> <span class="s2">&quot;Ql_err&quot;</span><span class="p">:</span><span class="n">Ql_err</span><span class="p">,</span> <span class="s2">&quot;absQc_err&quot;</span><span class="p">:</span><span class="n">absQc_err</span><span class="p">,</span> <span class="s2">&quot;fr_err&quot;</span><span class="p">:</span><span class="n">fr_err</span><span class="p">,</span><span class="s2">&quot;chi_square&quot;</span><span class="p">:</span><span class="n">chi_square</span><span class="p">,</span><span class="s2">&quot;Qi_no_corr_err&quot;</span><span class="p">:</span><span class="n">Qi_no_corr_err</span><span class="p">,</span><span class="s2">&quot;Qi_dia_corr_err&quot;</span><span class="p">:</span> <span class="n">Qi_dia_corr_err</span><span class="p">}</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">errors</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Error calculation failed!&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#just calc chisquared:</span>
+            <span class="n">fun2</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residuals_notch_ideal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">f_data</span><span class="p">,</span><span class="n">z_data</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">chi_square</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f_data</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">fun2</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;chi_square&quot;</span><span class="p">:</span><span class="n">chi_square</span><span class="p">}</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+    
+        <span class="k">return</span> <span class="n">results</span></div>
+
+        
+<div class="viewcode-block" id="notch_port.autofit">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.autofit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">autofit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        automatic calibration and fitting</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">delay</span><span class="p">,</span> <span class="n">amp_norm</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">Ql</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">frcal</span> <span class="o">=</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_calibration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_data_raw</span><span class="p">,</span><span class="n">ignoreslope</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">guessdelay</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_normalization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_data_raw</span><span class="p">,</span><span class="n">delay</span><span class="p">,</span><span class="n">amp_norm</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">A2</span><span class="p">,</span><span class="n">frcal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">circlefit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_data</span><span class="p">,</span><span class="n">fr</span><span class="p">,</span><span class="n">Ql</span><span class="p">,</span><span class="n">refine_results</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">calc_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_data_sim</span> <span class="o">=</span> <span class="n">A2</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="o">-</span><span class="n">frcal</span><span class="p">)</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_S21_notch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="p">,</span><span class="n">fr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s2">&quot;fr&quot;</span><span class="p">],</span><span class="n">Ql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s2">&quot;Ql&quot;</span><span class="p">],</span><span class="n">Qc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s2">&quot;absQc&quot;</span><span class="p">],</span><span class="n">phi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s2">&quot;phi0&quot;</span><span class="p">],</span><span class="n">a</span><span class="o">=</span><span class="n">amp_norm</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">)</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_S21_notch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">fr</span><span class="o">=</span><span class="mf">10e9</span><span class="p">,</span><span class="n">Ql</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span><span class="n">Qc</span><span class="o">=</span><span class="mf">1000.</span><span class="p">,</span><span class="n">phi</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span><span class="n">a</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="mf">.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        full model for notch type resonances</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">alpha</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">f</span><span class="o">*</span><span class="n">delay</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">Ql</span><span class="o">/</span><span class="n">Qc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">phi</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="o">*</span><span class="n">Ql</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="n">fr</span><span class="p">)</span><span class="o">/</span><span class="n">fr</span><span class="p">))</span>    
+    
+<div class="viewcode-block" id="notch_port.get_single_photon_limit">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_single_photon_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_single_photon_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="s1">&#39;dBm&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns the amout of power in units of W necessary</span>
+<span class="sd">        to maintain one photon on average in the cavity</span>
+<span class="sd">        unit can be &#39;dBm&#39; or &#39;watt&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="o">!=</span><span class="p">{}:</span>
+            <span class="n">fr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;fr&#39;</span><span class="p">]</span>
+            <span class="n">k_c</span> <span class="o">=</span> <span class="n">fr</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;absQc&#39;</span><span class="p">]</span>
+            <span class="n">k_i</span> <span class="o">=</span> <span class="n">fr</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;Qi_dia_corr&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">unit</span><span class="o">==</span><span class="s1">&#39;dBm&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Watt2dBm</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">4.</span><span class="o">*</span><span class="n">k_c</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">hbar</span><span class="o">*</span><span class="n">fr</span><span class="o">*</span><span class="p">(</span><span class="n">k_c</span><span class="o">+</span><span class="n">k_i</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+            <span class="k">elif</span> <span class="n">unit</span><span class="o">==</span><span class="s1">&#39;watt&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">4.</span><span class="o">*</span><span class="n">k_c</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">hbar</span><span class="o">*</span><span class="n">fr</span><span class="o">*</span><span class="p">(</span><span class="n">k_c</span><span class="o">+</span><span class="n">k_i</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>                
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Please perform the fit first&#39;</span><span class="p">,</span><span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+        
+<div class="viewcode-block" id="notch_port.get_photons_in_resonator">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.notch_port.get_photons_in_resonator">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_photons_in_resonator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">power</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="s1">&#39;dBm&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns the average number of photons</span>
+<span class="sd">        for a given power in units of W</span>
+<span class="sd">        unit can be &#39;dBm&#39; or &#39;watt&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="o">!=</span><span class="p">{}:</span>
+            <span class="k">if</span> <span class="n">unit</span><span class="o">==</span><span class="s1">&#39;dBm&#39;</span><span class="p">:</span>
+                <span class="n">power</span> <span class="o">=</span> <span class="n">dBm2Watt</span><span class="p">(</span><span class="n">power</span><span class="p">)</span>
+            <span class="n">fr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;fr&#39;</span><span class="p">]</span>
+            <span class="n">k_c</span> <span class="o">=</span> <span class="n">fr</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;Qc&#39;</span><span class="p">]</span>
+            <span class="n">k_i</span> <span class="o">=</span> <span class="n">fr</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span><span class="p">[</span><span class="s1">&#39;Qi&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="mf">4.</span><span class="o">*</span><span class="n">k_c</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">hbar</span><span class="o">*</span><span class="n">fr</span><span class="o">*</span><span class="p">(</span><span class="n">k_c</span><span class="o">+</span><span class="n">k_i</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">power</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Please perform the fit first&#39;</span><span class="p">,</span><span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>   </div>
+</div>
+
+
+<div class="viewcode-block" id="transmission_port">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.transmission_port">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">transmission_port</span><span class="p">(</span><span class="n">circlefit</span><span class="p">,</span><span class="n">save_load</span><span class="p">,</span><span class="n">plotting</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    a class for handling transmission measurements</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">z_data_raw</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">porttype</span> <span class="o">=</span> <span class="s1">&#39;transm&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">f_data</span><span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="o">=</span><span class="kc">None</span>
+        <span class="k">if</span> <span class="n">z_data_raw</span><span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_data_raw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z_data_raw</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_data</span><span class="o">=</span><span class="kc">None</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_S21</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">fr</span><span class="p">,</span><span class="n">Ql</span><span class="p">,</span><span class="n">A</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">A</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="mf">4.</span><span class="o">*</span><span class="n">Ql</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="p">((</span><span class="n">f</span><span class="o">-</span><span class="n">fr</span><span class="p">)</span><span class="o">/</span><span class="n">fr</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> 
+        
+<div class="viewcode-block" id="transmission_port.fit">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.transmission_port.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ampsqr</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z_data_raw</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ampsqr</span><span class="p">)],</span><span class="mf">1000.</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ampsqr</span><span class="p">)]</span>
+        <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">spopt</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_S21</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ampsqr</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">pcov</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitresults</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fr&#39;</span><span class="p">:</span><span class="n">popt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;fr_err&#39;</span><span class="p">:</span><span class="n">errors</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;Ql&#39;</span><span class="p">:</span><span class="n">popt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;Ql_err&#39;</span><span class="p">:</span><span class="n">errors</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s1">&#39;Ampsqr&#39;</span><span class="p">:</span><span class="n">popt</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="s1">&#39;Ampsqr_err&#39;</span><span class="p">:</span><span class="n">errors</span><span class="p">[</span><span class="mi">2</span><span class="p">]}</span> </div>
+</div>
+
+    
+<div class="viewcode-block" id="resonator">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">resonator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Universal resonator analysis class</span>
+<span class="sd">    It can handle different kinds of ports and assymetric resonators.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ports</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        initializes the resonator class object</span>
+<span class="sd">        ports (dictionary {key:value}): specify the name and properties of the coupling ports</span>
+<span class="sd">            e.g. ports = {&#39;1&#39;:&#39;direct&#39;, &#39;2&#39;:&#39;notch&#39;}</span>
+<span class="sd">        comment: add a comment</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transm</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ports</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">pname</span> <span class="ow">in</span> <span class="n">ports</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">pname</span><span class="o">==</span><span class="s1">&#39;direct&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span><span class="n">reflection_port</span><span class="p">()})</span>
+                <span class="k">elif</span> <span class="n">pname</span><span class="o">==</span><span class="s1">&#39;notch&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span><span class="n">notch_port</span><span class="p">()})</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Undefined input type! Use &#39;direct&#39; or &#39;notch&#39;.&quot;</span><span class="p">,</span> <span class="ne">SyntaxWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Resonator has no coupling ports!&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            
+<div class="viewcode-block" id="resonator.add_port">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.add_port">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_port</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">pname</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pname</span><span class="o">==</span><span class="s1">&#39;direct&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span><span class="n">reflection_port</span><span class="p">()})</span>
+        <span class="k">elif</span> <span class="n">pname</span><span class="o">==</span><span class="s1">&#39;notch&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span><span class="n">notch_port</span><span class="p">()})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Undefined input type! Use &#39;direct&#39; or &#39;notch&#39;.&quot;</span><span class="p">,</span> <span class="ne">SyntaxWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Resonator has no coupling ports!&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span></div>
+
+            
+<div class="viewcode-block" id="resonator.delete_port">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.delete_port">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_port</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Resonator has no coupling ports!&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="resonator.get_Qi">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_Qi">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Qi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        based on the number of ports and the corresponding measurements</span>
+<span class="sd">        it calculates the internal losses</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+
+    
+<div class="viewcode-block" id="resonator.get_single_photon_limit">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_single_photon_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_single_photon_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">port</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns the amout of power necessary to maintain one photon </span>
+<span class="sd">        on average in the cavity</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+
+    
+<div class="viewcode-block" id="resonator.get_photons_in_resonator">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.get_photons_in_resonator">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_photons_in_resonator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">power</span><span class="p">,</span><span class="n">port</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns the average number of photons</span>
+<span class="sd">        for a given power</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+
+        
+<div class="viewcode-block" id="resonator.add_transm_meas">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.resonator.add_transm_meas">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_transm_meas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">port1</span><span class="p">,</span> <span class="n">port2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        input: port1</span>
+<span class="sd">        output: port2</span>
+<span class="sd">        adds a transmission measurement </span>
+<span class="sd">        connecting two direct ports S21</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">port1</span> <span class="o">+</span> <span class="s2">&quot; -&gt; &quot;</span> <span class="o">+</span> <span class="n">port2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span><span class="n">transm</span><span class="p">()})</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+   
+<div class="viewcode-block" id="batch_processing">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.batch_processing">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">batch_processing</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A class for batch processing of resonator data as a function of another variable</span>
+<span class="sd">    Typical applications are power scans, magnetic field scans etc.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">porttype</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        porttype = &#39;notch&#39;, &#39;direct&#39;, &#39;transm&#39;</span>
+<span class="sd">        results is an array of dictionaries containing the fitresults</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">porttype</span> <span class="o">=</span> <span class="n">porttype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    
+<div class="viewcode-block" id="batch_processing.autofit">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.batch_processing.autofit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">autofit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">cal_dataslice</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        fits all data</span>
+<span class="sd">        cal_dataslice: choose scatteringdata which should be used for calibration</span>
+<span class="sd">        of the amplitude and phase, default = 0 (first)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">pass</span></div>
+</div>
+
+    
+<div class="viewcode-block" id="coupled_resonators">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_classic.html#qkit.analysis.circle_fit.circle_fit_classic.circuit.coupled_resonators">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">coupled_resonators</span><span class="p">(</span><span class="n">batch_processing</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A class for fitting a resonator coupled to a second one</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">porttype</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">porttype</span> <span class="o">=</span> <span class="n">porttype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

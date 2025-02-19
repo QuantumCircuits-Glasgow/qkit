@@ -1,0 +1,957 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.core.instrument_basev2 &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.core.instrument_basev2</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.core.instrument_basev2</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">unique</span><span class="p">,</span> <span class="n">auto</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.drivers.visa_prologix</span><span class="w"> </span><span class="kn">import</span> <span class="n">instrument</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<div class="viewcode-block" id="ModernInstrument">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModernInstrument</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for instruments.</span>
+
+<span class="sd">    Use @QkitProperty() to convert a getter to a property.</span>
+<span class="sd">    Use @$prop_name$.setter to add a setter to a property.</span>
+<span class="sd">    Do note, that the function name of the getter and setter must be the same.  </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">FLAG_GET</span> <span class="o">=</span> <span class="mh">0x01</span>             <span class="c1"># Parameter is gettable</span>
+    <span class="n">FLAG_SET</span> <span class="o">=</span> <span class="mh">0x02</span>             <span class="c1"># {arameter is settable</span>
+    <span class="n">FLAG_GETSET</span> <span class="o">=</span> <span class="mh">0x03</span>          <span class="c1"># Shortcut for GET and SET</span>
+    <span class="n">FLAG_GET_AFTER_SET</span> <span class="o">=</span> <span class="mh">0x04</span>   <span class="c1"># perform a &#39;get&#39; after a &#39;set&#39;</span>
+    <span class="n">FLAG_SOFTGET</span> <span class="o">=</span> <span class="mh">0x08</span>         <span class="c1"># &#39;get&#39; operation is simulated in software,</span>
+                                <span class="c1"># e.g. an internally stored value is returned.</span>
+                                <span class="c1"># Only use for parameters that cannot be read</span>
+                                <span class="c1"># back from a device.</span>
+
+<div class="viewcode-block" id="ModernInstrument.WrappedFunction">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.WrappedFunction">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">WrappedFunction</span><span class="p">:</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+
+<div class="viewcode-block" id="ModernInstrument.WrappedFunction.call">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.WrappedFunction.call">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.WrappedFunction.from_qkit_function">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.WrappedFunction.from_qkit_function">[docs]</a>
+        <span class="nd">@classmethod</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">from_qkit_function</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target_object</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">function</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModernInstrument</span><span class="o">.</span><span class="n">WrappedFunction</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">func</span><span class="p">(</span><span class="n">target_object</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
+</div>
+
+
+<div class="viewcode-block" id="ModernInstrument.WrappedProperty">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">WrappedProperty</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A wrapper around QKit-Property with the object information required</span>
+<span class="sd">        to call the functions on an object.</span>
+<span class="sd">        Qkit-Property does not belong to an instance, but to an class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">getter</span><span class="p">,</span> <span class="n">setter</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">PropertyMetadata</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_getter</span> <span class="o">=</span> <span class="n">getter</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setter</span> <span class="o">=</span> <span class="n">setter</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
+
+<div class="viewcode-block" id="ModernInstrument.WrappedProperty.build_options">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.build_options">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">build_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Backwards compatibility to the old ways of QKit.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;set_func&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setter</span><span class="p">,</span>
+                <span class="s2">&quot;get_func&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getter</span><span class="p">,</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span>
+            <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.WrappedProperty.get">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.get">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns the property value.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">ModernInstrument</span><span class="o">.</span><span class="n">_convert_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_getter</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="o">.</span><span class="n">type</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.WrappedProperty.set">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.set">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Sets the property value.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setter</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.WrappedProperty.get_metadata">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.get_metadata">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PropertyMetadata</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns the properties metadata</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.WrappedProperty.from_qkit_property">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.from_qkit_property">[docs]</a>
+        <span class="nd">@classmethod</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">from_qkit_property</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target_object</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="nb">property</span><span class="p">:</span> <span class="n">QkitProperty</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModernInstrument</span><span class="o">.</span><span class="n">WrappedProperty</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Converts a QKitProperty into a Wrapped Property to be handled in a ModernInstrument Instance.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="k">lambda</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">property</span><span class="o">.</span><span class="n">_get_logic</span><span class="p">(</span><span class="n">target_object</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="nb">property</span><span class="o">.</span><span class="fm">__set__</span><span class="p">(</span><span class="n">target_object</span><span class="p">,</span> <span class="n">val</span><span class="p">),</span> <span class="nb">property</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span></div>
+</div>
+
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instrument_options</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="s2">&quot;tags&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+<div class="viewcode-block" id="ModernInstrument.discover_capabilities">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.discover_capabilities">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">discover_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call this method from init to self-discover QkitNative functions and properties.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visitor</span> <span class="o">=</span> <span class="n">QkitNativeVisitor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">visitor</span><span class="o">.</span><span class="n">visit_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Instrument &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+
+<div class="viewcode-block" id="ModernInstrument.get_name">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Return the name of the instrument&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.get_type">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the type of the instrument as a string.</span>
+<span class="sd">        Might behave unexpectedly in case of new drivers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This function is called by the QkitJSONEncoder and should return a </span>
+<span class="sd">        dictionary that will be saved to the JSON file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span> <span class="p">:</span> <span class="s1">&#39;qkitInstrumentv2&#39;</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">())}</span>
+
+<div class="viewcode-block" id="ModernInstrument.get_options">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_options">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the user provided instrument options.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument_options</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.get_tags">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_tags">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the user provided instrument tags.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.has_tag">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.has_tag">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tags</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.initialize">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.initialize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.remove">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.remove">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_remove_parameters</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.is_initialized">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.is_initialized">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.add_parameter">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.add_parameter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># FIXME: Reimplement via ObjectTreeVisitor</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;add_parameter no longer supported in ModernInstrument!&quot;</span><span class="p">)</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remove_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="ModernInstrument.remove_parameter">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.remove_parameter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.has_parameter">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.has_parameter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.get_parameter_options">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_parameter_options">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return list of options for paramter.</span>
+
+<span class="sd">        Input: name (string)</span>
+<span class="sd">        Output: dictionary of options</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">build_options</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.get_shared_parameter_options">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_shared_parameter_options">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_shared_parameter_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return list of options for paramter.</span>
+
+<span class="sd">        Input: name (string)</span>
+<span class="sd">        Output: dictionary of options</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">build_options</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;get_func&#39;</span><span class="p">,</span> <span class="s1">&#39;set_func&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">options</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">options</span> <span class="ow">and</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+                <span class="n">options</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">options</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.set_parameter_options">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.set_parameter_options">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_parameter_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Change parameter options.</span>
+
+<span class="sd">        Input:  name of parameter (string)</span>
+<span class="sd">        Ouput:  None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Parameter </span><span class="si">%s</span><span class="s1"> not defined&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+
+
+
+<div class="viewcode-block" id="ModernInstrument.get_parameter_tags">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_parameter_tags">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return tags for parameter &#39;name&#39;.</span>
+
+<span class="sd">        Input:  name of parameter (string)</span>
+<span class="sd">        Ouput:  array of tags</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">tags</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.add_parameter_tag">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.add_parameter_tag">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_parameter_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add tag to list of tags for parameter &#39;name&#39;.</span>
+
+<span class="sd">        Input:  (1) name of parameter (string)</span>
+<span class="sd">                (2) tag (string)</span>
+<span class="sd">        Ouput:  None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.set_parameter_bounds">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.set_parameter_bounds">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_parameter_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Change the bounds for a parameter.</span>
+
+<span class="sd">        Input:  (1) name of parameter (string)</span>
+<span class="sd">                (2) minimum value</span>
+<span class="sd">                (3) maximum value</span>
+<span class="sd">        Output: None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_parameter_options</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="n">maxval</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.set_channel_bounds">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.set_channel_bounds">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_channel_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Change the bounds for a channel.</span>
+
+<span class="sd">        Input:  (1) name of parameter (string)</span>
+<span class="sd">                (2) channel number (int)</span>
+<span class="sd">                (3) minimum value</span>
+<span class="sd">                (4) maximum value</span>
+<span class="sd">        Output: None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter_options</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;channel_prefix&#39;</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+            <span class="n">var_name</span> <span class="o">=</span> <span class="n">opts</span><span class="p">[</span><span class="s1">&#39;channel_prefix&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="n">channel</span> <span class="o">+</span> <span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_parameter_options</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="n">maxval</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.set_parameter_rate">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.set_parameter_rate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_parameter_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">,</span> <span class="n">stepdelay</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Change the rate properties for a channel.</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            stepsize (float): the maximum step size</span>
+<span class="sd">            stepdelay (float): the delay after each step</span>
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_parameter_options</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">maxstep</span><span class="o">=</span><span class="n">stepsize</span><span class="p">,</span> <span class="n">stepdelay</span><span class="o">=</span><span class="n">stepdelay</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.get_parameter_names">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_parameter_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of parameter names.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Output: all the paramter names (list of strings)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.get_parameters">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the parameter dictionary.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Ouput: Dictionary, keys are parameter names, values are the options.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.get_shared_parameters">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_shared_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_shared_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the parameter dictionary, with non-shareable items stripped.</span>
+
+<span class="sd">        Input: None</span>
+<span class="sd">        Ouput: Dictionary, keys are parameter names, values are the options.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shared_parameter_options</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">params</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.get_parameter_groups">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get_parameter_groups">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return a dictionary with parameter group name -&gt; group members.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_groups</span></div>
+
+
+    <span class="n">_CONVERT_MAP</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nb">int</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="nb">float</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="nb">bytes</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="nb">bool</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="nb">tuple</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+            <span class="nb">list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">}</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ttype</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">bool</span> <span class="ow">and</span> \
+                <span class="n">ttype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Setting a boolean, but that is not the expected type&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ttype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ModernInstrument</span><span class="o">.</span><span class="n">_CONVERT_MAP</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported type </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ttype</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">ModernInstrument</span><span class="o">.</span><span class="n">_CONVERT_MAP</span><span class="p">[</span><span class="n">ttype</span><span class="p">]</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Conversion of </span><span class="si">%r</span><span class="s1"> to type </span><span class="si">%s</span><span class="s1"> failed&#39;</span><span class="p">,</span><span class="n">value</span><span class="p">,</span> <span class="n">ttype</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="ModernInstrument.get">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">NameError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Caught error while processing </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(query=</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">): e&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span></div>
+
+    
+<div class="viewcode-block" id="ModernInstrument.set">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.set">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModernInstrument.call">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ModernInstrument.call">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="interval_check">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.interval_check">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">interval_check</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a callable which returns true if its argument lies between the provided lower and upper bound.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">checker</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">lower</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;=</span> <span class="n">upper</span>
+    <span class="n">checker</span><span class="o">.</span><span class="n">lower</span> <span class="o">=</span> <span class="n">lower</span>
+    <span class="n">checker</span><span class="o">.</span><span class="n">upper</span> <span class="o">=</span> <span class="n">upper</span>
+    <span class="k">return</span> <span class="n">checker</span></div>
+
+
+
+<div class="viewcode-block" id="QkitFunction">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.QkitFunction">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">QkitFunction</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A wrapper of functions to facilitate easy self-discovery.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">func</span><span class="o">.</span><span class="n">_qkit_function</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">func</span></div>
+
+
+<div class="viewcode-block" id="CachePolicy">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.CachePolicy">[docs]</a>
+<span class="nd">@unique</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CachePolicy</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">SOFT_GET</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">ALWAYS_REFRESH</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span> <span class="c1"># Default value</span></div>
+
+
+<div class="viewcode-block" id="caching">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.caching">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">caching</span><span class="p">(</span><span class="n">cache_policy</span><span class="p">:</span> <span class="n">CachePolicy</span><span class="p">,</span> <span class="n">get_after_set</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">QkitProperty</span><span class="p">)</span>
+        <span class="n">func</span><span class="o">.</span><span class="n">set_caching</span><span class="p">(</span><span class="n">cache_policy</span><span class="p">,</span> <span class="n">get_after_set</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span>
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+<div class="viewcode-block" id="QkitProperty">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.QkitProperty">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">QkitProperty</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A store of metadata for properties, which shall be handled in QKit.</span>
+<span class="sd">    It does no range checking whatsoever.</span>
+
+<span class="sd">    Do note, that this is a member of a class. You will need an object to perform calls.</span>
+<span class="sd">    For this reason [WrappedProperty] exists.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">QKIT_CACHE_NAME</span> <span class="o">=</span> <span class="s2">&quot;_qkit_cache&quot;</span>
+
+<div class="viewcode-block" id="QkitProperty.ValueCache">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.QkitProperty.ValueCache">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ValueCache</span><span class="p">:</span>
+        <span class="n">last_value</span><span class="p">:</span> <span class="n">Any</span>
+        <span class="n">dirty</span><span class="p">:</span> <span class="nb">bool</span></div>
+
+
+    <span class="c1"># no longer implemented: name, channels, doc</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        See [QkitProperty.PropertyMetadata] for what the kwargs mean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s2">&quot;Missing Braces on &#39;@QkitProperty()&#39;!&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">PropertyMetadata</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_policy</span> <span class="o">=</span> <span class="n">CachePolicy</span><span class="o">.</span><span class="n">NONE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_after_set</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="ow">not</span> <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Documentation is missing on </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">!&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fget</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">objtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Emulate a property-getter. Default call to _get_logic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_logic</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the value either from the wrapped getter or the cache, depending on [cache_policy]</span>
+<span class="sd">        Used to access the cache if required. Used for internal calls.</span>
+
+<span class="sd">        We ignore all further kwargs, as they may result in incompatibilities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> 
+        
+        <span class="c1"># We need to determine if we hit the cache or call the actual device.</span>
+        <span class="n">hit_cache</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># Per default we can not assume that caching is a good idea. Let&#39;s be pessimistic.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_policy</span> <span class="o">==</span> <span class="n">CachePolicy</span><span class="o">.</span><span class="n">ALWAYS_REFRESH</span><span class="p">:</span> <span class="c1"># Automated QKit-Get call. Hit cache if we are not force to always refresh.</span>
+            <span class="n">hit_cache</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">query</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_policy</span> <span class="o">==</span> <span class="n">CachePolicy</span><span class="o">.</span><span class="n">SOFT_GET</span><span class="p">:</span> <span class="c1"># We have no getter. Always go to cache</span>
+            <span class="n">hit_cache</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hit_cache</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">hit_cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qkit_cache</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">last_value</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># Default query. Call getter.</span>
+            <span class="n">new_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fget</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qkit_cache</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">last_value</span> <span class="o">=</span> <span class="n">new_value</span>
+            <span class="k">return</span> <span class="n">new_value</span>
+
+<div class="viewcode-block" id="QkitProperty.setter">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.QkitProperty.setter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fset</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decorator to create the </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">fset</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Missing parameters in setter, expected (self, arg) or similar!&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fset</span> <span class="o">=</span> <span class="n">fset</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__set__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wraps the setting of the value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t set attribute!&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Likely bug detected: Attempting to set a QkitProperty to a function!&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">check_arg</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="s2">&quot;Argument validity check failed!&quot;</span>
+        
+        <span class="n">retval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fset</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="c1"># Update cache either with value or __get__</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_after_set</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_logic</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qkit_cache</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">last_value</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">retval</span>
+        
+
+<div class="viewcode-block" id="QkitProperty.set_cache_policy">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.QkitProperty.set_cache_policy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_cache_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_policy</span><span class="p">:</span> <span class="n">CachePolicy</span><span class="p">,</span> <span class="n">get_after_set</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_policy</span> <span class="o">=</span> <span class="n">cache_policy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_after_set</span> <span class="o">=</span> <span class="n">get_after_set</span></div>
+
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_qkit_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValueCache</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A consistent way to get the [obj]&#39;s qkit value cache and a member of it.</span>
+<span class="sd">        Creates the cache, should it not already exist.</span>
+<span class="sd">        Creates a ValueCache instance for this property, should none exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">QkitProperty</span><span class="o">.</span><span class="n">QKIT_CACHE_NAME</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">QkitProperty</span><span class="o">.</span><span class="n">QKIT_CACHE_NAME</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">cache</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">QkitProperty</span><span class="o">.</span><span class="n">QKIT_CACHE_NAME</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">QkitProperty</span><span class="o">.</span><span class="n">ValueCache</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+<div class="viewcode-block" id="QkitProperty.from_property">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.QkitProperty.from_property">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_property</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">property</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">PropertyMetadata</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QkitProperty</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a regular python property into a QkitProperty.</span>
+<span class="sd">        Used to install a shim to notify us if regular calls are made.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">fget</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">fget</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">fset</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">fset</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+<div class="viewcode-block" id="QkitProperty.get_metadata">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.QkitProperty.get_metadata">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">property_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PropertyMetadata</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the key is a QkitProperty of obj return its Metadata.</span>
+<span class="sd">        Otherwise return None. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">candidate</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">candidate</span><span class="p">,</span> <span class="n">QkitProperty</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">candidate</span><span class="o">.</span><span class="n">metadata</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+
+<div class="viewcode-block" id="ObjectTreeVisistor">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ObjectTreeVisistor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectTreeVisistor</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A visitor visiting class members to register them as properties and functions of </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="n">ModernInstrument</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span> <span class="o">=</span> <span class="n">instrument</span>
+
+<div class="viewcode-block" id="ObjectTreeVisistor.visit_instance">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ObjectTreeVisistor.visit_instance">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visit_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visists an object and disects it into usable pieces.</span>
+<span class="sd">        If some method is intended to be used as a function, call [visit_function]</span>
+<span class="sd">        If some property is inteded to be used as a property, call [visit_property]</span>
+<span class="sd">        If some array or iterable and indexable structure is channel-like, call [visit_channel]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+    
+<div class="viewcode-block" id="ObjectTreeVisistor.get_property_metadata">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ObjectTreeVisistor.get_property_metadata">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_property_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">property</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PropertyMetadata</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides an instance of [PropertyMetadata] for a discovered property if we were</span>
+<span class="sd">        not able to automatically derive it from [@QkitProperty].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unimplemented &#39;get_property_metadata&#39;!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObjectTreeVisistor.wrap_property">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ObjectTreeVisistor.wrap_property">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrap_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">property</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModernInstrument</span><span class="o">.</span><span class="n">WrappedProperty</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported property type &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span><span class="si">}</span><span class="s2">! Override &#39;wrap_property&#39; missing!&#39;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObjectTreeVisistor.wrap_function">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ObjectTreeVisistor.wrap_function">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrap_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModernInstrument</span><span class="o">.</span><span class="n">WrappedFunction</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported property type &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;! Override &#39;wrap_function&#39; missing!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObjectTreeVisistor.derive_name_from_path">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ObjectTreeVisistor.derive_name_from_path">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">derive_name_from_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">List</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">it</span><span class="p">),</span> <span class="n">path</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ObjectTreeVisistor.visit_property">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ObjectTreeVisistor.visit_property">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visit_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles a property [prop] of [obj] with the name [name].</span>
+<span class="sd">        Registers it in discovered properties.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">property_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derive_name_from_path</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">QkitProperty</span><span class="p">):</span>
+            <span class="n">wrapped</span> <span class="o">=</span> <span class="n">ModernInstrument</span><span class="o">.</span><span class="n">WrappedProperty</span><span class="o">.</span><span class="n">from_qkit_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="nb">property</span><span class="p">):</span>
+            <span class="n">wrapped</span> <span class="o">=</span> <span class="n">ModernInstrument</span><span class="o">.</span><span class="n">WrappedProperty</span><span class="p">(</span>
+                <span class="n">getter</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">property</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span>
+                <span class="n">setter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">value</span><span class="p">:</span> <span class="nb">property</span><span class="o">.</span><span class="fm">__set__</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">value</span><span class="p">),</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_property_metadata</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">wrapped</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrapped</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">wrapped</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span><span class="o">.</span><span class="n">group</span>
+        <span class="k">if</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">_parameter_groups</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">_parameter_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wrapped</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">_parameter_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">wrapped</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ObjectTreeVisistor.visit_function">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.ObjectTreeVisistor.visit_function">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visit_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles a function [func] of [obj] with the name [name].</span>
+<span class="sd">        Registers it in discovered functions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">property_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derive_name_from_path</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s2">&quot;_qkit_function&quot;</span><span class="p">):</span>
+            <span class="n">wrapped</span> <span class="o">=</span> <span class="n">ModernInstrument</span><span class="o">.</span><span class="n">WrappedFunction</span><span class="o">.</span><span class="n">from_qkit_function</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">wrapped</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap_function</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">_functions</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrapped</span></div>
+</div>
+
+
+<div class="viewcode-block" id="QkitNativeVisitor">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.QkitNativeVisitor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">QkitNativeVisitor</span><span class="p">(</span><span class="n">ObjectTreeVisistor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This visitor is good for home-made drivers. It assumes that all properties we want to register</span>
+<span class="sd">    have been properly marked as QkitProperty. It will not support other properties.</span>
+
+<span class="sd">    You can take inspiration from this approach to write your own visitor to shim regular properties</span>
+<span class="sd">    with [QkitProperty.from_property()] and setting the __dict__ entry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="QkitNativeVisitor.visit_instance">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.QkitNativeVisitor.visit_instance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visit_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="c1"># Check for properties</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;_qkit_path&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;_qkit_instrument&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="p">)</span>
+        <span class="n">cls_defined</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">cls_defined</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">prop</span> <span class="o">=</span> <span class="n">cls_defined</span><span class="p">[</span><span class="n">candidate</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">QkitProperty</span><span class="p">):</span>
+                <span class="c1"># This is a QkitProperty. We can wrap it like normal.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">visit_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">candidate</span><span class="p">,</span> <span class="n">cls_defined</span><span class="p">[</span><span class="n">candidate</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="s2">&quot;_qkit_function&quot;</span><span class="p">):</span>
+                <span class="c1"># This is a QkitFunction. Wrap it like a function.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">visit_function</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">candidate</span><span class="p">,</span> <span class="n">cls_defined</span><span class="p">[</span><span class="n">candidate</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
+        <span class="n">obj_defined</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">obj_defined</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">prop</span> <span class="o">=</span> <span class="n">obj_defined</span><span class="p">[</span><span class="n">candidate</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
+                <span class="c1"># This is a list, which might be channel-like</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prop</span><span class="p">)):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">visit_instance</span><span class="p">(</span><span class="n">prop</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="p">[</span><span class="n">candidate</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span></div>
+</div>
+
+
+<div class="viewcode-block" id="PropertyMetadata">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.PropertyMetadata">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PropertyMetadata</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores metadata about a property. Is read out by [ObjectTreeVisistor]</span>
+<span class="sd">    to create wrapped properties for [ModernInstrument]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arg_checker</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[],</span> <span class="n">subscribe</span><span class="o">=</span><span class="p">[],</span> <span class="n">units</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Optional Arguments:</span>
+<span class="sd">        type: float, int, str, np.ndarray, ...</span>
+<span class="sd">        arg_checker: Checks argument for validity (minimum, maximum, steps) and returns either True (valid) or False</span>
+<span class="sd">        tags: Tags associated with the parameter</span>
+<span class="sd">        subscribe: A set of parameter names whose change triggers an update of this one </span>
+<span class="sd">        units: A string describing this properties units</span>
+<span class="sd">        group: A string name of a group this property belongs to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arg_checker</span> <span class="o">=</span> <span class="n">arg_checker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="n">tags</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subsriptions</span> <span class="o">=</span> <span class="n">subscribe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
+
+<div class="viewcode-block" id="PropertyMetadata.check_arg">
+<a class="viewcode-back" href="../../../qkit.core.html#qkit.core.instrument_basev2.PropertyMetadata.check_arg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_arg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_checker</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_checker</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+        <span class="k">return</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        Property </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="si">}</span><span class="s2">): tagged </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="si">}</span><span class="s2"> in group </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="si">}</span>
+<span class="s2">        listens to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subsriptions</span><span class="si">}</span>
+<span class="s2">        argument checked: </span><span class="si">{</span><span class="ow">not</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">arg_checker</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">None</span><span class="si">}</span>
+<span class="s2">        Documentation: &quot;&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1025 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.spectroscopy.spectroscopy_unified &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.measure.spectroscopy.spectroscopy_unified</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.measure.spectroscopy.spectroscopy_unified</h1><div class="highlight"><pre>
+<span></span><span class="c1"># spectroscopy.py spectroscopy measurement class for use with a vector network analyzer</span>
+<span class="c1"># JB/MP/AS@KIT 04/2015, 08/2015, 01/2016</span>
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit</span>
+
+<span class="k">if</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">(</span><span class="s2">&quot;matplotlib&quot;</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pylab</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="k">if</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">(</span><span class="s2">&quot;scipy&quot;</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">curve_fit</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp1d</span><span class="p">,</span> <span class="n">UnivariateSpline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.analysis.resonator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resonator</span> <span class="k">as</span> <span class="n">resonator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.gui.notebook.Progress_Bar</span><span class="w"> </span><span class="kn">import</span> <span class="n">Progress_Bar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.measure.measurement_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeasureBase</span>
+
+
+<span class="c1">##################################################################</span>
+
+<div class="viewcode-block" id="spectrum">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">spectrum</span><span class="p">(</span><span class="n">MeasureBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for spectroscopy measurements with a VNA</span>
+<span class="sd">    usage:</span>
+<span class="sd">    m = spectrum(vna=vna1, sample=yoursample)</span>
+
+<span class="sd">    m.set_x_parameters(arange(-0.05,0.05,0.01),&#39;flux_coil_current&#39;,coil.set_current, unit = &#39;mA&#39;)  outer scan in 3D</span>
+<span class="sd">    m.set_y_parameters(arange(4e9,7e9,10e6),&#39;excitation_frequency&#39;,mw_src1.set_frequency, unit = &#39;Hz&#39;)</span>
+
+<span class="sd">    m.landscape.generate_fit_function_xy(...) for 3D scan, can be called several times and appends the current landscape</span>
+<span class="sd">    m.landscape.generate_fit_function_xz(...) for 2D or 3D scan, adjusts the vna freqs with respect to x</span>
+
+<span class="sd">    m.measure_XX()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vna</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">vna</span> <span class="o">=</span> <span class="n">vna</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">averaging_start_ready</span> <span class="o">=</span> <span class="s2">&quot;start_measurement&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_function_names</span><span class="p">()</span> <span class="ow">and</span> <span class="s2">&quot;ready&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_function_names</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">averaging_start_ready</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;: With your VNA instrument driver (&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;), I can not see when a measurement is complete. So I only wait for a specific time and hope the VNA has finished. Please consider implemeting the necessary functions into your driver.&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span> <span class="o">=</span> <span class="n">Landscape</span><span class="p">(</span><span class="n">vna</span><span class="o">=</span><span class="n">vna</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fit_resonator</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">measurement_type</span> <span class="o">=</span> <span class="s1">&#39;SpectroscopyMeasurement&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scan_time</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># bool([]) == False</span>
+    
+<div class="viewcode-block" id="spectrum.set_x_parameters">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.set_x_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_x_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vec</span><span class="p">,</span> <span class="n">coordname</span><span class="p">,</span> <span class="n">set_obj</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets x-parameters for 2D and 3D scan.</span>
+<span class="sd">        In a 3D measurement, the x-parameters will be the &quot;outer&quot; sweep meaning for every x value all y values are swept and for each (x,y) value the bias is swept according to the set sweep parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        vec: array_likes</span>
+<span class="sd">            An N-dimensional array that contains the sweep values.</span>
+<span class="sd">        coordname: string</span>
+<span class="sd">            The coordinate name to be created as data series in the .h5 file.</span>
+<span class="sd">        set_obj: obj</span>
+<span class="sd">            An callable object to execute with vec-values.</span>
+<span class="sd">        unit: string</span>
+<span class="sd">            The unit name to be used in data series in the .h5 file.</span>
+<span class="sd">        dt: float, optional</span>
+<span class="sd">            The sleep time between x-iterations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_x_parameters</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">coordname</span><span class="p">,</span> <span class="n">set_obj</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">delete_landscape_function_xy</span><span class="p">()</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;xy landscape has been deleted&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">delete_landscape_function_xz</span><span class="p">()</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;xz landscape has been deleted&#39;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="spectrum.set_y_parameters">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.set_y_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_y_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vec</span><span class="p">,</span> <span class="n">coordname</span><span class="p">,</span> <span class="n">set_obj</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets y-parameters for 2D and 3D scan.</span>
+<span class="sd">        In a 3D measurement, the y-parameters will be the &quot;inner&quot; sweep meaning for every x value all y values are swept</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        vec: array_likes</span>
+<span class="sd">            An N-dimensional array that contains the sweep values.</span>
+<span class="sd">        coordname: string</span>
+<span class="sd">            The coordinate name to be created as data series in the .h5 file.</span>
+<span class="sd">        set_obj: obj</span>
+<span class="sd">            An callable object to execute with vec-values.</span>
+<span class="sd">        unit: string</span>
+<span class="sd">            The unit name to be used in data series in the .h5 file.</span>
+<span class="sd">        dt: float, optional</span>
+<span class="sd">            The sleep time between y-iterations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_y_parameters</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">coordname</span><span class="p">,</span> <span class="n">set_obj</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">delete_landscape_function_xy</span><span class="p">()</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;xy landscape has been deleted&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">delete_landscape_function_xz</span><span class="p">()</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;xz landscape has been deleted. You can switch this off if you whish.&#39;</span><span class="p">)</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_measurement_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        all the relevant settings from the vna are updated and called</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_nop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sweeptime_averages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime_averages</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_segments</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">:</span>  <span class="c1"># normal scan</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_freqpoints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_freqpoints</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_freqpoints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">get_freqpoints_xz</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">averaging_start_ready</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">pre_measurement</span><span class="p">()</span>
+
+    <span class="c1"># def _prepare_measurement_file_(self):</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if not self._scan_time:</span>
+    <span class="c1">#         self._data_freq = self._data_file.add_coordinate(&#39;frequency&#39;, unit=&#39;Hz&#39;)</span>
+    <span class="c1">#         self._data_freq.add(self._freqpoints)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if self._scan_2D:</span>
+    <span class="c1">#         if self._nop &lt; 10:</span>
+    <span class="c1">#             &quot;&quot;&quot;creates view: plot middle point vs x-parameter, for qubit measurements&quot;&quot;&quot;</span>
+    <span class="c1">#             self._views = [self._data_file.add_view(&quot;amplitude_midpoint&quot;, x=self._data_x, y=self._data_amp,</span>
+    <span class="c1">#                                                     view_params=dict(transpose=True, default_trace=self._nop // 2, linecolors=[(200, 200, 100)])),</span>
+    <span class="c1">#                            self._data_file.add_view(&quot;phase_midpoint&quot;, x=self._data_x, y=self._data_pha,</span>
+    <span class="c1">#                                                     view_params=dict(transpose=True, default_trace=self._nop // 2, linecolors=[(200, 200, 100)]))]</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if self._scan_time:</span>
+    <span class="c1">#         self._data_x = self._data_file.add_coordinate(&#39;trace_number&#39;, unit=&#39;&#39;)</span>
+    <span class="c1">#         self._data_x.add(np.arange(0, self.number_of_timetraces, 1))</span>
+    <span class="c1">#</span>
+    <span class="c1">#         self._data_amp = self._data_file.add_value_matrix(&#39;amplitude&#39;, x=self._data_x, y=self._data_time, unit=&#39;lin. mag.&#39;, save_timestamp=False)</span>
+    <span class="c1">#         self._data_pha = self._data_file.add_value_matrix(&#39;phase&#39;, x=self._data_x, y=self._data_time, unit=&#39;rad.&#39;, save_timestamp=False)</span>
+    
+<div class="viewcode-block" id="spectrum.measure_1D">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.measure_1D">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">measure_1D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rescan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        measure method to record a single (averaged) VNA trace, S11 or S21 according to the setting on the VNA</span>
+<span class="sd">        rescan: If True (default), the averages on the VNA are cleared and a new measurement is started.</span>
+<span class="sd">                If False, it will directly take the data from the VNA without waiting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dim</span> <span class="o">=</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">measurement_func</span> <span class="o">=</span> <span class="s1">&#39;measure_1D&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_devices</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span>  <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Coordinate</span><span class="p">(</span><span class="s1">&#39;frequency_</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_freqpoints</span><span class="p">[</span><span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_file</span><span class="p">(</span>
+                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">P</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">save_timestamp</span><span class="o">=</span><span class="n">P</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">i</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))</span> <span class="k">for</span> <span class="n">P</span> <span class="ow">in</span> <span class="p">[[</span><span class="s2">&quot;amplitude_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;arb. unit&quot;</span><span class="p">,</span><span class="kc">True</span><span class="p">],[</span><span class="s2">&quot;phase_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;rad&quot;</span><span class="p">,</span><span class="kc">False</span><span class="p">],[</span><span class="s2">&quot;real_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="kc">False</span><span class="p">],[</span><span class="s2">&quot;imag_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="kc">False</span><span class="p">]]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Coordinate</span><span class="p">(</span><span class="s1">&#39;frequency&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_freqpoints</span><span class="p">)</span>
+    
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_file</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;real&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;imag&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="s2">&quot;arb. unit&quot;</span><span class="p">,</span> <span class="n">save_timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="s2">&quot;rad&quot;</span><span class="p">)])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_open_qviewkit</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="p">[]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">4</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+        
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">rescan</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span> <span class="o">=</span> <span class="n">Progress_Bar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_averages</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime</span><span class="p">(),</span> <span class="n">dummy</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">averaging_start_ready</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">start_measurement</span><span class="p">()</span>
+                <span class="n">ti</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">.2</span><span class="p">)</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">ti</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span>
+                        <span class="n">ti</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+                    <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">.2</span><span class="p">)</span>
+                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span><span class="o">.</span><span class="n">progr</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span><span class="o">.</span><span class="n">max_it</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">avg_clear</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_averages</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_Average</span><span class="p">()</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>  <span class="c1"># no averaging</span>
+                    <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime</span><span class="p">())</span>  <span class="c1"># wait single sweep</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># with averaging</span>
+                    <span class="k">if</span> <span class="s2">&quot;avg_status&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_function_names</span><span class="p">():</span>
+                        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_averages</span><span class="p">()):</span>
+                            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">avg_status</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">a</span><span class="p">:</span>
+                                <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">.2</span><span class="p">)</span>  <span class="c1"># maybe one would like to adjust this at a later point</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>  <span class="c1"># old style</span>
+                        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_averages</span><span class="p">()):</span>
+                            <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime</span><span class="p">())</span>  <span class="c1"># wait single sweep time</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span>
+        
+        <span class="n">data_amp</span><span class="p">,</span> <span class="n">data_pha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_tracedata</span><span class="p">()</span>
+        <span class="n">data_real</span><span class="p">,</span> <span class="n">data_imag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_tracedata</span><span class="p">(</span><span class="s1">&#39;RealImag&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_append</span><span class="p">(</span><span class="n">data_amp</span><span class="p">,</span><span class="n">data_pha</span><span class="p">,</span><span class="n">data_real</span><span class="p">,</span><span class="n">data_imag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_resonator</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_do_fit_resonator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end_measurement</span><span class="p">()</span></div>
+
+    
+<div class="viewcode-block" id="spectrum.measure_2D">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.measure_2D">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">measure_2D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        measure method to record a (averaged) VNA trace, S11 or S21 according to the setting on the VNA</span>
+<span class="sd">        for all parameters x_vec in x_obj</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">:</span>  <span class="c1"># The vna limits need to be adjusted, happens in the frequency wrapper</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">set_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">vna_frequency_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">set_function</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dim</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">measurement_func</span> <span class="o">=</span> <span class="s1">&#39;measure_2D&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_devices</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span>  <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Coordinate</span><span class="p">(</span><span class="s1">&#39;frequency_</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_freqpoints</span><span class="p">[</span><span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_file</span><span class="p">(</span>
+                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="p">,</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">P</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">save_timestamp</span><span class="o">=</span><span class="n">P</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">i</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))</span> <span class="k">for</span> <span class="n">P</span> <span class="ow">in</span> <span class="p">[[</span><span class="s2">&quot;amplitude_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;arb. unit&quot;</span><span class="p">,</span><span class="kc">True</span><span class="p">],[</span><span class="s2">&quot;phase_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;rad&quot;</span><span class="p">,</span><span class="kc">False</span><span class="p">],[</span><span class="s2">&quot;real_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="kc">False</span><span class="p">],[</span><span class="s2">&quot;imag_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="kc">False</span><span class="p">]]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Coordinate</span><span class="p">(</span><span class="s1">&#39;frequency&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_freqpoints</span><span class="p">)</span>
+    
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_file</span><span class="p">(</span>
+                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="p">,</span> <span class="n">f</span><span class="p">],</span> <span class="s2">&quot;arb. unit&quot;</span><span class="p">,</span> <span class="n">save_timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="p">,</span> <span class="n">f</span><span class="p">],</span> <span class="s2">&quot;rad&quot;</span><span class="p">)])</span>
+       
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span> <span class="o">=</span> <span class="n">Progress_Bar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="s1">&#39;2D VNA sweep &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime_averages</span><span class="p">(),</span>
+                                <span class="n">dummy</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nop</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="c1"># creates view: plot middle point vs x-parameter, for qubit measurements</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="s2">&quot;amplitude_midpoint&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">hdf_dataset</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">],</span>
+                                                    <span class="n">view_params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">transpose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default_trace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nop</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">linecolors</span><span class="o">=</span><span class="p">[(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">)])),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="s2">&quot;phase_midpoint&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">hdf_dataset</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">],</span>
+                                         <span class="n">view_params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">transpose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default_trace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nop</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">linecolors</span><span class="o">=</span><span class="p">[(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">)]))]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_open_qviewkit</span><span class="p">([</span><span class="s1">&#39;views/amplitude_midpoint&#39;</span><span class="p">,</span> <span class="s1">&#39;views/phase_midpoint&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_views</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_open_qviewkit</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="p">[]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">4</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_resonator</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resonator</span> <span class="o">=</span> <span class="n">resonator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measure</span><span class="p">()</span></div>
+
+    
+<div class="viewcode-block" id="spectrum.measure_3D">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.measure_3D">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">measure_3D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        measure full window of vna while sweeping x_set_obj and y_set_obj with parameters x_vec/y_vec. sweep over y_set_obj is the inner loop, for every value x_vec[i] all values y_vec are measured.</span>
+
+<span class="sd">        optional: measure method to perform the measurement according to landscape, if set</span>
+<span class="sd">        self.span is the range (in units of the vertical plot axis) data is taken around the specified funtion(s)</span>
+<span class="sd">        note: make sure to have properly set x,y vectors before generating traces</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">:</span>  <span class="c1"># The vna limits need to be adjusted, happens in the frequency wrapper</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">set_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">vna_frequency_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">set_function</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dim</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">measurement_func</span> <span class="o">=</span> <span class="s1">&#39;measure_3D&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_devices</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span>  <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Coordinate</span><span class="p">(</span><span class="s1">&#39;frequency_</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_freqpoints</span><span class="p">[</span><span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_file</span><span class="p">(</span>
+                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_parameter</span><span class="p">,</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">P</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">save_timestamp</span><span class="o">=</span><span class="n">P</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">i</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))</span> <span class="k">for</span> <span class="n">P</span> <span class="ow">in</span> <span class="p">[[</span><span class="s2">&quot;amplitude_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;arb. unit&quot;</span><span class="p">,</span><span class="kc">True</span><span class="p">],[</span><span class="s2">&quot;phase_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;rad&quot;</span><span class="p">,</span><span class="kc">False</span><span class="p">],[</span><span class="s2">&quot;real_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="kc">False</span><span class="p">],[</span><span class="s2">&quot;imag_</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="kc">False</span><span class="p">]]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Coordinate</span><span class="p">(</span><span class="s1">&#39;frequency&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_freqpoints</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_file</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_parameter</span><span class="p">,</span> <span class="n">f</span><span class="p">],</span> <span class="s2">&quot;arb. unit&quot;</span><span class="p">,</span> <span class="n">save_timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_parameter</span><span class="p">,</span> <span class="n">f</span><span class="p">],</span> <span class="s2">&quot;rad&quot;</span><span class="p">)])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_open_qviewkit</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="p">[]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">4</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_resonator</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resonator</span> <span class="o">=</span> <span class="n">resonator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_file</span><span class="o">.</span><span class="n">get_filepath</span><span class="p">())</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">:</span>  <span class="c1"># ToDo: This part could be part of the Landscape class</span>
+                <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">)),</span> <span class="kc">False</span><span class="p">)</span>  <span class="c1"># first, nothing is selected:</span>
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;blacklist&#39;</span><span class="p">]:</span>
+                        <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;center_points&#39;</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;y_span&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span>  <span class="c1"># check y span</span>
+                                              <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;x_range&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">values</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;x_range&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># check x range</span>
+                
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;blacklist&#39;</span><span class="p">]:</span>  <span class="c1"># exclude blacklisted areas</span>
+                        <span class="n">truth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span>
+                                <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;center_points&#39;</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;y_span&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+                                    <span class="n">e</span><span class="p">[</span><span class="s1">&#39;x_range&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">values</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;x_range&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])))</span>
+                <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">truth</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span> <span class="o">=</span> <span class="n">Progress_Bar</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="s1">&#39;3D VNA sweep &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime_averages</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span> <span class="o">=</span> <span class="n">Progress_Bar</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dummy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measure</span><span class="p">()</span></div>
+
+    
+<div class="viewcode-block" id="spectrum.measure_timetrace">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.measure_timetrace">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">measure_timetrace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        measure method to record a single VNA timetrace, this only makes sense when span is set to 0 Hz!,</span>
+<span class="sd">        tested only with KEYSIGHT E5071C ENA and its corresponding qkit driver</span>
+<span class="sd">        LGruenhaupt 11/2016</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#ToDo: move this to regular sweeps</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_span</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;: For timetrace scans, VNA span needs to be 0 Hz&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_Average</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;: For timetrace scans, Averaging needs to be turned off.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_centerfreq</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scan_time</span> <span class="o">=</span> <span class="kc">True</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement_object</span><span class="o">.</span><span class="n">measurement_func</span> <span class="o">=</span> <span class="s1">&#39;measure_timetrace&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_devices</span><span class="p">()</span>
+        
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Coordinate</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nop</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nop</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Coordinate</span><span class="p">(</span><span class="s1">&#39;frequency&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_centerfreq</span><span class="p">()])</span>
+        <span class="n">iteration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Coordinate</span><span class="p">(</span><span class="s2">&quot;trace_number&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_timetraces</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_measurement_file</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;amplitude&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">iteration</span><span class="p">,</span> <span class="n">t</span><span class="p">],</span> <span class="s2">&quot;arb. unit&quot;</span><span class="p">,</span> <span class="n">save_timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">iteration</span><span class="p">,</span> <span class="n">t</span><span class="p">],</span> <span class="s2">&quot;rad&quot;</span><span class="p">)],</span>
+                <span class="n">coords</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span> <span class="o">=</span> <span class="n">Progress_Bar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_timetraces</span><span class="p">,</span> <span class="s1">&#39;VNA timetrace &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurement_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime_averages</span><span class="p">(),</span>
+                                <span class="n">dummy</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">)</span>
+        
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            loop: x_obj with parameters from x_vec</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">set_function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">wait_time</span><span class="p">)</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_log_functions</span><span class="p">()</span>
+                
+                <span class="n">data_amp</span><span class="p">,</span> <span class="n">data_pha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_vna_data</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_amp</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_pha</span><span class="p">)</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_end_measurement</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scan_time</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_acquire_vna_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">averaging_start_ready</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">start_measurement</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scan_time</span><span class="p">:</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>  <span class="c1"># to prevent timeouts in time scan</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;VNA STILL ready... Adding delay&quot;</span><span class="p">)</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">.2</span><span class="p">)</span>  <span class="c1"># just to make sure, the ready command does not *still* show ready</span>
+            
+            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">ready</span><span class="p">():</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_sweeptime_averages</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">/</span> <span class="mf">11.</span><span class="p">,</span> <span class="mf">.2</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">avg_clear</span><span class="p">()</span>
+            <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sweeptime_averages</span><span class="p">)</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; measurement &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_tracedata</span><span class="p">()</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">amplitude</span><span class="p">,</span><span class="n">phase</span><span class="p">,</span><span class="n">real</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">imag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;amplitude_</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">amplitude</span><span class="p">[</span><span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;phase_</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phase</span><span class="p">[</span><span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+                <span class="k">if</span> <span class="n">real</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">imag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;real_</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">real</span><span class="p">[</span><span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;imag_</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imag</span><span class="p">[</span><span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">amplitude</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">real</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">imag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;real&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">real</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="s1">&#39;imag&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imag</span><span class="p">)</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">_measure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        measures and plots the data depending on the measurement type.</span>
+<span class="sd">        the measurement loops feature the setting of the objects and saving the data in the .h5 file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            loop: x_obj with parameters from x_vec</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">set_function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_parameter</span><span class="o">.</span><span class="n">wait_time</span><span class="p">)</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_log_functions</span><span class="p">()</span>
+    
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_parameter</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                        <span class="c1"># loop: y_obj with parameters from y_vec (only 3D measurement)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xylandscapes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">perform_measurement_at_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ix</span><span class="p">):</span>
+                            <span class="c1"># if point is not of interest (not close to one of the functions)</span>
+                            <span class="n">data_amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nop</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span>
+                            <span class="n">data_pha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nop</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span>  <span class="c1"># fill with NaNs</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_y_parameter</span><span class="o">.</span><span class="n">set_function</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+                            <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_parameter</span><span class="o">.</span><span class="n">wait_time</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">:</span>  <span class="c1"># normal scan</span>
+                                <span class="n">data_amp</span><span class="p">,</span> <span class="n">data_pha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_vna_data</span><span class="p">()</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">data_amp</span><span class="p">,</span> <span class="n">data_pha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">get_tracedata_xz</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_append</span><span class="p">(</span><span class="n">data_amp</span><span class="p">,</span><span class="n">data_pha</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_resonator</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_do_fit_resonator</span><span class="p">()</span>
+                        <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    filling of value-box is done here.</span>
+<span class="sd">                    after every y-loop the data is stored the next 2d structure</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+                    <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">next_matrix</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">data_amp</span><span class="p">,</span> <span class="n">data_pha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_vna_data</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_append</span><span class="p">(</span><span class="n">data_amp</span><span class="p">,</span> <span class="n">data_pha</span><span class="p">)</span>
+                    
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_resonator</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_do_fit_resonator</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pb</span><span class="o">.</span><span class="n">iterate</span><span class="p">()</span>
+                    <span class="n">qkit</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_end_measurement</span><span class="p">()</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_end_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_end_measurement</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">averaging_start_ready</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">post_measurement</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="spectrum.set_resonator_fit">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.set_resonator_fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_resonator_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_resonator</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_function</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">f_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets fit parameter for resonator</span>
+
+<span class="sd">        fit_resonator (bool): True or False, default: True (optional)</span>
+<span class="sd">        fit_function (string): function which will be fitted to the data (optional)</span>
+<span class="sd">        f_min (float): lower frequency boundary for the fitting function, default: None (optional)</span>
+<span class="sd">        f_max (float): upper frequency boundary for the fitting function, default: None (optional)</span>
+<span class="sd">        fit types: &#39;lorentzian&#39;,&#39;skewed_lorentzian&#39;,&#39;circle_fit_reflection&#39;, &#39;circle_fit_notch&#39;,&#39;fano&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fit_resonator</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fit_resonator</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lorentzian&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;skewed_lorentzian&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;circle_fit_reflection&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;circle_fit_notch&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;fano&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;all_fits&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fit_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_functions</span><span class="p">[</span><span class="n">fit_function</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s1">&#39;Fit function not properly set. Must be either </span><span class="se">\&#39;</span><span class="s1">lorentzian</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">skewed_lorentzian</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">circle_fit_reflection</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">circle_fit_notch</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">fano</span><span class="se">\&#39;</span><span class="s1">, or </span><span class="se">\&#39;</span><span class="s1">all_fits</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fit_resonator</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_f_min</span> <span class="o">=</span> <span class="n">f_min</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_f_max</span> <span class="o">=</span> <span class="n">f_max</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_do_fit_resonator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        calls fit function in resonator class</span>
+<span class="sd">        fit function is specified in self.set_fit, with boundaries f_mim and f_max</span>
+<span class="sd">        only the last &#39;slice&#39; of data is fitted, since we fit live while measuring.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_function</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># lorentzian</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resonator</span><span class="o">.</span><span class="n">fit_lorentzian</span><span class="p">(</span><span class="n">f_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f_min</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f_max</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_function</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># skewed_lorentzian</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resonator</span><span class="o">.</span><span class="n">fit_skewed_lorentzian</span><span class="p">(</span><span class="n">f_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f_min</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f_max</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_function</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># circle_reflection</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resonator</span><span class="o">.</span><span class="n">fit_circle</span><span class="p">(</span><span class="n">reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">f_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f_min</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f_max</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_function</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># circle_notch</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resonator</span><span class="o">.</span><span class="n">fit_circle</span><span class="p">(</span><span class="n">notch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">f_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f_min</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f_max</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_function</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>  <span class="c1"># fano</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resonator</span><span class="o">.</span><span class="n">fit_fano</span><span class="p">(</span><span class="n">f_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f_min</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f_max</span><span class="p">)</span>
+            <span class="c1"># if self._fit_function == 5: #all fits</span>
+            <span class="c1"># self._resonator.fit_all_fits(f_min=self._f_min, f_max = self._f_max)</span>
+    
+<div class="viewcode-block" id="spectrum.set_plot_comment">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.set_plot_comment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_plot_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comment</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Small comment to add at the end of plot pics for more information i.e. good for wiki entries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_comment</span> <span class="o">=</span> <span class="n">comment</span></div>
+
+    
+<div class="viewcode-block" id="spectrum.gen_fit_function">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.gen_fit_function">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gen_fit_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve_f</span><span class="p">,</span> <span class="n">curve_p</span><span class="p">,</span> <span class="n">x_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">span</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates an xy landscape fit for 3D scan. Function is deprecated and calls landscape.generate_fit_function</span>
+<span class="sd">        curve_f: &#39;spline&#39;, &#39;2pt&#39; &#39;lin, &#39;parab&#39;, &#39;hyp&#39;, specifies the fit function to be employed</span>
+<span class="sd">        curve_p: set of points that are the basis for the fit in the format [[x1,x2,x3,...],[y1,y2,y3,...]], frequencies in Hz</span>
+<span class="sd">        span: specify span for the generated fit_function, if not given default of self.span is used</span>
+<span class="sd">        x_range: specify x_range for the function in the format [x_min, x_max]</span>
+<span class="sd">        p0 (optional): start parameters for the fit, must be an 1D array of length 3 ([a,b,c,d]),</span>
+<span class="sd">           where for the parabula p0[3] will be ignored</span>
+<span class="sd">        units: set this to &#39;Hz&#39; in order to avoid large values that cause the fit routine to diverge</span>
+<span class="sd">        The parabolic function takes the form  y = a*(x-b)**2 + c , where (a,b,c) = p0</span>
+<span class="sd">        The hyperbolic function takes the form y = sqrt[ a*(x-b)**2 + c ], where (a,b,c) = p0</span>
+
+<span class="sd">        adds a trace to landscape</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;This function is deprecated. Better to use landscape.generate_fit_function_xy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">generate_fit_function_xy</span><span class="p">(</span><span class="n">curve_f</span><span class="o">=</span><span class="n">curve_f</span><span class="p">,</span> <span class="n">curve_p</span><span class="o">=</span><span class="n">curve_p</span><span class="p">,</span> <span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">units</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="spectrum.delete_fit_function">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.delete_fit_function">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_fit_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        legacy support for delete_xy_landscape_function. Please use the other function in the future</span>
+<span class="sd">        delete single fit function n (with 0 being the first one generated) or the complete landscape for n not specified</span>
+<span class="sd">        :param n: index of single fit function to be deleted</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;This function is deprecated for clarity purposes.&#39;</span>
+                        <span class="s1">&#39; Please use delete_xy_landscape_function in the future&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">delete_landscape_function_xy</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="spectrum.plot_fit_function">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.spectrum.plot_fit_function">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_fit_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        legeacy support for landscape.plot_fit_function_xy. Please use the other function in the future.</span>
+<span class="sd">        Plots the landscape</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">landscape</span><span class="o">.</span><span class="n">plot_xy_landscape</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Landscape">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Landscape</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for landscape scans in combination with spectroscopy. spectrum gnerates an instance of Landscape in __init__</span>
+<span class="sd">    Use this instance to generate your fit_functions/landscape for your measurement.</span>
+<span class="sd">    Instance stores the landscape(functions), lets you plot them, checks if points are to be measured and adjusts</span>
+<span class="sd">    the vna frequencies.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vna</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vna</span> <span class="o">=</span> <span class="n">vna</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spec</span> <span class="o">=</span> <span class="n">spec</span>  <span class="c1"># The spectroscopy object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># List containing dicts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_span_default</span> <span class="o">=</span> <span class="mf">200e6</span>  <span class="c1"># this is for the xy landscape scan, i.e., span of your y_parameter, e.g, mw_frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_span</span><span class="p">()</span>  <span class="c1"># This is for the xz landscape scan i.e. span of vna is adjusted w/ resp to x</span>
+    
+<div class="viewcode-block" id="Landscape.generate_fit_function_xy">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.generate_fit_function_xy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_fit_function_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve_f</span><span class="p">,</span> <span class="n">curve_p</span><span class="p">,</span> <span class="n">x_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_span</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blacklist</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use this function if you keep your vna span fixed but want to add a landscape to your x and y parameter.</span>
+<span class="sd">        I.e., for given x parameter not all y parameters are swept but only those that lie within the specified y-span</span>
+<span class="sd">        around the fit function.</span>
+<span class="sd">        Adds a trace to landscape</span>
+<span class="sd">        curve_f: &#39;spline&#39;, &#39;lin_spline&#39; &#39;lin, &#39;parab&#39;, &#39;hyp&#39;, &#39;transmon&#39; specifies the fit function to be employed</span>
+<span class="sd">        curve_p: set of points that are the basis for the fit in the format [[x1,x2,x3,...],[y1,y2,y3,...]], frequencies in Hz</span>
+<span class="sd">        x_range: specify x_range for the function in the format [x_min, x_max]</span>
+<span class="sd">        y_span: specify the span of your y_axis for the generated fit_function,</span>
+<span class="sd">                if not given default of self.span is used, if negative the span will be excluded from the measurement</span>
+<span class="sd">                interesting for overlaping regions</span>
+<span class="sd">        blacklist: Use this parameter to explicitly exclude a section from the measurement (previously done by negative span)</span>
+<span class="sd">        p0 (optional): start parameters for the fit, must be an 1D array of length 3 ([a,b,c,d]),</span>
+<span class="sd">           where for the parabula p0[3] will be ignored</span>
+<span class="sd">        units: set this to &#39;Hz&#39; in order to avoid large values that cause the fit routine to diverge</span>
+
+<span class="sd">        The parabolic function takes the form  y = a*(x-b)**2 + c , where (a,b,c) = p0</span>
+<span class="sd">        The hyperbolic function takes the form y = sqrt[ a*(x-b)**2 + c ], where (a,b,c) = p0</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">(</span><span class="s2">&quot;scipy&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;scipy not available.&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;Hz&#39;</span><span class="p">:</span>
+            <span class="n">multiplier</span> <span class="o">=</span> <span class="mf">1e9</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">multiplier</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">x_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">curve_p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">y_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">curve_p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">x_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x_range</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">y_span</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">y_span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_span_default</span>
+        <span class="k">if</span> <span class="n">y_span</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">y_span</span> <span class="o">=</span> <span class="o">-</span><span class="n">y_span</span>
+            <span class="n">blacklist</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Using a negative span in generate_fit_function_xy is deprecated. Please use blacklist = True instead for more clarity.&#39;</span><span class="p">)</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;lin_spline&#39;</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">)</span>
+                <span class="n">center_points</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;spline&#39;</span><span class="p">:</span>
+                <span class="n">center_points</span> <span class="o">=</span> <span class="n">UnivariateSpline</span><span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># curve_fit procedure differs from splines</span>
+                <span class="k">if</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;parab&#39;</span><span class="p">:</span>
+                    <span class="n">fit_fct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_parab</span>
+                <span class="k">elif</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;hyp&#39;</span><span class="p">:</span>
+                    <span class="n">fit_fct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_hyp</span>
+                <span class="k">elif</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;lin&#39;</span><span class="p">:</span>
+                    <span class="n">fit_fct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_lin</span>
+                    <span class="n">p0</span> <span class="o">=</span> <span class="n">p0</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;transmon&#39;</span><span class="p">:</span>
+                    <span class="n">fit_fct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_transmon</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;function type not known...aborting&#39;</span><span class="p">)</span>
+                <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">fit_fct</span><span class="p">,</span> <span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span> <span class="o">/</span> <span class="n">multiplier</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">)</span>
+                <span class="n">center_points</span> <span class="o">=</span> <span class="n">multiplier</span> <span class="o">*</span> <span class="n">fit_fct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">,</span> <span class="o">*</span><span class="n">popt</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">message</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;fit not successful:&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;center_points&#39;</span><span class="p">:</span> <span class="n">center_points</span><span class="p">,</span> <span class="s1">&#39;y_span&#39;</span><span class="p">:</span> <span class="n">y_span</span><span class="p">,</span> <span class="s1">&#39;x_range&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">x_range</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x_range</span><span class="p">)],</span> <span class="s1">&#39;blacklist&#39;</span><span class="p">:</span> <span class="n">blacklist</span><span class="p">})</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.generate_fit_function_xz">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.generate_fit_function_xz">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_fit_function_xz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve_f</span><span class="p">,</span> <span class="n">curve_p</span><span class="p">,</span> <span class="n">z_span</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">7</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use this function if you want to adjust your vna span with respect to your x-values, useful if you want to</span>
+<span class="sd">        track your fresonator, e.g., shifting resonance due qubit resonator coupling or fmr measurements. It works</span>
+<span class="sd">        in a 2d and 3d scan.</span>
+<span class="sd">        :param curve_f: fit_function (str) such as &#39;lin_spline&#39;, &#39;spline&#39;, &#39;parab&#39;, &#39;hyp&#39;, &#39;lin&#39;</span>
+<span class="sd">        :param curve_p: Valeus to fit in the form [[x0,x1,..xn],[z0,z1,..zn]]</span>
+<span class="sd">        :param z_span: If None, span from VNA is used. If specified, vna span will be updated.</span>
+<span class="sd">        :param p0: intial fit parameters</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">(</span><span class="s2">&quot;scipy&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;scipy not available.&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">curve_p</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1e6</span><span class="p">:</span>  <span class="c1"># test if z_values are given in Hz or GHz</span>
+            <span class="n">multiplier</span> <span class="o">=</span> <span class="mf">1e9</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">multiplier</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">z_span</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_span</span> <span class="o">=</span> <span class="n">z_span</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">set_span</span><span class="p">(</span><span class="n">z_span</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_span</span><span class="p">()</span>
+        <span class="n">x_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">curve_p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">z_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">curve_p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;lin_spline&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">z_fit</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;spline&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span> <span class="o">=</span> <span class="n">UnivariateSpline</span><span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">z_fit</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># curve_fit procedure differs from splines</span>
+                <span class="k">if</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;parab&#39;</span><span class="p">:</span>
+                    <span class="n">fit_fct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_parab</span>
+                <span class="k">elif</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;hyp&#39;</span><span class="p">:</span>
+                    <span class="n">fit_fct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_hyp</span>
+                <span class="k">elif</span> <span class="n">curve_f</span> <span class="o">==</span> <span class="s1">&#39;lin&#39;</span><span class="p">:</span>
+                    <span class="n">fit_fct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_lin</span>
+                    <span class="n">p0</span> <span class="o">=</span> <span class="n">p0</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;function type not known...aborting&#39;</span><span class="p">)</span>
+                <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">fit_fct</span><span class="p">,</span> <span class="n">x_fit</span><span class="p">,</span> <span class="n">z_fit</span> <span class="o">/</span> <span class="n">multiplier</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">multiplier</span> <span class="o">*</span> <span class="n">fit_fct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">popt</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_span</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_span</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_span</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_nop</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">message</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;fit not successful:&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.delete_landscape_function_xy">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.delete_landscape_function_xy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_landscape_function_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        delete single xy landscape function n (with 0 being the first one generated)</span>
+<span class="sd">        or the complete landscape for n not specified</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.delete_landscape_function_xz">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.delete_landscape_function_xz">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_landscape_function_xz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        delets the xz_landscape_function incl. the xz_freqpoints</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;xz_landscape deleted&#39;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.plot_xy_landscape">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.plot_xy_landscape">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_xy_landscape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots the xy landscape(s) (for 3D scan, z-axis (vna) is not plotted</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">(</span><span class="s2">&quot;matplotlib&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;matplotlib not found.&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">arg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;x_range&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span> <span class="o">&lt;=</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;x_range&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span>
+                    <span class="n">t</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;center_points&#39;</span><span class="p">][</span><span class="n">arg</span><span class="p">]</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;blacklist&#39;</span><span class="p">]:</span>
+                        <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;y_span&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">t</span> <span class="o">-</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;y_span&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;y_span&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">t</span> <span class="o">-</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;y_span&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;invalid trace...skip&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">y_vec</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">y_vec</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;0.5&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No trace generated. Use landscape.generate_xy_function&#39;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.plot_xz_landscape">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.plot_xz_landscape">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_xz_landscape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        plots the xz landscape, i.e., how your vna frequency span changes with respect to the x vector</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">qkit</span><span class="o">.</span><span class="n">module_available</span><span class="p">(</span><span class="s2">&quot;matplotlib&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;matplotlib not found.&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">:</span>
+            <span class="n">y_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">,</span> <span class="n">y_values</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">,</span> <span class="n">y_values</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_span</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">y_values</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_span</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">x_vec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No xz funcion generated. Use landscape.generate_xz_function&#39;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.set_y_span">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.set_y_span">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_y_span</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_span</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_span_default</span> <span class="o">=</span> <span class="n">y_span</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="s1">&#39;y_span&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_span</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">:</span>
+                    <span class="n">e</span><span class="p">[</span><span class="s1">&#39;y_span&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_span</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.get_y_span">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.get_y_span">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_y_span</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_span_default</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.get_y_span_list">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.get_y_span_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_y_span_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;y_span&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">]</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.vna_frequency_wrapper">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.vna_frequency_wrapper">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vna_frequency_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_set_obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function wraps the x_set_obj function for a landscape_xy scan such that the vna frequencies are automatically</span>
+<span class="sd">        adjusted</span>
+<span class="sd">        :param x_set_obj: as given by the user</span>
+<span class="sd">        :return: the wrapped function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">vna_wrapper</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">start_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_span</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">set_startfreq</span><span class="p">(</span><span class="n">start_freq</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">set_stopfreq</span><span class="p">(</span><span class="n">start_freq</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_span</span><span class="p">)</span>
+            <span class="n">x_set_obj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">vna_wrapper</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.perform_measurement_at_point">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.perform_measurement_at_point">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">perform_measurement_at_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ix</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Looks if the point is of interest and returns True or False</span>
+<span class="sd">        :param x: point in the x-vector</span>
+<span class="sd">        :param y: point in the y-vector</span>
+<span class="sd">        :param ix: index of x-vector</span>
+<span class="sd">        :return: measure_bool, whether or not the point should be measured</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># looks strange but works</span>
+        <span class="n">measure</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xylandscapes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;center_points&#39;</span><span class="p">][</span><span class="n">ix</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;y_span&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;x_range&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;x_range&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># The point is covered by this span</span>
+                <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;blacklist&#39;</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># if the point is blacklisted anywhere, we don&#39;t need to look further</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">measure</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">measure</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.get_tracedata_xz">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.get_tracedata_xz">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tracedata_xz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function to fill the tracedata with NaNs outside the scan region</span>
+<span class="sd">        :param x: x_value where we perform the scan</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span>
+        <span class="n">pha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span>
+        <span class="n">startarg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xzlandscape_func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_span</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+        <span class="n">stoparg</span> <span class="o">=</span> <span class="n">startarg</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vna</span><span class="o">.</span><span class="n">get_nop</span><span class="p">()</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">_acquire_vna_data</span><span class="p">()</span>
+        <span class="n">amp</span><span class="p">[</span><span class="n">startarg</span><span class="p">:</span><span class="n">stoparg</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="n">pha</span><span class="p">[</span><span class="n">startarg</span><span class="p">:</span><span class="n">stoparg</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="k">return</span> <span class="n">amp</span><span class="p">,</span> <span class="n">pha</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.get_freqpoints_xz">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.get_freqpoints_xz">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_freqpoints_xz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xz_freqpoints</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.f_parab">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.f_parab">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_parab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">c</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.f_hyp">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.f_hyp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_hyp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;hyperbolic function with the form y = sqrt[ a*(x-b)**2 + c ]&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">c</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.f_lin">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.f_lin">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_lin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">b</span></div>
+
+    
+<div class="viewcode-block" id="Landscape.f_transmon">
+<a class="viewcode-back" href="../../../../qkit.measure.spectroscopy.html#qkit.measure.spectroscopy.spectroscopy_unified.Landscape.f_transmon">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_transmon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">w_max</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">I_ext</span><span class="p">,</span> <span class="n">djj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dispersion of a tunable transmon qubit with junction asymmetry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x:     x-value</span>
+<span class="sd">            w_max:    Maximum qubit frequency without detuning.</span>
+<span class="sd">            L:     Oscillation period in current/x-value.</span>
+<span class="sd">            I_ext: Offset current/x offset.</span>
+<span class="sd">            djj:   Josephson junction asymmetry (Ic1 - Ic2)/(Ic1 + Ic2)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Primal transition frequency of a transmon qubit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">w_max</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">L</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">I_ext</span><span class="p">)))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">djj</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">L</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">I_ext</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">.5</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

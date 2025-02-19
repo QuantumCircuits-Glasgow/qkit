@@ -1,0 +1,209 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.Virtual_VCA &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.Virtual_VCA</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.Virtual_VCA</h1><div class="highlight"><pre>
+<span></span><span class="c1"># filename: Virtual_VCA.py</span>
+<span class="c1"># Tim Wolz &lt;tim.wolz@.kit.edu&gt;, 5/2017 updated 09/2018</span>
+
+<span class="c1"># virtual VCA instrument to be used as a wrapper for several DACs</span>
+<span class="c1"># so far the IVVI and DC_DAC are implemented</span>
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">interpolate</span>
+
+<span class="n">volts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">17</span><span class="p">)</span>
+<span class="n">attenuation0408</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.11278882e+00</span><span class="p">,</span> <span class="mf">3.73766693e+00</span><span class="p">,</span> <span class="mf">7.14756693e+00</span><span class="p">,</span>
+                   <span class="mf">1.00470419e+01</span><span class="p">,</span> <span class="mf">1.30124250e+01</span><span class="p">,</span> <span class="mf">1.53641026e+01</span><span class="p">,</span> <span class="mf">1.76756578e+01</span><span class="p">,</span>
+                   <span class="mf">2.00411519e+01</span><span class="p">,</span> <span class="mf">2.22864997e+01</span><span class="p">,</span> <span class="mf">2.45740138e+01</span><span class="p">,</span> <span class="mf">2.65537780e+01</span><span class="p">,</span>
+                   <span class="mf">2.84989597e+01</span><span class="p">,</span> <span class="mf">3.03834811e+01</span><span class="p">,</span> <span class="mf">3.21356836e+01</span><span class="p">,</span> <span class="mf">3.40573527e+01</span><span class="p">,</span>
+                   <span class="mf">3.57549752e+01</span><span class="p">]</span>  <span class="c1"># These are measurement values, insertion loss not considered</span>
+<span class="c1"># ToDo include measurment values of 0812 vca for interpolation</span>
+<span class="n">attenuation0812</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="Virtual_VCA">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Virtual_VCA.Virtual_VCA">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Virtual_VCA</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper for the VCA that allows to set the attenuation without knowing the underlying DAC mechanisms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dac_device</span><span class="p">,</span> <span class="n">dac_port</span><span class="p">,</span> <span class="n">freqrange</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        inits the VCA (virtual instrument)</span>
+<span class="sd">        :param name: qkit instrument name</span>
+<span class="sd">        :param dac_device: either IVVI (must be set to positive values) or DC_DAC</span>
+<span class="sd">        :param dac_port: chosen output port / channel of your DAC-device</span>
+<span class="sd">        :param freqrange: frequency range of the vca as string either &#39;0408&#39; or &#39;0812&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;virtual&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">freqrange</span> <span class="ow">is</span> <span class="s1">&#39;0408&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">volts_interpol</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">attenuation0408</span><span class="p">,</span> <span class="n">volts</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">att_interpol</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">volts</span><span class="p">,</span> <span class="n">attenuation0408</span><span class="p">)</span>
+
+        <span class="c1"># ToDo:</span>
+        <span class="c1"># elif freqrange is &#39;0812&#39;:</span>
+        <span class="c1">#    self.volts_interpol=interpolate.interp1d(attenuation0812, volts)</span>
+        <span class="c1">#    self.att_interpol=interpolate.interp1d(volts, attenuation0812)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;dB&#39;</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                           <span class="n">maxval</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dac</span> <span class="o">=</span> <span class="n">_Dac</span><span class="p">(</span><span class="n">dac_device</span><span class="p">,</span> <span class="n">dac_port</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Virtual_VCA.do_set_attenuation">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Virtual_VCA.Virtual_VCA.do_set_attenuation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_attenuation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">att</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets the attenuation of the vca</span>
+<span class="sd">        :param att in dB (float)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">voltage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">volts_interpol</span><span class="p">(</span><span class="n">att</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># 2 bc of amplifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dac</span><span class="o">.</span><span class="n">set_dac_voltage</span><span class="p">(</span><span class="n">voltage</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Virtual_VCA.do_get_attenuation">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Virtual_VCA.Virtual_VCA.do_get_attenuation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_attenuation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns the attenuation of the vca</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">voltage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dac</span><span class="o">.</span><span class="n">get_dac_voltage</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">att_interpol</span><span class="p">(</span><span class="n">voltage</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Dac</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    wrapper class so that Virtual_VCA works with several different Dacs.</span>
+<span class="sd">    Please just append other devices here.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dac_device</span><span class="p">,</span> <span class="n">dac_port</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dac_device</span> <span class="o">=</span> <span class="n">dac_device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dac_port</span> <span class="o">=</span> <span class="n">dac_port</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_dac_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">voltage</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_device</span><span class="o">.</span><span class="n">get_type</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;IVVI&#39;</span><span class="p">:</span>
+            <span class="n">mv</span> <span class="o">=</span> <span class="n">voltage</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dac_device</span><span class="o">.</span><span class="n">set_dac</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dac_port</span><span class="p">,</span> <span class="n">mv</span><span class="p">,</span> <span class="n">dacrange</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4000</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_device</span><span class="o">.</span><span class="n">get_type</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DC_DAC&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dac_device</span><span class="o">.</span><span class="n">do_set_voltage</span><span class="p">(</span><span class="n">voltage</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_port</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dac_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_device</span><span class="o">.</span><span class="n">get_type</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;IVVI&#39;</span><span class="p">:</span>
+            <span class="n">voltage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_device</span><span class="o">.</span><span class="n">get_dac</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dac_port</span><span class="p">,</span> <span class="n">dacrange</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4000</span><span class="p">))</span> <span class="o">/</span> <span class="mi">1000</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_device</span><span class="o">.</span><span class="n">get_type</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DC_DAC&#39;</span><span class="p">:</span>
+            <span class="n">voltage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dac_device</span><span class="o">.</span><span class="n">do_get_voltage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dac_port</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">voltage</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

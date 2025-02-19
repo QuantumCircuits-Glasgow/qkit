@@ -1,0 +1,307 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.gui.qviewkit.pg_time_axis &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.gui.qviewkit.pg_time_axis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.gui.qviewkit.pg_time_axis</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># Thanks to @cpascual. This code is taken from</span>
+<span class="c1"># https://gist.github.com/cpascual/cdcead6c166e63de2981bc23f5840a98</span>
+<span class="c1">#############################################################################</span>
+<span class="c1">#</span>
+<span class="c1"># This file was adapted from Taurus TEP17, but all taurus dependencies were </span>
+<span class="c1"># removed so that it works with just pyqtgraph</span>
+<span class="c1">#</span>
+<span class="c1"># Just run it and play with the zoom to see how the labels and tick positions </span>
+<span class="c1"># automatically adapt to the shown range</span>
+<span class="c1">#</span>
+<span class="c1">#############################################################################</span>
+<span class="c1"># http://taurus-scada.org</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2011 CELLS / ALBA Synchrotron, Bellaterra, Spain</span>
+<span class="c1">#</span>
+<span class="c1"># Taurus is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Taurus is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU Lesser General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU Lesser General Public License</span>
+<span class="c1"># along with Taurus.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="c1">#############################################################################</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides date-time aware axis</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DateAxisItem&quot;</span><span class="p">]</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyqtgraph</span><span class="w"> </span><span class="kn">import</span> <span class="n">AxisItem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">mktime</span>
+
+
+<div class="viewcode-block" id="DateAxisItem">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.pg_time_axis.DateAxisItem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DateAxisItem</span><span class="p">(</span><span class="n">AxisItem</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A tool that provides a date-time aware axis. It is implemented as an</span>
+<span class="sd">    AxisItem that interpretes positions as unix timestamps (i.e. seconds</span>
+<span class="sd">    since 1970).</span>
+<span class="sd">    The labels and the tick positions are dynamically adjusted depending</span>
+<span class="sd">    on the range.</span>
+<span class="sd">    It provides a  :meth:`attachToPlotItem` method to add it to a given</span>
+<span class="sd">    PlotItem</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Max width in pixels reserved for each label in axis</span>
+    <span class="n">_pxLabelWidth</span> <span class="o">=</span> <span class="mi">80</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">AxisItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_oldAxis</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="DateAxisItem.tickValues">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.pg_time_axis.DateAxisItem.tickValues">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tickValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minVal</span><span class="p">,</span> <span class="n">maxVal</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reimplemented from PlotItem to adjust to the range and to force</span>
+<span class="sd">        the ticks at &quot;round&quot; positions in the context of time units instead of</span>
+<span class="sd">        rounding in a decimal base</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">maxMajSteps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_pxLabelWidth</span><span class="p">)</span>
+
+        <span class="n">dt1</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">minVal</span><span class="p">)</span>
+        <span class="n">dt2</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">maxVal</span><span class="p">)</span>
+
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">maxVal</span> <span class="o">-</span> <span class="n">minVal</span>
+        <span class="n">majticks</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">dx</span> <span class="o">&gt;</span> <span class="mi">63072001</span><span class="p">:</span>  <span class="c1"># 3600s*24*(365+366) = 2 years (count leap year)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">366</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dt1</span><span class="o">.</span><span class="n">year</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dt2</span><span class="o">.</span><span class="n">year</span><span class="p">):</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">majticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mktime</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()))</span>
+
+        <span class="k">elif</span> <span class="n">dx</span> <span class="o">&gt;</span> <span class="mi">5270400</span><span class="p">:</span>  <span class="c1"># 3600s*24*61 = 61 days</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">31</span><span class="p">)</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">dt1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                             <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">d</span>
+            <span class="k">while</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="n">dt2</span><span class="p">:</span>
+                <span class="c1"># make sure that we are on day 1 (even if always sum 31 days)</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">majticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mktime</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()))</span>
+                <span class="n">dt</span> <span class="o">+=</span> <span class="n">d</span>
+
+        <span class="k">elif</span> <span class="n">dx</span> <span class="o">&gt;</span> <span class="mi">172800</span><span class="p">:</span>  <span class="c1"># 3600s24*2 = 2 days</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">dt1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">d</span>
+            <span class="k">while</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="n">dt2</span><span class="p">:</span>
+                <span class="n">majticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mktime</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()))</span>
+                <span class="n">dt</span> <span class="o">+=</span> <span class="n">d</span>
+
+        <span class="k">elif</span> <span class="n">dx</span> <span class="o">&gt;</span> <span class="mi">7200</span><span class="p">:</span>  <span class="c1"># 3600s*2 = 2hours</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">dt1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">d</span>
+            <span class="k">while</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="n">dt2</span><span class="p">:</span>
+                <span class="n">majticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mktime</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()))</span>
+                <span class="n">dt</span> <span class="o">+=</span> <span class="n">d</span>
+
+        <span class="k">elif</span> <span class="n">dx</span> <span class="o">&gt;</span> <span class="mi">1200</span><span class="p">:</span>  <span class="c1"># 60s*20 = 20 minutes</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">dt1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">minute</span><span class="o">=</span><span class="p">(</span><span class="n">dt1</span><span class="o">.</span><span class="n">minute</span> <span class="o">//</span> <span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
+                             <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">d</span>
+            <span class="k">while</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="n">dt2</span><span class="p">:</span>
+                <span class="n">majticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mktime</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()))</span>
+                <span class="n">dt</span> <span class="o">+=</span> <span class="n">d</span>
+
+        <span class="k">elif</span> <span class="n">dx</span> <span class="o">&gt;</span> <span class="mi">120</span><span class="p">:</span>  <span class="c1"># 60s*2 = 2 minutes</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">dt1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">d</span>
+            <span class="k">while</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="n">dt2</span><span class="p">:</span>
+                <span class="n">majticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mktime</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()))</span>
+                <span class="n">dt</span> <span class="o">+=</span> <span class="n">d</span>
+
+        <span class="k">elif</span> <span class="n">dx</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">:</span>  <span class="c1"># 20s</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">dt1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">second</span><span class="o">=</span><span class="p">(</span><span class="n">dt1</span><span class="o">.</span><span class="n">second</span> <span class="o">//</span> <span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">d</span>
+            <span class="k">while</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="n">dt2</span><span class="p">:</span>
+                <span class="n">majticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mktime</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()))</span>
+                <span class="n">dt</span> <span class="o">+=</span> <span class="n">d</span>
+
+        <span class="k">elif</span> <span class="n">dx</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># 2s</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">majticks</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">minVal</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">maxVal</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># &lt;2s , use standard implementation from parent</span>
+            <span class="k">return</span> <span class="n">AxisItem</span><span class="o">.</span><span class="n">tickValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minVal</span><span class="p">,</span> <span class="n">maxVal</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">majticks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">L</span> <span class="o">&gt;</span> <span class="n">maxMajSteps</span><span class="p">:</span>
+            <span class="n">majticks</span> <span class="o">=</span> <span class="n">majticks</span><span class="p">[::</span><span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">/</span> <span class="n">maxMajSteps</span><span class="p">))]</span>
+
+        <span class="k">return</span> <span class="p">[(</span><span class="n">d</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">(),</span> <span class="n">majticks</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="DateAxisItem.tickStrings">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.pg_time_axis.DateAxisItem.tickStrings">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tickStrings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">spacing</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reimplemented from PlotItem to adjust to the range&quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">spacing</span> <span class="o">&gt;=</span> <span class="mi">31622400</span><span class="p">:</span>  <span class="c1"># 366 days</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;%Y&quot;</span>
+
+        <span class="k">elif</span> <span class="n">spacing</span> <span class="o">&gt;=</span> <span class="mi">2678400</span><span class="p">:</span>  <span class="c1"># 31 days</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;%m.%Y&quot;</span>
+
+        <span class="k">elif</span> <span class="n">spacing</span> <span class="o">&gt;=</span> <span class="mi">86400</span><span class="p">:</span>  <span class="c1"># = 1 day</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">.%m.%y&quot;</span>
+
+        <span class="k">elif</span> <span class="n">spacing</span> <span class="o">&gt;=</span> <span class="mi">3600</span><span class="p">:</span>  <span class="c1"># 1 h</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">.%m. %#H°°&quot;</span>
+
+        <span class="k">elif</span> <span class="n">spacing</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">:</span>  <span class="c1"># 1 m</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">.%m. %H:%M&quot;</span>
+
+        <span class="k">elif</span> <span class="n">spacing</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># 1s</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;%H:%M:%S&quot;</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># less than 2s (show microseconds)</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;[+</span><span class="si">%f</span><span class="s1">us]&#39;</span>  <span class="c1"># explicitly relative to last second</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">fmt</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>  <span class="c1"># Windows can&#39;t handle dates before 1970</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="DateAxisItem.attachToPlotItem">
+<a class="viewcode-back" href="../../../../qkit.gui.qviewkit.html#qkit.gui.qviewkit.pg_time_axis.DateAxisItem.attachToPlotItem">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">attachToPlotItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotItem</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add this axis to the given PlotItem</span>
+<span class="sd">        :param plotItem: (PlotItem)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setParentItem</span><span class="p">(</span><span class="n">plotItem</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_oldAxis</span> <span class="o">=</span> <span class="n">plotItem</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">][</span><span class="s1">&#39;item&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_oldAxis</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">viewBox</span> <span class="o">=</span> <span class="n">plotItem</span><span class="o">.</span><span class="n">getViewBox</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">linkToView</span><span class="p">(</span><span class="n">viewBox</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">_oldAxis</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="n">plotItem</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">][</span><span class="s1">&#39;item&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">plotItem</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">][</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span>
+            <span class="n">old_item</span> <span class="o">=</span> <span class="n">plotItem</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">)</span>
+            <span class="n">plotItem</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">old_item</span><span class="p">)</span>
+            <span class="n">plotItem</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">pos</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="o">-</span><span class="mi">1000</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

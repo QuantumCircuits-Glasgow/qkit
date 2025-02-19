@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.gui.notebook.Progress_Bar &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.gui.notebook.Progress_Bar</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.gui.notebook.Progress_Bar</h1><div class="highlight"><pre>
+<span></span><span class="c1"># progress bar handler by AS/JB@KIT 09/2014, 08/2015</span>
+<span class="c1"># jupyter adjust HR@KIT/2016</span>
+<span class="c1"># use:</span>
+<span class="c1"># import Progress_Bar</span>
+<span class="c1"># initialize and create empty progress bar by instantiating, passing the number of iterations: e.g. p = Progress_Bar.Progress_Bar(100)</span>
+<span class="c1"># to iterate the progress bar call p.iterate()</span>
+<span class="c1"># pass _dummy=True to initialize a _dummy progressbar if you don&#39;t want to see it.</span>
+
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span><span class="o">,</span><span class="nn">sys</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">try_legacy</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">pb_list</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;List of progressbars with </span><span class="si">%i</span><span class="s2"> items found&quot;</span><span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pb_list</span><span class="p">)))</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="n">pb_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="hourformat">
+<a class="viewcode-back" href="../../../../qkit.gui.notebook.html#qkit.gui.notebook.Progress_Bar.hourformat">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">hourformat</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%i</span><span class="s2">:</span><span class="si">%02i</span><span class="s2">:</span><span class="si">%02i</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">time</span><span class="o">/</span><span class="mi">60</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span><span class="n">time</span><span class="o">/</span><span class="mi">60</span><span class="o">%</span><span class="mi">60</span><span class="p">,</span><span class="n">time</span><span class="o">%</span><span class="mi">60</span><span class="p">)</span></div>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="s2">&quot;try using the jupyter progress bar&quot;</span>
+    <span class="c1">#import somemodule.that.doesnt.exist</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntProgress</span><span class="p">,</span> <span class="n">HTML</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Progress_Bar</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">max_it</span><span class="p">,</span><span class="n">name</span><span class="o">=</span> <span class="s1">&#39;Progress:&#39;</span><span class="p">,</span><span class="n">est_cycle_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">dummy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;new style progress bar&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="o">=</span><span class="n">dummy</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">starttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starttime</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span> <span class="o">=</span> <span class="n">max_it</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">=</span> <span class="mi">0</span>
+            
+            <span class="c1">#check for old (finished) progressbar with the same name</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pb_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                    <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">pb</span> <span class="o">=</span> <span class="n">IntProgress</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="nb">max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;95%&quot;</span><span class="p">},</span>
+                <span class="p">)</span>     
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">pi</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span>
+                <span class="c1">#value = &quot;(0/%i) &lt;br&gt;&amp;#9992; -?-    &lt;br&gt;&amp;#128336;  --:--:--   (estimated)&lt;br&gt;&amp;#10010;  00:00:00 (elapsed) &lt;br&gt;&amp;#9866; --:--:--  (remaining)&quot;% (self.max_it),</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&lt;table style=&#39;width:100</span><span class="si">%%</span><span class="s2">&#39;&gt;&lt;tr&gt;&lt;td&gt;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%i</span><span class="s2">/</span><span class="si">%i</span><span class="s2">) &lt;/td&gt;&lt;td&gt;&amp;#9992; </span><span class="si">%s</span><span class="s2">    &lt;/td&gt;&lt;td&gt;&amp;#128336;  </span><span class="si">%s</span><span class="s2">   (estimated)&lt;/td&gt;&lt;td&gt;&amp;#10010;  </span><span class="si">%s</span><span class="s2"> (elapsed) &lt;/td&gt;&lt;td&gt;&amp;#9866;  </span><span class="si">%s</span><span class="s2"> (remaining)&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&quot;</span><span class="o">%</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">,</span>
+                    <span class="s2">&quot;-?-&quot;</span> <span class="k">if</span> <span class="n">est_cycle_time</span><span class="o">==</span><span class="kc">None</span> <span class="k">else</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> (</span><span class="si">%a</span><span class="s1">) %H:%M:%S&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">est_cycle_time</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span> <span class="p">)),</span>
+                    <span class="s2">&quot;--:--:--&quot;</span> <span class="k">if</span> <span class="n">est_cycle_time</span><span class="o">==</span><span class="kc">None</span> <span class="k">else</span> <span class="n">hourformat</span><span class="p">(</span><span class="n">est_cycle_time</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">),</span>
+                    <span class="s2">&quot;00:00:00&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;--:--:--&quot;</span> <span class="k">if</span> <span class="n">est_cycle_time</span><span class="o">==</span><span class="kc">None</span> <span class="k">else</span> <span class="n">hourformat</span><span class="p">(</span><span class="n">est_cycle_time</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">)),</span>
+                <span class="p">)</span>
+
+            <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+            <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="p">)</span>            
+            
+        <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">max_it</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">max_it</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span> <span class="o">=</span> <span class="n">max_it</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">starttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starttime</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">bar_style</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="n">max_it</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">()</span>
+                    
+        <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">iteration</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">=</span> <span class="n">iteration</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">iterate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">addend</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">+=</span> <span class="n">addend</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="n">progr_info</span> <span class="o">=</span> <span class="s2">&quot;&lt;table style=&#39;width:100</span><span class="si">%%</span><span class="s2">&#39;&gt;&lt;tr&gt;&lt;td&gt;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%i</span><span class="s2">/</span><span class="si">%i</span><span class="s2">) &lt;/td&gt;&lt;td&gt;&amp;#9992; </span><span class="si">%s</span><span class="s2">    &lt;/td&gt;&lt;td&gt;&amp;#128336;  </span><span class="si">%s</span><span class="s2">   (estimated)&lt;/td&gt;&lt;td&gt;&amp;#10010;  </span><span class="si">%s</span><span class="s2"> (elapsed) &lt;/td&gt;&lt;td&gt;&amp;#9866;  </span><span class="si">%s</span><span class="s2"> (remaining)&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">param</span><span class="p">,</span>     <span class="c1">#&quot;%s (%i/%i) &amp;#10148;  ETA: %s &amp;#10148; Time elapsed: %s&quot; %(param,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">,</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> (</span><span class="si">%a</span><span class="s1">) %H:%M:%S&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="o">-</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span>  <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="p">))),</span> <span class="c1">#ETA</span>
+                    <span class="n">hourformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">starttime</span><span class="o">+</span><span class="nb">float</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="o">-</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span> <span class="o">-</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)),</span> <span class="c1">#estimated</span>
+                    <span class="n">hourformat</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">starttime</span><span class="p">),</span> <span class="c1">#elapsed</span>
+                    <span class="n">hourformat</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="o">-</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span>  <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="p">)))</span> <span class="c1">#remaining</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pi</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">progr_info</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="s2">&quot;this is a little academic, but the time between the first and the second iteration has usually a time lag.&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">:</span> <span class="c1">#last iteration</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;green&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">bar_style</span> <span class="o">=</span> <span class="s2">&quot;success&quot;</span>
+                <span class="n">pb_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">pi</span><span class="p">])</span> <span class="c1">#append to the list of done PBs</span>
+                <span class="c1">#progr_info = &quot;%s (%i/%i) &amp;#9992; %s    &amp;#10010;  %s  &quot;%(param,     #&quot;%s (%i/%i) &amp;#10148;  ETA: %s &amp;#10148; Time elapsed: %s&quot; %(param,</span>
+                <span class="c1">#    self.progr,</span>
+                <span class="c1">#    self.max_it,</span>
+                <span class="c1">#    time.ctime(time.time() + float(time.time()-self.start_eta_time)/self.progr * (self.max_it - 1  - self.progr)),</span>
+                <span class="c1">#    #time.strftime(&#39;%H:%M:%S&#39;, time.gmtime(self.start_eta_time-self.starttime+float(time.time()-self.start_eta_time)/self.progr * (self.max_it - 1 ))),</span>
+                <span class="c1">#    time.strftime(&#39;%H:%M:%S&#39;, time.gmtime(time.time()-self.starttime)))</span>
+                <span class="c1">#    #time.strftime(&#39;%H:%M:%S&#39;, time.gmtime(float(time.time()-self.start_eta_time)/self.progr * (self.max_it - 1  - self.progr))))</span>
+                <span class="c1">#self.pi.value = progr_info</span>
+            
+        <span class="k">def</span><span class="w"> </span><span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">bar_style</span> <span class="o">=</span> <span class="s2">&quot;danger&quot;</span>
+            <span class="n">pb_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pi</span><span class="p">])</span>  <span class="c1"># append to the list of done PBs</span>
+            
+                    
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="s2">&quot;Most likely not yet in the jupyter environment ... Falling back to old style progress bar, untouched.&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">Javascript</span><span class="p">,</span> <span class="n">display</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">clear_output</span>
+
+
+<div class="viewcode-block" id="Progress_Bar">
+<a class="viewcode-back" href="../../../../qkit.gui.notebook.html#qkit.gui.notebook.Progress_Bar.Progress_Bar">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Progress_Bar</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_it</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Progress:&#39;</span><span class="p">,</span><span class="n">est_cycle_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">dummy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;old style progress bar&quot;</span><span class="p">)</span>
+            <span class="c1">#create HTML progress bar</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span> <span class="o">=</span> <span class="n">dummy</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">divid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span> <span class="o">=</span> <span class="n">max_it</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1">#delete existing progress bar with same name</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">Javascript</span><span class="p">(</span><span class="s2">&quot;if(document.getElementById(&#39;</span><span class="si">%s</span><span class="s2">t&#39;) !== null) document.getElementById(&#39;</span><span class="si">%s</span><span class="s2">t&#39;).parentNode.remove()&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
+            <span class="c1">#display(Javascript(&quot;if(document.getElementById(&#39;%s&#39;) !== null) document.getElementById(&#39;%s&#39;).remove()&quot;%(self.name,self.name)))</span>
+               
+            <span class="n">outp</span> <span class="o">=</span> <span class="s2">&quot;&lt;table style=&#39;width:100</span><span class="si">%%</span><span class="s2">;border:none&#39;&gt;&lt;tr style=&#39;border:none&#39;&gt;&lt;td style=&#39;border:none&#39;&gt;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%i</span><span class="s2">/</span><span class="si">%i</span><span class="s2">) &lt;/td&gt;&lt;td style=&#39;border:none&#39;&gt;&amp;#9992; </span><span class="si">%s</span><span class="s2">    &lt;/td&gt;&lt;td style=&#39;border:none&#39;&gt;&amp;#128336;  </span><span class="si">%s</span><span class="s2">   (estimated)&lt;/td&gt;&lt;td style=&#39;border:none&#39;&gt;&amp;#10010;  </span><span class="si">%s</span><span class="s2"> (elapsed) &lt;/td&gt;&lt;td style=&#39;border:none&#39;&gt;&amp;#9866;  </span><span class="si">%s</span><span class="s2"> (remaining)&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&quot;</span><span class="o">%</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">,</span>
+                    <span class="s2">&quot;-?-&quot;</span> <span class="k">if</span> <span class="n">est_cycle_time</span><span class="o">==</span><span class="kc">None</span> <span class="k">else</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> (</span><span class="si">%a</span><span class="s1">) %H:%M:%S&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">est_cycle_time</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span> <span class="p">)),</span>
+                    <span class="s2">&quot;--:--:--&quot;</span> <span class="k">if</span> <span class="n">est_cycle_time</span><span class="o">==</span><span class="kc">None</span> <span class="k">else</span> <span class="n">hourformat</span><span class="p">(</span><span class="n">est_cycle_time</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">),</span>
+                    <span class="s2">&quot;00:00:00&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;--:--:--&quot;</span> <span class="k">if</span> <span class="n">est_cycle_time</span><span class="o">==</span><span class="kc">None</span> <span class="k">else</span> <span class="n">hourformat</span><span class="p">(</span><span class="n">est_cycle_time</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">))</span>
+           
+            <span class="bp">self</span><span class="o">.</span><span class="n">pb</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            &lt;div id=&quot;%s_title&quot;&gt; %s&lt;/div&gt;</span>
+<span class="sd">            &lt;div id=&quot;%s1&quot; style=&quot;border: 1px solid black; width:900px&quot;&gt;</span>
+<span class="sd">              &lt;div id=&quot;%s0&quot; style=&quot;text-align: center; color:white; background-color:blue; width:0%%&quot;&gt;&amp;nbsp;&lt;/div&gt;</span>
+<span class="sd">            &lt;/div&gt;</span>
+<span class="sd">            &lt;div id=&quot;%s_text&quot;&gt;%s&lt;/div&gt;</span>
+<span class="sd">            &quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">divid</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">divid</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">divid</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">divid</span><span class="p">,</span><span class="n">outp</span><span class="p">))</span>
+            <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="p">)</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">Javascript</span><span class="p">(</span><span class="s2">&quot;$(&#39;div#</span><span class="si">%s</span><span class="s2">&#39;).width(&#39;</span><span class="si">%i%%</span><span class="s2">&#39;)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">divid</span><span class="p">,</span> <span class="mi">100</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">)))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">starttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Progress_Bar.iterate">
+<a class="viewcode-back" href="../../../../qkit.gui.notebook.html#qkit.gui.notebook.Progress_Bar.Progress_Bar.iterate">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">iterate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">param</span><span class="p">)</span></div>
+
+            
+        <span class="k">def</span><span class="w"> </span><span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">Javascript</span><span class="p">(</span><span class="s2">&quot;$(&#39;div#</span><span class="si">%s</span><span class="s2">0&#39;).width(&#39;</span><span class="si">%i%%</span><span class="s2">&#39;);&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">divid</span><span class="p">,</span> <span class="mi">100</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">)))</span>
+            <span class="n">outp</span> <span class="o">=</span> <span class="s2">&quot;&lt;table style=&#39;width:100</span><span class="si">%%</span><span class="s2">;border:none&#39;&gt;&lt;tr style=&#39;border:none&#39;&gt;&lt;td style=&#39;border:none&#39;&gt;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%i</span><span class="s2">/</span><span class="si">%i</span><span class="s2">) &lt;/td&gt;&lt;td style=&#39;border:none&#39;&gt;&amp;#9992; </span><span class="si">%s</span><span class="s2">    &lt;/td&gt;&lt;td style=&#39;border:none&#39;&gt;&amp;#128336;  </span><span class="si">%s</span><span class="s2">   (estimated)&lt;/td&gt;&lt;td style=&#39;border:none&#39;&gt;&amp;#10010;  </span><span class="si">%s</span><span class="s2"> (elapsed) &lt;/td&gt;&lt;td style=&#39;border:none&#39;&gt;&amp;#9866;  </span><span class="si">%s</span><span class="s2"> (remaining)&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">param</span><span class="p">,</span>     <span class="c1">#&quot;%s (%i/%i) &amp;#10148;  ETA: %s &amp;#10148; Time elapsed: %s&quot; %(param,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">,</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> (</span><span class="si">%a</span><span class="s1">) %H:%M:%S&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="o">-</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span>  <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="p">))),</span> <span class="c1">#ETA</span>
+                    <span class="n">hourformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">starttime</span><span class="o">+</span><span class="nb">float</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="o">-</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span> <span class="p">)),</span> <span class="c1">#estimated</span>
+                    <span class="n">hourformat</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">starttime</span><span class="p">),</span> <span class="c1">#elapsed</span>
+                    <span class="n">hourformat</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="o">-</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_it</span>  <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="p">)))</span> <span class="c1">#remaining</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="s2">&quot;this is a little academic, but the time between the first and the second iteration has usually a time lag.&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="c1">#outp = &quot;%s (%i/%i) &amp;#10148;  ETA: %s &amp;#10148; Time elapsed: %s&quot;%(param,self.progr,self.max_it,time.ctime(time.time() + float(time.time()-self.starttime)/self.progr * (self.max_it - self.progr)),time.strftime(&#39;%H:%M:%S&#39;,time.gmtime(time.time()-self.starttime)))</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">Javascript</span><span class="p">(</span><span class="s2">&quot;document.getElementById(&#39;</span><span class="si">%s</span><span class="s2">_text&#39;).innerHTML = </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">;&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">divid</span><span class="p">,</span><span class="n">outp</span><span class="p">)))</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">:</span>   <span class="c1">#end of progress bar</span>
+                <span class="c1">#Turn the status bar into green</span>
+                <span class="c1">#Delete all &lt;div&gt; containers</span>
+                <span class="n">outp</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%i</span><span class="s2">/</span><span class="si">%i</span><span class="s2">) &amp;#9992; </span><span class="si">%s</span><span class="s2">    &amp;#10010;  </span><span class="si">%s</span><span class="s2">  &quot;</span><span class="o">%</span><span class="p">(</span><span class="n">param</span><span class="p">,</span>     <span class="c1">#&quot;%s (%i/%i) &amp;#10148;  ETA: %s &amp;#10148; Time elapsed: %s&quot; %(param,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">progr</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span><span class="p">,</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> (</span><span class="si">%a</span><span class="s1">) %H:%M:%S&#39;</span><span class="p">),</span>
+                    <span class="n">hourformat</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">starttime</span><span class="p">))</span>
+                <span class="n">display</span><span class="p">(</span><span class="n">Javascript</span><span class="p">(</span><span class="s2">&quot;document.getElementById(&#39;</span><span class="si">%s</span><span class="s2">_title&#39;).parentNode.remove();&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">divid</span><span class="p">))</span> <span class="c1">#title</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pb</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                &lt;div id=&quot;%st&quot;&gt; %s&lt;/div&gt;</span>
+<span class="sd">                &lt;div id=&quot;%s&quot; style=&quot;border: 1px solid black; width:900px;text-align: center; color:white; background-color:green;&quot;&gt;%s</span>
+<span class="sd">                &lt;/div&gt;</span>
+<span class="sd">                &quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">outp</span><span class="p">))</span>
+                <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="Progress_Bar.reset">
+<a class="viewcode-back" href="../../../../qkit.gui.notebook.html#qkit.gui.notebook.Progress_Bar.Progress_Bar.reset">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">max_it</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">max_it</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_it</span> <span class="o">=</span> <span class="n">max_it</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">starttime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_eta_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starttime</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">()</span></div>
+
+                    
+<div class="viewcode-block" id="Progress_Bar.set">
+<a class="viewcode-back" href="../../../../qkit.gui.notebook.html#qkit.gui.notebook.Progress_Bar.Progress_Bar.set">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">iteration</span><span class="p">,</span><span class="n">param</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progr</span> <span class="o">=</span> <span class="n">iteration</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">param</span><span class="p">)</span></div>
+
+            
+<div class="viewcode-block" id="Progress_Bar.abort">
+<a class="viewcode-back" href="../../../../qkit.gui.notebook.html#qkit.gui.notebook.Progress_Bar.Progress_Bar.abort">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">Javascript</span><span class="p">(</span><span class="s2">&quot;$(&#39;div#</span><span class="si">%s</span><span class="s2">0&#39;).css(&#39;background-color&#39;, &#39;red&#39;);&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">divid</span><span class="p">)))</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

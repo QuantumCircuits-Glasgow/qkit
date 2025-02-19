@@ -1,0 +1,934 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.transport package &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.services package" href="qkit.services.html" />
+    <link rel="prev" title="qkit.measure.timedomain.quantum_machine package" href="qkit.measure.timedomain.quantum_machine.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.measure.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html">qkit.measure.oscilloscope package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html">qkit.measure.spectroscopy package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.timedomain.html">qkit.measure.timedomain package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">qkit.measure.transport package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure.json_handler">qkit.measure.json_handler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure.measurement_base">qkit.measure.measurement_base module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure.measurement_class">qkit.measure.measurement_class module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure.samples_class">qkit.measure.samples_class module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure.write_additional_files">qkit.measure.write_additional_files module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.tests.html">qkit.tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.measure.html">qkit.measure package</a></li>
+      <li class="breadcrumb-item active">qkit.measure.transport package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.measure.transport.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-measure-transport-package">
+<h1>qkit.measure.transport package<a class="headerlink" href="#qkit-measure-transport-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-qkit.measure.transport.transport">
+<span id="qkit-measure-transport-transport-module"></span><h2>qkit.measure.transport.transport module<a class="headerlink" href="#module-qkit.measure.transport.transport" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.transport.transport.</span></span><span class="sig-name descname"><span class="pre">transport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">IV_Device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is a measurement class to perform transport measurements such as IV-characteristics by means of a current-voltage source meter.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.add_sweep_4quadrants">
+<span class="sig-name descname"><span class="pre">add_sweep_4quadrants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.add_sweep_4quadrants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.add_sweep_4quadrants" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Adds a four quadrants sweep series with the pattern</dt><dd><p>0th: (+&lt;start&gt; –&gt; +&lt;stop&gt;,  &lt;step&gt;) + &lt;offset&gt;
+1st: (+&lt;stop&gt;  –&gt; +&lt;start&gt;, &lt;step&gt;) + &lt;offset&gt;
+2nd: (+&lt;start&gt; –&gt; -&lt;stop&gt;,  &lt;step&gt;) + &lt;offset&gt;
+3rd: (-&lt;stop&gt;  –&gt; +&lt;start&gt;, &lt;step&gt;) + &lt;offset&gt;
+time.sleep(&lt;sleep&gt;)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<em>float</em>) – Start value of sweep.</p></li>
+<li><p><strong>stop</strong> (<em>float</em>) – Stop value of sweep.</p></li>
+<li><p><strong>step</strong> (<em>float</em>) – Step value of sweep.</p></li>
+<li><p><strong>offset</strong> (<em>float</em><em>, </em><em>optional</em>) – Offset value by which &lt;start&gt; and &lt;stop&gt; are shifted. Default is 0.</p></li>
+<li><p><strong>sleep</strong> (<em>float</em>) – Sleep time after whole sweep. Default is 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.add_sweep_halfswing">
+<span class="sig-name descname"><span class="pre">add_sweep_halfswing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.add_sweep_halfswing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.add_sweep_halfswing" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Adds a halfswing sweep series with the pattern</dt><dd><p>0th: (+&lt;amplitude&gt; –&gt; -&lt;amplitude, &lt;step&gt;) + &lt;offset&gt;
+1st: (-&lt;amplitude&gt; –&gt; +&lt;amplitude, &lt;step&gt;) + &lt;offset&gt;
+time.sleep(&lt;sleep&gt;)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>amplitude</strong> (<em>float</em>) – Amplitude value of sweep.</p></li>
+<li><p><strong>step</strong> (<em>float</em>) – Step value of sweep.</p></li>
+<li><p><strong>offset</strong> (<em>float</em>) – Offset value by which &lt;start&gt; and &lt;stop&gt; are shifted. Default is 0.</p></li>
+<li><p><strong>sleep</strong> (<em>float</em>) – Sleep time after whole sweep. Default is 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_average">
+<span class="sig-name descname"><span class="pre">get_average</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_average" title="Link to this definition"></a></dt>
+<dd><p>Sets trace average parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>avg</strong> – Number of averages of whole traces. Is None (off) or a natural number.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_comment">
+<span class="sig-name descname"><span class="pre">get_comment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_comment" title="Link to this definition"></a></dt>
+<dd><p>Gets comment that is added to the .h5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>comment</strong> – The comment added to data in .h5 file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_dVdI">
+<span class="sig-name descname"><span class="pre">get_dVdI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_dVdI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_dVdI" title="Link to this definition"></a></dt>
+<dd><p>Gets the internal dVdI parameter, to decide weather the differential resistance (dV/dI) is calculated or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>status</strong> (<em>bool</em>) – Status if numerical derivative is calculated.</p></li>
+<li><p><strong>func</strong> (<em>function</em>) – Function to calculate numerical derivative, e.g. scipy.signal.savgol_filter (default), numpy.gradient, …</p></li>
+<li><p><strong>*args</strong> (<em>array_likes</em>) – Arguments for derivation function.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dictionary_likes</em>) – Keyword arguments for derivation function.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_expname">
+<span class="sig-name descname"><span class="pre">get_expname</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_expname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_expname" title="Link to this definition"></a></dt>
+<dd><p>Gets experiment name of current measurement</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>expname</strong> – The experiment name used as suffix of uuid and &lt;filename&gt;.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_filename">
+<span class="sig-name descname"><span class="pre">get_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_filename" title="Link to this definition"></a></dt>
+<dd><p>Gets filename of current measurement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>filename</strong> – The file name used as suffix of uuid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_log_function">
+<span class="sig-name descname"><span class="pre">get_log_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_log_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_log_function" title="Link to this definition"></a></dt>
+<dd><p>Gets the current log_function settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>func</strong> (<em>array_likes of callable objects</em>) – A callable object that returns the value to be saved.</p></li>
+<li><p><strong>name</strong> (<em>array_likes of strings</em>) – Names of logging parameter appearing in h5 file. Default is ‘log_param’.</p></li>
+<li><p><strong>unit</strong> (<em>array_likes of strings</em>) – Units of logging parameter. Default is ‘’.</p></li>
+<li><p><strong>dtype</strong> (<em>array_likes of dtypes</em>) – h5 data type to be used in the data file. Default is float (float64).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_tdy">
+<span class="sig-name descname"><span class="pre">get_tdy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_tdy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_tdy" title="Link to this definition"></a></dt>
+<dd><p>Gets sleep time between y-iterations in 3D scans.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>x_dt</strong> – The sleep time between y-iterations.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_view_xy">
+<span class="sig-name descname"><span class="pre">get_view_xy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_view_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_view_xy" title="Link to this definition"></a></dt>
+<dd><p>Gets views that combine different data series of xy-measurement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>view</strong> – Parameter that determines if additional views of different y-parameters are added. Is boolean or an array containing tuples of two natural numbers, where y1 is used x-axis and y2 as y-axis.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool or array_likes of integers</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.get_x_dt">
+<span class="sig-name descname"><span class="pre">get_x_dt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.get_x_dt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.get_x_dt" title="Link to this definition"></a></dt>
+<dd><p>Gets sleep time between x-iterations in 2D and 3D scans.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>x_dt</strong> – The sleep time between x-iterations</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.measure_1D">
+<span class="sig-name descname"><span class="pre">measure_1D</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.measure_1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.measure_1D" title="Link to this definition"></a></dt>
+<dd><p>Measures a 1 dimensional set of IV curves while sweeping the bias according to the set sweep parameters.
+Every single data point is taken with the current IV Device settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.measure_2D">
+<span class="sig-name descname"><span class="pre">measure_2D</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.measure_2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.measure_2D" title="Link to this definition"></a></dt>
+<dd><p>Measures a 2 dimensional set of IV curves while sweeping the bias according to the set sweep parameters and iterating all parameters x_vec in x_obj.
+Every single data point is taken with the current IV Device settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.measure_3D">
+<span class="sig-name descname"><span class="pre">measure_3D</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.measure_3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.measure_3D" title="Link to this definition"></a></dt>
+<dd><p>Measures a 3 dimensional set of IV curves while sweeping the bias according to the set sweep parameters and iterating all parameters x_vec in x_obj and all parameters y_vec in y_obj. The sweep over y_obj is the inner loop, for every value x_vec[i] all values y_vec are measured.
+Every single data point is taken with the current IV Device settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.measure_xy">
+<span class="sig-name descname"><span class="pre">measure_xy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.measure_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.measure_xy" title="Link to this definition"></a></dt>
+<dd><p>Measures single data points, e.g. current or voltage and iterating all parameters x_vec, e.g. time.
+Every single data point is taken with the current IV Device settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_comment">
+<span class="sig-name descname"><span class="pre">reset_comment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_comment" title="Link to this definition"></a></dt>
+<dd><p>Resets comment that is added to the .h5 file to None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_expname">
+<span class="sig-name descname"><span class="pre">reset_expname</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_expname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_expname" title="Link to this definition"></a></dt>
+<dd><p>Resets experiment name of current measurement to None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_filename">
+<span class="sig-name descname"><span class="pre">reset_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_filename" title="Link to this definition"></a></dt>
+<dd><p>Resets filename of current measurement to None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_fit_IV">
+<span class="sig-name descname"><span class="pre">reset_fit_IV</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_fit_IV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_fit_IV" title="Link to this definition"></a></dt>
+<dd><p>Resets all fit_function settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_landscape">
+<span class="sig-name descname"><span class="pre">reset_landscape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_landscape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_landscape" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.reset_log_function">
+<span class="sig-name descname"><span class="pre">reset_log_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.reset_log_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.reset_log_function" title="Link to this definition"></a></dt>
+<dd><p>Resets all log_function settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_average">
+<span class="sig-name descname"><span class="pre">set_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">avg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_average" title="Link to this definition"></a></dt>
+<dd><p>Sets trace average parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>avg</strong> (<em>int</em>) – Number of averages of whole traces. Must be None (off) or natural numbers.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_comment">
+<span class="sig-name descname"><span class="pre">set_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_comment" title="Link to this definition"></a></dt>
+<dd><p>Sets comment that is added to the .h5 file to &lt;comment&gt;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>comment</strong> (<em>str</em>) – The comment added to data in .h5 file.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_dVdI">
+<span class="sig-name descname"><span class="pre">set_dVdI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_dVdI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_dVdI" title="Link to this definition"></a></dt>
+<dd><p>Sets the internal dVdI parameter, to decide weather the differential resistance (dV/dI) is calculated or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<em>bool</em>) – Status if numerical derivative is calculated.</p></li>
+<li><p><strong>func</strong> (<em>function</em>) – Function to calculate numerical derivative, e.g. scipy.signal.savgol_filter (default), numpy.gradient, …</p></li>
+<li><p><strong>*args</strong> (<em>array_likes</em><em>, </em><em>optional</em>) – Arguments for derivation function.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dictionary_likes</em><em>, </em><em>optional</em>) – Keyword arguments for derivation function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Savitzky-Golay filter
+&gt;&gt;&gt; tr.set_dVdI(True, func=signal.savgol_filter, window_length=15, polyorder=3, deriv=1)</p>
+<p>Gradient as difference quotient
+&gt;&gt;&gt; tr.set_dVdI(True, func=np.gradient)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_expname">
+<span class="sig-name descname"><span class="pre">set_expname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_expname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_expname" title="Link to this definition"></a></dt>
+<dd><p>Sets experiment name of current measurement to &lt;expname&gt;.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>expname</strong> (<em>str</em>) – The experiment name used as suffix of uuid and &lt;filename&gt;.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_filename">
+<span class="sig-name descname"><span class="pre">set_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_filename" title="Link to this definition"></a></dt>
+<dd><p>Sets filename of current measurement to &lt;filename&gt;.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The file name used as suffix of uuid.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_fit_IV">
+<span class="sig-name descname"><span class="pre">set_fit_IV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_fit_IV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_fit_IV" title="Link to this definition"></a></dt>
+<dd><p>Sets fit-parameters for an in situ IV fit.
+This function is called for each trace with ints kexword arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>obj</em>) – An callable object to execute for each trace.</p></li>
+<li><p><strong>name</strong> (<em>string</em>) – The coordinate name to be created as data series in the .h5 file.</p></li>
+<li><p><strong>unit</strong> (<em>string</em><em>, </em><em>optional</em>) – The unit name to be used in data series in the .h5 file.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dictionary_likes</em><em>, </em><em>optional</em>) – Keyword arguments for fit function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">qkit.analysis.IV_curve</span><span class="w"> </span><span class="kn">import</span> <span class="n">IV_curve</span> <span class="k">as</span> <span class="n">IVC</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ivc</span> <span class="o">=</span> <span class="n">IVC</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Ic fit via threshold voltage
+&gt;&gt;&gt; tr.set_fit_IV(func=ivc.get_Ic_threshold, name=’I_c’, unit=’A’, offset=0)</p>
+<p>Ic fit via peaks in the numerical derivative dV/dI
+&gt;&gt;&gt; tr.set_fit_IV(func=ivc.get_Ic_deriv, name=’I_c’, unit=’A’, prominence=10)</p>
+<p>Ic fit via peaks in the smoothed derivation in the frequency domain
+&gt;&gt;&gt; tr.set_fit_IV(func=ivc.get_Ic_dft, name=’I_c’, unit=’A’, prominence=1e-2)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_landscape">
+<span class="sig-name descname"><span class="pre">set_landscape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_landscape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_landscape" title="Link to this definition"></a></dt>
+<dd><p>Sets parameters for landscapes scans in case of 2D and 3D scans to fasten up the measurement.
+The values of the given envelop function limit the sweep bounds for each x-value of 2D or 3D scans. The overall sweep bounds can merely be decreased, so that only envelop values &lt;= sweep bounds affect them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>function</em>) – An envelop function that limits bias values.</p></li>
+<li><p><strong>args</strong> (<em>tuple</em>) – The arguments for the envelop function.</p></li>
+<li><p><strong>mirror</strong> (<em>bool</em><em>, </em><em>optional</em>) – This determines if the envelop function is mirrored at the x-axis. Default is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tr</span><span class="o">.</span><span class="n">add_sweep_halfswing</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">10e-9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">x_function</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+<span class="go">        set_x_value(i)</span>
+<span class="go">        return</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tr</span><span class="o">.</span><span class="n">set_x_parameters</span><span class="p">(</span><span class="n">x_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span>
+<span class="go">                        x_coordname = &#39;x_name&#39;,</span>
+<span class="go">                        x_set_obj = x_function,</span>
+<span class="go">                        x_unit = &#39;x_unit&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">lsc_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+<span class="go">        y = np.ones(shape = len(x)) * a1</span>
+<span class="go">        y[np.abs(x) &gt; x0] = a0</span>
+<span class="go">        return y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tr</span><span class="o">.</span><span class="n">set_landscape</span><span class="p">(</span><span class="n">lsc_func</span><span class="p">,</span> <span class="p">(</span><span class="mf">500e-9</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_log_function">
+<span class="sig-name descname"><span class="pre">set_log_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'f'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_log_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_log_function" title="Link to this definition"></a></dt>
+<dd><p>Saves desired values obtained by a function &lt;func&gt; in the .h5-file as a value vector with name &lt;name&gt;, unit &lt;unit&gt; and in data format &lt;f&gt;.
+The function (object) can be passed to the measurement loop which is executed before every x iteration
+but after executing the x_object setter in 2D measurements and before every line (but after setting
+the x value) in 3D measurements.
+The return value of the function of type float or similar is stored in a value vector in the h5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>array_likes</em><em> of </em><em>callable objects</em>) – A callable object that returns the value to be saved.</p></li>
+<li><p><strong>name</strong> (<em>array_likes</em><em> of </em><em>strings</em>) – Names of logging parameter appearing in h5 file. Default is ‘log_param’.</p></li>
+<li><p><strong>unit</strong> (<em>array_likes</em><em> of </em><em>strings</em>) – Units of logging parameter. Default is ‘’.</p></li>
+<li><p><strong>dtype</strong> (<em>array_likes</em><em> of </em><em>dtypes</em>) – h5 data type to be used in the data file. Default is ‘f’ (float64).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_plot_comment">
+<span class="sig-name descname"><span class="pre">set_plot_comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_plot_comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_plot_comment" title="Link to this definition"></a></dt>
+<dd><p>Set small comment to add at the end of plot pics for more information i.e. good for wiki entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>comment</strong> (<em>str</em>) – A comment that is added in the plot images.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_sample">
+<span class="sig-name descname"><span class="pre">set_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_sample" title="Link to this definition"></a></dt>
+<dd><p>Adds sample object (e.g. with sample properties, measurement comments) to measurement object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> (<em>qkit.measure.sample_class.Sample</em><em>(</em><em>)</em>) – Sample object to store information about the sample.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">qkit.measure.samples_class</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Sample</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;sample_name&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tr</span><span class="o">.</span><span class="n">set_sample</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_tdy">
+<span class="sig-name descname"><span class="pre">set_tdy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_tdy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_tdy" title="Link to this definition"></a></dt>
+<dd><p>Sets sleep time between y-iterations in 3D scans.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x_dt</strong> (<em>float</em>) – The sleep time between y-iterations.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_view_xy">
+<span class="sig-name descname"><span class="pre">set_view_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_view_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_view_xy" title="Link to this definition"></a></dt>
+<dd><p>Sets views that combine different data series of xy-measurement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>view</strong> (<em>bool</em><em> or </em><em>array_likes</em><em> of </em><em>integers</em>) – Parameter that determines if additional views of different y-parameters are added. Must be boolean or an array containing tuples of two natural numbers, where y1 is used x-axis and y2 as y-axis.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_x_dt">
+<span class="sig-name descname"><span class="pre">set_x_dt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_x_dt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_x_dt" title="Link to this definition"></a></dt>
+<dd><p>Sets sleep time between x-iterations in 2D and 3D scans.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x_dt</strong> (<em>float</em>) – The sleep time between x-iterations.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_x_parameters">
+<span class="sig-name descname"><span class="pre">set_x_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_coordname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_set_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_x_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_x_parameters" title="Link to this definition"></a></dt>
+<dd><p>Sets x-parameters for 2D and 3D scan.
+In a 3D measurement, the x-parameters will be the “outer” sweep meaning for every x value all y values are swept and for each (x,y) value the bias is swept according to the set sweep parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_vec</strong> (<em>array_likes</em>) – An N-dimensional array that contains the sweep values.</p></li>
+<li><p><strong>x_coordname</strong> (<em>string</em>) – The coordinate name to be created as data series in the .h5 file.</p></li>
+<li><p><strong>x_set_obj</strong> (<em>obj</em>) – An callable object to execute with x_vec-values.</p></li>
+<li><p><strong>x_unit</strong> (<em>string</em><em>, </em><em>optional</em>) – The unit name to be used in data series in the .h5 file.</p></li>
+<li><p><strong>x_dt</strong> (<em>float</em><em>, </em><em>optional</em>) – The sleep time between x-iterations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_xy_parameters">
+<span class="sig-name descname"><span class="pre">set_xy_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_xy_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_xy_parameters" title="Link to this definition"></a></dt>
+<dd><p>Set x- and y-parameters for measure_xy(), where y-parameters can be a list in order to record various quantities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_name</strong> (<em>str</em>) – The name of the x-parameter to be created as data series in the .h5 file.</p></li>
+<li><p><strong>x_func</strong> (<em>function</em>) – A function that returns x-values.</p></li>
+<li><p><strong>x_vec</strong> (<em>array_likes</em><em> of </em><em>floats</em>) – An array of x-values at which data should be taken.</p></li>
+<li><p><strong>x_unit</strong> (<em>str</em>) – The unit of the x-parameter to be used in data series in the .h5 file.</p></li>
+<li><p><strong>x_kwargs</strong> (<em>dict</em>) – Keyword arguments forwarded to the x-function &lt;x_func&gt;.</p></li>
+<li><p><strong>y_name</strong> (<em>array_likes</em><em> of </em><em>strings</em>) – Names of y-parameters to be created as data series in the .h5 file.</p></li>
+<li><p><strong>y_func</strong> (<em>function</em>) – A function that returns y-values.</p></li>
+<li><p><strong>y_unit</strong> (<em>array_likes</em><em> of </em><em>strings</em>) – Units of y-parameters to be used in data series in the .h5 file.</p></li>
+<li><p><strong>y_kwargs</strong> (<em>dict</em>) – Keyword arguments forwarded to the y-function &lt;y_func&gt;.</p></li>
+<li><p><strong>x_dt</strong> (<em>float</em><em>, </em><em>optional</em>) – The sleep time between queries of x-values. Default is 1e-3.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.set_y_parameters">
+<span class="sig-name descname"><span class="pre">set_y_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_coordname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_set_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.set_y_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.set_y_parameters" title="Link to this definition"></a></dt>
+<dd><p>Sets x-parameters for 3D scan, where y-parameters will be the “inner” sweep meaning for every x value all y values are swept and for each (x,y) value the bias is swept according to the set sweep parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_vec</strong> (<em>array_likes</em>) – An N-dimensional array that contains the sweep values.</p></li>
+<li><p><strong>y_coordname</strong> (<em>string</em>) – The coordinate name to be created as data series in the .h5 file.</p></li>
+<li><p><strong>y_set_obj</strong> (<em>obj</em>) – An callable object to execute with y_vec-values.</p></li>
+<li><p><strong>y_unit</strong> (<em>string</em><em>, </em><em>optional</em>) – The unit name to be used in data series in the .h5 file.</p></li>
+<li><p><strong>y_dt</strong> (<em>float</em><em>, </em><em>optional</em>) – The sleep time between y-iterations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sweep</span></span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is a subclass of &lt;transport&gt; that provides the customized usage of many sweeps in one measurement.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.add_sweep">
+<span class="sig-name descname"><span class="pre">add_sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.add_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.add_sweep" title="Link to this definition"></a></dt>
+<dd><p>Adds a sweep object with given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<em>float</em>) – Start value of the sweep.</p></li>
+<li><p><strong>stop</strong> (<em>float</em>) – Stop value of the sweep.</p></li>
+<li><p><strong>step</strong> (<em>float</em>) – Step value of the sweep.</p></li>
+<li><p><strong>sleep</strong> (<em>float</em>) – Sleep time after whole sweep. Default is 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.create_iterator">
+<span class="sig-name descname"><span class="pre">create_iterator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.create_iterator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.create_iterator" title="Link to this definition"></a></dt>
+<dd><p>Creates iterator of start, stop, step and sleep arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.get_nos">
+<span class="sig-name descname"><span class="pre">get_nos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.get_nos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.get_nos" title="Link to this definition"></a></dt>
+<dd><p>Gets number of sweeps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>nos</strong> – Number of sweeps stored in this sweep-class.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.get_sweep">
+<span class="sig-name descname"><span class="pre">get_sweep</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.get_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.get_sweep" title="Link to this definition"></a></dt>
+<dd><p>Gets sweep parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sweep</strong> – Sweep object containing start, stop, step and sleep values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.get_sweeps">
+<span class="sig-name descname"><span class="pre">get_sweeps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.get_sweeps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.get_sweeps" title="Link to this definition"></a></dt>
+<dd><p>Gets parameters of all sweep.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sweep</strong> – Sweep object containing start, stop, step and sleep values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.sweep.reset_sweeps">
+<span class="sig-name descname"><span class="pre">reset_sweeps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.sweep.reset_sweeps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.sweep.reset_sweeps" title="Link to this definition"></a></dt>
+<dd><p>Resets sweeps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.transport.transport.transport.take_IV">
+<span class="sig-name descname"><span class="pre">take_IV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sweep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/transport/transport.html#transport.take_IV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.transport.transport.transport.take_IV" title="Link to this definition"></a></dt>
+<dd><p>Takes IV and considers if landscape is set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sweep</strong> (<em>array_likes</em><em> of </em><em>floats</em>) – Sweep object containing start, stop, step and sleep values.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>I_values</strong> (<em>numpy.array(float)</em>) – Measured current values.</p></li>
+<li><p><strong>V_values</strong> (<em>numpy.array(float)</em>) – Measured voltage values.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.transport">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.measure.transport" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.measure.timedomain.quantum_machine.html" class="btn btn-neutral float-left" title="qkit.measure.timedomain.quantum_machine package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.services.html" class="btn btn-neutral float-right" title="qkit.services package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

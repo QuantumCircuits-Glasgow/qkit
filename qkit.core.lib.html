@@ -1,0 +1,532 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.core.lib package &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.core.lib.com package" href="qkit.core.lib.com.html" />
+    <link rel="prev" title="qkit.core package" href="qkit.core.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.core.html">qkit.core package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.core.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">qkit.core.lib package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html">qkit.core.s_init package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.html#module-qkit.core.flow">qkit.core.flow module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.html#module-qkit.core.instrument_base">qkit.core.instrument_base module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.html#module-qkit.core.instrument_basev2">qkit.core.instrument_basev2 module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.html#module-qkit.core.instrument_tools">qkit.core.instrument_tools module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.html#module-qkit.core.startup">qkit.core.startup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.html#module-qkit.core">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.tests.html">qkit.tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.core.html">qkit.core package</a></li>
+      <li class="breadcrumb-item active">qkit.core.lib package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.core.lib.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-core-lib-package">
+<h1>qkit.core.lib package<a class="headerlink" href="#qkit-core-lib-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qkit.core.lib.com.html">qkit.core.lib.com package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.com.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.com.html#qkit-core-lib-com-info-client-module">qkit.core.lib.com.info_client module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.com.html#module-qkit.core.lib.com.info_service">qkit.core.lib.com.info_service module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.com.html#qkit.core.lib.com.info_service.info_service"><code class="docutils literal notranslate"><span class="pre">info_service</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#qkit.core.lib.com.info_service.info_service.dist"><code class="docutils literal notranslate"><span class="pre">info_service.dist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#qkit.core.lib.com.info_service.info_service.emit"><code class="docutils literal notranslate"><span class="pre">info_service.emit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#qkit.core.lib.com.info_service.info_service.info"><code class="docutils literal notranslate"><span class="pre">info_service.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#qkit.core.lib.com.info_service.info_service.start_service"><code class="docutils literal notranslate"><span class="pre">info_service.start_service()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.com.html#module-qkit.core.lib.com.ri_client">qkit.core.lib.com.ri_client module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.com.html#qkit.core.lib.com.ri_client.control_panel"><code class="docutils literal notranslate"><span class="pre">control_panel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.com.html#qkit.core.lib.com.ri_client.start_ric"><code class="docutils literal notranslate"><span class="pre">start_ric()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.com.html#qkit-core-lib-com-ri-service-module">qkit.core.lib.com.ri_service module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.com.html#module-qkit.core.lib.com.signals">qkit.core.lib.com.signals module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.com.html#module-qkit.core.lib.com">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qkit.core.lib.file_service.html">qkit.core.lib.file_service package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.file_service.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit-core-lib-file-service-file-info-database-module">qkit.core.lib.file_service.file_info_database module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.file_service.html#module-qkit.core.lib.file_service.file_info_database_lib">qkit.core.lib.file_service.file_info_database_lib module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.UUID_base"><code class="docutils literal notranslate"><span class="pre">UUID_base</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_date"><code class="docutils literal notranslate"><span class="pre">UUID_base.get_date()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_time"><code class="docutils literal notranslate"><span class="pre">UUID_base.get_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.UUID_base.get_uuid"><code class="docutils literal notranslate"><span class="pre">UUID_base.get_uuid()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service"><code class="docutils literal notranslate"><span class="pre">file_system_service</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.add_h5_file"><code class="docutils literal notranslate"><span class="pre">file_system_service.add_h5_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.h5_db"><code class="docutils literal notranslate"><span class="pre">file_system_service.h5_db</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.h5_info_db"><code class="docutils literal notranslate"><span class="pre">file_system_service.h5_info_db</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.lock"><code class="docutils literal notranslate"><span class="pre">file_system_service.lock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.measure_db"><code class="docutils literal notranslate"><span class="pre">file_system_service.measure_db</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.set_db"><code class="docutils literal notranslate"><span class="pre">file_system_service.set_db</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.update_file_db"><code class="docutils literal notranslate"><span class="pre">file_system_service.update_file_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit.core.lib.file_service.file_info_database_lib.file_system_service.wait"><code class="docutils literal notranslate"><span class="pre">file_system_service.wait()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.file_service.html#module-qkit.core.lib.file_service">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qkit.core.lib.network.html">qkit.core.lib.network package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.network.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.network.html#module-qkit.core.lib.network.tcpclient">qkit.core.lib.network.tcpclient module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.network.html#qkit.core.lib.network.tcpclient.TCPClient"><code class="docutils literal notranslate"><span class="pre">TCPClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.network.html#qkit.core.lib.network.tcpclient.TCPClient.recv"><code class="docutils literal notranslate"><span class="pre">TCPClient.recv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.network.html#qkit.core.lib.network.tcpclient.TCPClient.send"><code class="docutils literal notranslate"><span class="pre">TCPClient.send()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.network.html#module-qkit.core.lib.network">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-qkit.core.lib.list_dict_DB">
+<span id="qkit-core-lib-list-dict-db-module"></span><h2>qkit.core.lib.list_dict_DB module<a class="headerlink" href="#module-qkit.core.lib.list_dict_DB" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.Qobj">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.lib.list_dict_DB.</span></span><span class="sig-name descname"><span class="pre">Qobj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ixs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#Qobj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.Qobj" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Query objects. This is a bit wonky.</p>
+<dl>
+<dt>Calling</dt><dd><ul class="simple">
+<li><p>Q.attribute sets attribute</p></li>
+<li><p>Q.attribute == val (or any other comparison) set the index of elements</p></li>
+<li><p>Q1 &amp; Q1 or other boolean perform set operations</p></li>
+</ul>
+</dd>
+<dt>Useful Methods:</dt><dd><dl>
+<dt>_filter<span class="classifier">(or just <cite>filter</cite> if not an attribute): Apply a filter</span></dt><dd><p>to the DB</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.Qobj.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#Qobj.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.Qobj.copy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.lib.list_dict_DB.</span></span><span class="sig-name descname"><span class="pre">list_dict_DB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_attributes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowMultipleEdit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alwaysReturnList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexObjects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.Q">
+<span class="sig-name descname"><span class="pre">Q</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.Q"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.Q" title="Link to this definition"></a></dt>
+<dd><p>same as Qobj method</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.Qobj">
+<span class="sig-name descname"><span class="pre">Qobj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.Qobj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.Qobj" title="Link to this definition"></a></dt>
+<dd><p>Query object already loaded with the DB</p>
+<blockquote>
+<div><p>DB.Qobj() &lt;==&gt; DB.Qobj() &lt;==&gt; Qobj(DB)</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.add" title="Link to this definition"></a></dt>
+<dd><p>Add an item or items to the DB</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.add_attribute">
+<span class="sig-name descname"><span class="pre">add_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">default</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.add_attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.add_attribute" title="Link to this definition"></a></dt>
+<dd><p>Add an attribute to the index attributes.</p>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s1">&#39;new_attrib&#39;</span><span class="p">)</span> <span class="c1"># Will raise an error if *any*</span>
+<span class="go">                                   # items don&#39;t have &#39;new_attrib&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s1">&#39;new_attrib&#39;</span><span class="p">,</span><span class="n">default</span><span class="p">)</span>
+<span class="go">                                   # Set any missing to the default</span>
+</pre></div>
+</div>
+<p>If the <cite>default</cite> is callable, it will call it instead. (such as <cite>list</cite>
+to add an empty list)</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.isin">
+<span class="sig-name descname"><span class="pre">isin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">K</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.isin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.isin" title="Link to this definition"></a></dt>
+<dd><p>Check if there is at least one item that matches the given query</p>
+<p>see query() for usage</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.items">
+<span class="sig-name descname"><span class="pre">items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.items" title="Link to this definition"></a></dt>
+<dd><p>Return a list of items.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.iteritems">
+<span class="sig-name descname"><span class="pre">iteritems</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.iteritems"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.iteritems" title="Link to this definition"></a></dt>
+<dd><p>Return an iterator over the items.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.next">
+<span class="sig-name descname"><span class="pre">next</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.next" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">K</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.query" title="Link to this definition"></a></dt>
+<dd><p>Query the value for attribute. Will always return a
+single item if only one matches, otherwise it will return a list.</p>
+<dl class="simple">
+<dt>Tip: If you ALWAYS want a list, do:</dt><dd><p>list(DB.query(…))</p>
+</dd>
+</dl>
+<section id="id1">
+<h3>Usage<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>Any combination of the following will works</p>
+<p>Keywords: Only check equality</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">attrib</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">attrib1</span><span class="o">=</span><span class="n">val1</span><span class="p">,</span><span class="n">attrib2</span><span class="o">=</span><span class="n">val2</span><span class="p">)</span>  <span class="c1"># Match both</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">query</span><span class="p">({</span><span class="s1">&#39;attrib&#39;</span><span class="p">:</span><span class="n">val</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">query</span><span class="p">({</span><span class="s1">&#39;attrib1&#39;</span><span class="p">:</span><span class="n">val1</span><span class="p">,</span><span class="s1">&#39;attrib2&#39;</span><span class="p">:</span><span class="n">val2</span><span class="p">})</span> <span class="c1"># Match Both</span>
+</pre></div>
+</div>
+<p>Query Objects (DB.Q, DB.Qobj)</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Q</span> <span class="o">=</span> <span class="n">DB</span><span class="o">.</span><span class="n">Q</span><span class="p">()</span> <span class="c1"># Load Qobj from list_dict_DB</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">DQ</span><span class="o">.</span><span class="n">attrib</span> <span class="o">==</span> <span class="n">val</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">query</span><span class="p">(</span> <span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">attrib1</span> <span class="o">==</span> <span class="n">val1</span><span class="p">)</span> <span class="o">&amp;</span>  <span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">attrib1</span> <span class="o">==</span> <span class="n">val2</span><span class="p">)</span> <span class="p">)</span>  <span class="c1"># Parentheses are important!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">query</span><span class="p">(</span> <span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">attrib1</span> <span class="o">==</span> <span class="n">val1</span><span class="p">)</span> <span class="o">&amp;</span>  <span class="p">(</span><span class="n">Q</span><span class="o">.</span><span class="n">attrib1</span> <span class="o">!=</span> <span class="n">val2</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.reindex">
+<span class="sig-name descname"><span class="pre">reindex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.reindex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.reindex" title="Link to this definition"></a></dt>
+<dd><p>Reindex the dictionary for specified attributes (or all)</p>
+<section id="id2">
+<h3>Usage<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">reindex</span><span class="p">()</span>                <span class="c1"># All</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="s1">&#39;attrib&#39;</span><span class="p">)</span>        <span class="c1"># Reindex &#39;attrib&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="s1">&#39;attrib1&#39;</span><span class="p">,</span><span class="s1">&#39;attrib2&#39;</span><span class="p">)</span> <span class="c1"># Multiple</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">K</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.remove" title="Link to this definition"></a></dt>
+<dd><p>Remove item that matches a given attribute or dict. See query() for
+input specification</p>
+<p>DB Options:
+This is set at instantiation but can be changed directly
+———–</p>
+<dl class="simple">
+<dt>DB.allowMultipleEdit</dt><dd><ul class="simple">
+<li><p>If True, this can remove multiple matching items</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.list_dict_DB.list_dict_DB.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">queryKWs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/list_dict_DB.html#list_dict_DB.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.list_dict_DB.list_dict_DB.update" title="Link to this definition"></a></dt>
+<dd><p>Update an entry without needing to reindex the DB (or a specific
+attribute)</p>
+<section id="id3">
+<h3>Usage:<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">updated_dict</span><span class="p">,</span> <span class="n">query_dict_or_Qobj</span><span class="p">,</span> <span class="n">query_attrib1</span><span class="o">=</span><span class="n">val1</span><span class="p">,</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DB</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">updated_dict</span><span class="p">,</span> <span class="n">query_attrib1</span><span class="o">=</span><span class="n">val1</span><span class="p">,</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="inputs">
+<h3>Inputs:<a class="headerlink" href="#inputs" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>updated_dict<span class="classifier">Dictionary with which to update the entry. This is</span></dt><dd><p>done using the typical dict().update() construct to
+overwrite it</p>
+</dd>
+<dt>query_dict_or_Qobj</dt><dd><dl class="simple">
+<dt>: Either the dictionary used in the query or a Qobj that</dt><dd><p>defines a more advanced query</p>
+</dd>
+</dl>
+</dd>
+<dt>query_attrib1=val1</dt><dd><p>: Additional (or sole) query attributes</p>
+</dd>
+</dl>
+</section>
+<section id="db-options">
+<h3>DB Options:<a class="headerlink" href="#db-options" title="Link to this heading"></a></h3>
+<p>This is set at instantiation but can be changed ‘DB’ is the list_dict_DB</p>
+<dl class="simple">
+<dt>DB.allowMultipleEdit</dt><dd><ul class="simple">
+<li><p>If True, will update multiple items</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes:<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p>Updating an item requires a deletion in a list that has length n
+equal to the number of items matching an attribute. This is O(n).
+However changing the entry directly and reindexing is O(N) where
+N is the size of the DB. If many items are changing and you do not
+need to query them in between, it <em>may</em> be faster to directly
+update the item and reindex</p></li>
+</ul>
+</div></blockquote>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.core.lib.misc">
+<span id="qkit-core-lib-misc-module"></span><h2>qkit.core.lib.misc module<a class="headerlink" href="#module-qkit.core.lib.misc" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.lib.misc.concat">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.lib.misc.</span></span><span class="sig-name descname"><span class="pre">concat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/misc.html#concat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.misc.concat" title="Link to this definition"></a></dt>
+<dd><p>Concatenates any number of strings or bytestrings together to a string.
+This function can be helpful for code migration from py2</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.lib.misc.get_ipython">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.lib.misc.</span></span><span class="sig-name descname"><span class="pre">get_ipython</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/misc.html#get_ipython"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.misc.get_ipython" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.lib.misc.get_traceback">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.lib.misc.</span></span><span class="sig-name descname"><span class="pre">get_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/misc.html#get_traceback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.misc.get_traceback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.lib.misc.ipython_is_newer">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.lib.misc.</span></span><span class="sig-name descname"><span class="pre">ipython_is_newer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/misc.html#ipython_is_newer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.misc.ipython_is_newer" title="Link to this definition"></a></dt>
+<dd><p>vin is tuple of version (a,b,c) for version “a.b.c”
+result gives True for larger or equal version</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.lib.misc.is_ipython">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.lib.misc.</span></span><span class="sig-name descname"><span class="pre">is_ipython</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/misc.html#is_ipython"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.misc.is_ipython" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.lib.misc.register_exit">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.lib.misc.</span></span><span class="sig-name descname"><span class="pre">register_exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/misc.html#register_exit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.misc.register_exit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.lib.misc.seconds_to_str">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.lib.misc.</span></span><span class="sig-name descname"><span class="pre">seconds_to_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/misc.html#seconds_to_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.misc.seconds_to_str" title="Link to this definition"></a></dt>
+<dd><p>Convert a number of seconds to hh:mm:ss string.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.lib.misc.str3">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.lib.misc.</span></span><span class="sig-name descname"><span class="pre">str3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'UTF-8'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/misc.html#str3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.misc.str3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-qkit.core.lib.temp">
+<span id="qkit-core-lib-temp-module"></span><h2>qkit.core.lib.temp module<a class="headerlink" href="#module-qkit.core.lib.temp" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.lib.temp.</span></span><span class="sig-name descname"><span class="pre">File</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'w+'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File.close" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File.create_name">
+<span class="sig-name descname"><span class="pre">create_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File.create_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File.create_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File.flush">
+<span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File.flush"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File.flush" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File.get_file">
+<span class="sig-name descname"><span class="pre">get_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File.get_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File.get_file" title="Link to this definition"></a></dt>
+<dd><p>Return the underlying file object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File.read" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File.remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File.remove" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File.remove_all">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">remove_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File.remove_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File.remove_all" title="Link to this definition"></a></dt>
+<dd><p>Remove all temporary files created through the File class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File.reopen">
+<span class="sig-name descname"><span class="pre">reopen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File.reopen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File.reopen" title="Link to this definition"></a></dt>
+<dd><p>Reopen the temporary file.
+If mode is None (default) the mode passed when creating the object
+will be used.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File.set_temp_dir">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_temp_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File.set_temp_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File.set_temp_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.lib.temp.File.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/lib/temp.html#File.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.lib.temp.File.write" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.core.lib">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.core.lib" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.core.html" class="btn btn-neutral float-left" title="qkit.core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.core.lib.com.html" class="btn btn-neutral float-right" title="qkit.core.lib.com package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
