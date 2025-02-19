@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.timedomain.quantum_machine.script_pyqt &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.measure.timedomain.quantum_machine.script_pyqt</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.measure.timedomain.quantum_machine.script_pyqt</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyqtgraph</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyqtgraph.Qt</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<div class="viewcode-block" id="ImageWidget">
+<a class="viewcode-back" href="../../../../../qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.script_pyqt.ImageWidget">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImageWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageWidget</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="c1"># Interpret image data as row-major instead of col-major</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">setConfigOptions</span><span class="p">(</span><span class="n">imageAxisOrder</span><span class="o">=</span><span class="s1">&#39;row-major&#39;</span><span class="p">)</span>
+
+        <span class="n">pg</span><span class="o">.</span><span class="n">mkQApp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">win</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">GraphicsLayoutWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s1">&#39;pyqtgraph example: Image Analysis&#39;</span><span class="p">)</span>
+
+        <span class="c1"># A plot1 area (ViewBox + axes) for displaying the image</span>
+        <span class="c1">#self.plot1 = self.win.addItem() # addPlot()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vb</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ViewBox</span><span class="p">(</span><span class="n">enableMouse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">enableMenu</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Item for displaying image data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ImageItem</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1">#self.vb.setAspectLocked()</span>
+        <span class="c1">#self.vb.setRange(xRange=(0, 10), yRange=(0, 10))</span>
+
+        <span class="c1"># Item for x-axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">nextRow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span> <span class="o">=</span> <span class="n">MyStringAxis</span><span class="p">(</span><span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="n">linkView</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">setLabel</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;x axis&quot;</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;arb.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaxis</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">AxisItem</span><span class="p">(</span><span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">linkView</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">setLabel</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;y axis&quot;</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;arb.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaxis</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+        <span class="c1"># Custom ROI for selecting an image region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ROI</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ROI</span><span class="p">([</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mi">14</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">addScaleHandle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROI</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># make sure ROI is drawn above image</span>
+
+        <span class="c1"># Isocurve drawing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iso</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">IsocurveItem</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iso</span><span class="o">.</span><span class="n">setParentItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iso</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="c1"># Contrast/color control</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hist</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">HistogramLUTItem</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hist</span><span class="o">.</span><span class="n">setImageItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hist</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Draggable line for setting isocurve level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isoLine</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">InfiniteLine</span><span class="p">(</span><span class="n">angle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">movable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hist</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isoLine</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hist</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">setMouseEnabled</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># makes user interaction a little easier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isoLine</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isoLine</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span> <span class="c1"># bring iso line above contrast controls</span>
+
+        <span class="c1"># Another plot1 area for displaying ROI data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">addPlot</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot2</span><span class="o">.</span><span class="n">setMaximumHeight</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="c1"># Generate image self.data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">20</span><span class="p">:</span><span class="mi">80</span><span class="p">,</span> <span class="mi">20</span><span class="p">:</span><span class="mi">80</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">2.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">gaussianFilter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span> <span class="o">*</span> <span class="mf">0.1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hist</span><span class="o">.</span><span class="n">setLevels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
+        <span class="c1"># build isocurves from smoothed self.data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iso</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">gaussianFilter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+        <span class="c1"># set position and scale of image</span>
+        <span class="c1">#self.item.scale(0.2, 0.2)</span>
+        <span class="c1">#self.item.translate(-50, 0)</span>
+
+        <span class="n">ticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">tickDictMajor</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tick</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ticks</span><span class="p">):</span>
+            <span class="n">tickDictMajor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_tick_dict</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">tickDictMajor</span><span class="p">)))</span>
+
+        <span class="c1">#strings = self.xaxis.tickValues()</span>
+
+        <span class="c1"># zoom to fit imageo</span>
+        <span class="c1">#self.vb.autoRange()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">sigRegionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updatePlot</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updatePlot</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">isoLine</span><span class="o">.</span><span class="n">sigDragged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updateIsocurve</span><span class="p">)</span>
+
+    <span class="c1"># Callbacks for handling user interaction</span>
+<div class="viewcode-block" id="ImageWidget.updatePlot">
+<a class="viewcode-back" href="../../../../../qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.script_pyqt.ImageWidget.updatePlot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updatePlot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">selected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROI</span><span class="o">.</span><span class="n">getArrayRegion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">selected</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ImageWidget.updateIsocurve">
+<a class="viewcode-back" href="../../../../../qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.script_pyqt.ImageWidget.updateIsocurve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updateIsocurve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iso</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isoLine</span><span class="o">.</span><span class="n">value</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MyStringAxis">
+<a class="viewcode-back" href="../../../../../qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyStringAxis</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">AxisItem</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">pg</span><span class="o">.</span><span class="n">AxisItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_strings</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MyStringAxis.set_tick_dict">
+<a class="viewcode-back" href="../../../../../qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis.set_tick_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_tick_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xdict</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">xdict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="o">+</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_strings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">xdict</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="MyStringAxis.tickStrings">
+<a class="viewcode-back" href="../../../../../qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis.tickStrings">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tickStrings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">spacing</span><span class="p">):</span>
+        <span class="n">strings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="c1"># vs is the original tick value</span>
+            <span class="n">vs</span> <span class="o">=</span> <span class="n">v</span> <span class="o">*</span> <span class="n">scale</span>
+            <span class="c1"># if we have vs in our values, show the string</span>
+            <span class="c1"># otherwise show nothing</span>
+            <span class="k">if</span> <span class="n">vs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="p">:</span>
+                <span class="c1"># Find the string with x_values closest to vs</span>
+                <span class="n">vstr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_strings</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_values</span> <span class="o">-</span> <span class="n">vs</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vstr</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vstr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">strings</span></div>
+
+
+<div class="viewcode-block" id="MyStringAxis.tickSpacing">
+<a class="viewcode-back" href="../../../../../qkit.measure.timedomain.quantum_machine.html#qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis.tickSpacing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tickSpacing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minVal</span><span class="p">,</span> <span class="n">maxVal</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return values describing the desired spacing and offset of ticks.</span>
+
+<span class="sd">        This method is called whenever the axis needs to be redrawn and is a</span>
+<span class="sd">        good method to override in subclasses that require control over tick locations.</span>
+
+<span class="sd">        The return value must be a list of tuples, one for each set of ticks::</span>
+
+<span class="sd">            [</span>
+<span class="sd">                (major tick spacing, offset),</span>
+<span class="sd">                (minor tick spacing, offset),</span>
+<span class="sd">                (sub-minor tick spacing, offset),</span>
+<span class="sd">                ...</span>
+<span class="sd">            ]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># First check for override tick spacing</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tickSpacing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tickSpacing</span>
+
+        <span class="n">dif</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">maxVal</span> <span class="o">-</span> <span class="n">minVal</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dif</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1">## decide optimal minor tick spacing in pixels (this is just aesthetics)</span>
+        <span class="n">optimalTickCount</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">2.</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+
+        <span class="c1">## optimal minor tick spacing</span>
+        <span class="n">optimalSpacing</span> <span class="o">=</span> <span class="n">dif</span> <span class="o">/</span> <span class="n">optimalTickCount</span>
+
+        <span class="c1">## the largest power-of-10 spacing which is smaller than optimal</span>
+        <span class="n">p10unit</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">optimalSpacing</span><span class="p">))</span>
+
+        <span class="c1">## Determine major/minor tick spacings which flank the optimal spacing.</span>
+        <span class="n">intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span> <span class="mf">20.</span><span class="p">,</span> <span class="mf">100.</span><span class="p">])</span> <span class="o">*</span> <span class="n">p10unit</span>
+        <span class="n">minorIndex</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">intervals</span><span class="p">[</span><span class="n">minorIndex</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">optimalSpacing</span><span class="p">:</span>
+            <span class="n">minorIndex</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">levels</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">intervals</span><span class="p">[</span><span class="n">minorIndex</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="n">offset</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">intervals</span><span class="p">[</span><span class="n">minorIndex</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">offset</span><span class="p">),</span>
+            <span class="c1"># (intervals[minorIndex], offset)    ## Pretty, but eats up CPU</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">[</span><span class="s1">&#39;maxTickLevel&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1">## decide whether to include the last level of ticks</span>
+            <span class="n">minSpacing</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="mf">20.</span><span class="p">,</span> <span class="mf">30.</span><span class="p">)</span>
+            <span class="n">maxTickCount</span> <span class="o">=</span> <span class="n">size</span> <span class="o">/</span> <span class="n">minSpacing</span>
+            <span class="k">if</span> <span class="n">dif</span> <span class="o">/</span> <span class="n">intervals</span><span class="p">[</span><span class="n">minorIndex</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">maxTickCount</span><span class="p">:</span>
+                <span class="n">levels</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">intervals</span><span class="p">[</span><span class="n">minorIndex</span><span class="p">],</span> <span class="n">offset</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">levels</span></div>
+</div>
+
+
+
+<span class="c1">## Start Qt event loop unless running in interactive mode or using     pyside.</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="p">([])</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QStyleFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;Cleanlooks&quot;</span><span class="p">))</span>
+
+    <span class="n">image_widget</span> <span class="o">=</span> <span class="n">ImageWidget</span><span class="p">()</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">interactive</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">QtCore</span><span class="p">,</span>     <span class="s1">&#39;PYQT_VERSION&#39;</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

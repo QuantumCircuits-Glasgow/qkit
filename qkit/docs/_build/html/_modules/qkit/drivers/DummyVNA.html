@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.DummyVNA &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.DummyVNA</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.DummyVNA</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Agilent_VNA_E5071C driver, P. Macha, modified by M. Weides July 2013, J. Braumueller 2015</span>
+<span class="c1"># Adapted to Keysight VNA by A. Schneider and L. Gurenhaupt 2016</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="DummyVNA">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DummyVNA</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    simple dummy VNA class to test changes in the spectroscopy script without having a real device. Feel free to extend</span>
+<span class="sd">    the functionality, for example noise that scales with power and averages.</span>
+<span class="sd">    get_tracedata generates a random S21 trace with an overcoupled resonator dip</span>
+<span class="sd">    frequency changes should behave like a real VNA, i.e., span is kept constant when start stop centerfreq are changed</span>
+<span class="sd">    No Docstrings. If you don&#39;t know what the functions do, you should go into the lab first and measure with a real</span>
+<span class="sd">    VNA.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;virtual&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nop</span> <span class="o">=</span> <span class="mi">1001</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span> <span class="o">=</span> <span class="mf">4e9</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span> <span class="o">=</span> <span class="mf">5e9</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sweeptime_averages</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centerfreq</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ready</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">minval</span><span class="o">=-</span><span class="mi">85</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;dBm&#39;</span><span class="p">,</span><span class="n">offset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET_AFTER_SET</span><span class="o">|</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_freqpoints&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_tracedata&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_sweeptime_averages&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;pre_measurement&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;start_measurement&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;ready&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;post_measurement&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="mi">0</span>
+        
+<div class="viewcode-block" id="DummyVNA.do_get_power">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.do_get_power">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>  <span class="bp">self</span><span class="o">.</span><span class="n">power</span></div>
+
+    
+<div class="viewcode-block" id="DummyVNA.do_set_power">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.do_set_power">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting VNA power to &quot;</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.set_startfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.set_startfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_startfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">startfreq</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span> <span class="o">=</span> <span class="n">startfreq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centerfreq</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_startfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_startfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_startfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.set_stopfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.set_stopfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_stopfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stopfreq</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span> <span class="o">=</span> <span class="n">stopfreq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centerfreq</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_stopfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_stopfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stopfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.set_centerfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.set_centerfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_centerfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centerfreq</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centerfreq</span> <span class="o">=</span> <span class="n">centerfreq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span> <span class="o">=</span> <span class="n">centerfreq</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span> <span class="o">=</span> <span class="n">centerfreq</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="o">/</span> <span class="mi">2</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_centerfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_centerfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_centerfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">centerfreq</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_span">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_span">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_span</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">span</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.set_span">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.set_span">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_span</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="o">=</span> <span class="n">span</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centerfreq</span> <span class="o">-</span> <span class="n">span</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centerfreq</span> <span class="o">+</span> <span class="n">span</span> <span class="o">/</span> <span class="mi">2</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_nop">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_nop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_nop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nop</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.set_nop">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.set_nop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_nop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nop</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nop</span> <span class="o">=</span> <span class="n">nop</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_freqpoints">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_freqpoints">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_freqpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nop</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_sweeptime_averages">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_sweeptime_averages">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sweeptime_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweeptime_averages</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_sweeptime">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_sweeptime">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sweeptime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">query</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_averages">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_averages">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_Average">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_Average">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Average</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_tracedata">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_tracedata">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tracedata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">RealImag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">S21_notch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">Ql</span><span class="p">,</span> <span class="n">Qc</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">Ql</span> <span class="o">/</span> <span class="n">Qc</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="mi">2</span><span class="n">j</span> <span class="o">*</span> <span class="n">Ql</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span> <span class="o">-</span> <span class="n">fr</span><span class="p">)</span> <span class="o">/</span> <span class="n">fr</span><span class="p">)</span>
+
+        <span class="n">Qi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+        <span class="n">Qc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1500</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>  <span class="c1"># for a nice signal the resonance is overcoupled</span>
+        <span class="n">fr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">stopfreq</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">startfreq</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">Ql</span> <span class="o">=</span> <span class="n">Qi</span> <span class="o">*</span> <span class="n">Qc</span> <span class="o">/</span> <span class="p">(</span><span class="n">Qi</span> <span class="o">+</span> <span class="n">Qc</span><span class="p">)</span>
+        <span class="n">S21_data</span> <span class="o">=</span> <span class="n">S21_notch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_freqpoints</span><span class="p">(),</span> <span class="n">fr</span><span class="p">,</span> <span class="n">Ql</span><span class="p">,</span> <span class="n">Qi</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nop</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">RealImag</span><span class="p">:</span>
+            <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">S21_data</span><span class="p">)</span>
+            <span class="n">pha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">S21_data</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">amp</span><span class="p">,</span> <span class="n">pha</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="n">S21_data</span><span class="o">.</span><span class="n">real</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="n">S21_data</span><span class="o">.</span><span class="n">imag</span>
+            <span class="k">return</span> <span class="n">I</span><span class="p">,</span> <span class="n">Q</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.get_all">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.get_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.pre_measurement">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.pre_measurement">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.post_measurement">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.post_measurement">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.start_measurement">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.start_measurement">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.ready">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.ready">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ready</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ready</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ready</span></div>
+
+
+<div class="viewcode-block" id="DummyVNA.avg_clear">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.DummyVNA.DummyVNA.avg_clear">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">avg_clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

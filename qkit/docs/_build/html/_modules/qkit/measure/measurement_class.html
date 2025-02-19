@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.measurement_class &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.measure.measurement_class</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.measure.measurement_class</h1><div class="highlight"><pre>
+<span></span><span class="c1"># MP, AS @ KIT 05/2017</span>
+<span class="c1"># Class to collect all information about a single measurement</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.measure.json_handler</span><span class="w"> </span><span class="kn">import</span> <span class="n">QkitJSONEncoder</span><span class="p">,</span> <span class="n">QkitJSONDecoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.measure.samples_class</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sample</span>
+
+
+<div class="viewcode-block" id="Measurement">
+<a class="viewcode-back" href="../../../qkit.measure.html#qkit.measure.measurement_class.Measurement">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Measurement</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Measurement class to define general information about the specific measurement.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">git_commit_id</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">git</span><span class="p">[</span><span class="s1">&#39;commit_id&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdf_relpath</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_visible</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analyzed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurement_type</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurement_func</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_axis</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_axis</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_axis</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span><span class="s1">&#39;John_Doe&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_id</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;run_id&#39;</span><span class="p">,</span><span class="s1">&#39;NO_RUN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Measurement.get_JSON">
+<a class="viewcode-back" href="../../../qkit.measure.html#qkit.measure.measurement_class.Measurement.get_JSON">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_JSON</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns JSON string of all attributes. The function is mostly used for saving in .h5.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_copydict</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">=</span><span class="n">QkitJSONEncoder</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Measurement.save">
+<a class="viewcode-back" href="../../../qkit.measure.html#qkit.measure.measurement_class.Measurement.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filepath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Save sample object in the same directory as the measurement .h5 file or in the given filepath.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">filepath</span><span class="p">:</span>
+            <span class="n">filepath</span><span class="o">=</span><span class="n">filepath</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datadir&#39;</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">hdf_relpath</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;.measurement&#39;</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span><span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">filehandler</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_copydict</span><span class="p">(),</span> <span class="n">fp</span><span class="o">=</span><span class="n">filehandler</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">QkitJSONEncoder</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Measurement.load">
+<a class="viewcode-back" href="../../../qkit.measure.html#qkit.measure.measurement_class.Measurement.load">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Load sample keys and entries to current sample instance.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datadir&#39;</span><span class="p">),</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">filehandle</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filehandle</span><span class="p">,</span> <span class="bp">cls</span> <span class="o">=</span> <span class="n">QkitJSONDecoder</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">Sample</span><span class="p">()</span>
+        <span class="n">s</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_copydict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a copy of self.__dict__ with all object attributes returned in a JSONable format.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">copydict</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Both &#39;sample&#39; and &#39;instruments&#39; entries have to be converted into a dict to save information about datatype etc.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">copydict</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">]:</span>
+            <span class="n">copydict</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copydict</span><span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span> <span class="c1"># change entry to dict to make it readable for JSONEncoder</span>
+        <span class="k">if</span> <span class="n">copydict</span><span class="p">[</span><span class="s1">&#39;instruments&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">copydict</span><span class="p">[</span><span class="s1">&#39;instruments&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span> <span class="c1"># conversion needed during measurement</span>
+                <span class="n">copydict</span><span class="p">[</span><span class="s1">&#39;instruments&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_JSON_instruments_dict</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">copydict</span>
+            
+    <span class="k">def</span><span class="w"> </span><span class="nf">_JSON_instruments_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Iterates through all entries in the self.instruments dict and creates a dict with the individial instrument</span>
+<span class="sd">        name together with all attributs, attribute values and information about setter function. This is needed</span>
+<span class="sd">        for an automized reading and re-setting of a measurement.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">return_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ins_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">:</span>
+            <span class="n">ins</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ins_name</span><span class="p">)</span>
+            <span class="n">param_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="n">ins</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">():</span>
+                <span class="n">has_setter</span> <span class="o">=</span> <span class="s1">&#39;set_func&#39;</span> <span class="ow">in</span> <span class="n">ins</span><span class="o">.</span><span class="n">get_parameter_options</span><span class="p">(</span><span class="n">param_name</span><span class="p">)</span>
+                <span class="n">param_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">param_name</span><span class="p">:{</span><span class="s1">&#39;content&#39;</span><span class="p">:</span><span class="n">ins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="s1">&#39;has_setter&#39;</span><span class="p">:</span><span class="n">has_setter</span><span class="p">}})</span>
+            <span class="n">return_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">ins_name</span><span class="p">:</span><span class="n">param_dict</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">return_dict</span>
+
+<div class="viewcode-block" id="Measurement.update_instrument">
+<a class="viewcode-back" href="../../../qkit.measure.html#qkit.measure.measurement_class.Measurement.update_instrument">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_instrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ins_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets all parameters of the instrument ins_name to the values used in the measurements.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ins</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ins_name</span><span class="p">)</span>
+            <span class="n">params_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="p">[</span><span class="s1">&#39;instruments&#39;</span><span class="p">][</span><span class="n">ins_name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="ow">or</span> <span class="ne">NameError</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Relevant instruments and attributes not properly specified. &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ins_name</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Use only parameters with setter and update the instrument</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">params_dict</span><span class="p">[</span><span class="n">param</span><span class="p">][</span><span class="s1">&#39;has_setter&#39;</span><span class="p">]:</span> <span class="n">ins</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">params_dict</span><span class="p">[</span><span class="n">param</span><span class="p">],</span> <span class="n">params_dict</span><span class="p">[</span><span class="n">param</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">])</span></div>
+
+    
+<div class="viewcode-block" id="Measurement.update_all_instruments">
+<a class="viewcode-back" href="../../../qkit.measure.html#qkit.measure.measurement_class.Measurement.update_all_instruments">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_all_instruments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Updates all instruments to their parameter settings during the measurement.</span>
+<span class="sd">        CAUTION: This can be critical for current sources, since the current value is set and not ramped!</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">ins</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instuments</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_instrument</span><span class="p">(</span><span class="n">ins</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Measurement.write_to_hdf">
+<a class="viewcode-back" href="../../../qkit.measure.html#qkit.measure.measurement_class.Measurement.write_to_hdf">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_to_hdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdf_file</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="n">hdf_file</span><span class="o">.</span><span class="n">_uuid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdf_relpath</span> <span class="o">=</span> <span class="n">hdf_file</span><span class="o">.</span><span class="n">_relpath</span>
+        <span class="n">mo</span> <span class="o">=</span> <span class="n">hdf_file</span><span class="o">.</span><span class="n">add_textlist</span><span class="p">(</span><span class="s1">&#39;measurement&#39;</span><span class="p">)</span>
+        <span class="n">mo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_JSON</span><span class="p">())</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

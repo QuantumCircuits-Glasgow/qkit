@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.timedomain.quantum_machine package &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.measure.transport package" href="qkit.measure.transport.html" />
+    <link rel="prev" title="qkit.measure.timedomain.awg package" href="qkit.measure.timedomain.awg.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.measure.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.oscilloscope.html">qkit.measure.oscilloscope package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.spectroscopy.html">qkit.measure.spectroscopy package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="qkit.measure.timedomain.html">qkit.measure.timedomain package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.measure.transport.html">qkit.measure.transport package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure.json_handler">qkit.measure.json_handler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure.measurement_base">qkit.measure.measurement_base module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure.measurement_class">qkit.measure.measurement_class module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure.samples_class">qkit.measure.samples_class module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure.write_additional_files">qkit.measure.write_additional_files module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.measure.html#module-qkit.measure">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.tests.html">qkit.tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.measure.html">qkit.measure package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.measure.timedomain.html">qkit.measure.timedomain package</a></li>
+      <li class="breadcrumb-item active">qkit.measure.timedomain.quantum_machine package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.measure.timedomain.quantum_machine.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-measure-timedomain-quantum-machine-package">
+<h1>qkit.measure.timedomain.quantum_machine package<a class="headerlink" href="#qkit-measure-timedomain-quantum-machine-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="qkit-measure-timedomain-quantum-machine-basic-qubit-experiments-module">
+<h2>qkit.measure.timedomain.quantum_machine.basic_qubit_experiments module<a class="headerlink" href="#qkit-measure-timedomain-quantum-machine-basic-qubit-experiments-module" title="Link to this heading"></a></h2>
+</section>
+<section id="qkit-measure-timedomain-quantum-machine-basic-qubit-experiments-v2-module">
+<h2>qkit.measure.timedomain.quantum_machine.basic_qubit_experiments_V2 module<a class="headerlink" href="#qkit-measure-timedomain-quantum-machine-basic-qubit-experiments-v2-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-qkit.measure.timedomain.quantum_machine.pulses">
+<span id="qkit-measure-timedomain-quantum-machine-pulses-module"></span><h2>qkit.measure.timedomain.quantum_machine.pulses module<a class="headerlink" href="#module-qkit.measure.timedomain.quantum_machine.pulses" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.pulses.const">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.quantum_machine.pulses.</span></span><span class="sig-name descname"><span class="pre">const</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/pulses.html#const"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.pulses.const" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.pulses.const_zeroed">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.quantum_machine.pulses.</span></span><span class="sig-name descname"><span class="pre">const_zeroed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeros_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeros_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/pulses.html#const_zeroed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.pulses.const_zeroed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.pulses.gauss">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.quantum_machine.pulses.</span></span><span class="sig-name descname"><span class="pre">gauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/pulses.html#gauss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.pulses.gauss" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.pulses.plot_pulses">
+<span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.quantum_machine.pulses.</span></span><span class="sig-name descname"><span class="pre">plot_pulses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/pulses.html#plot_pulses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.pulses.plot_pulses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper">
+<span id="qkit-measure-timedomain-quantum-machine-qm-qkit-wrapper-module"></span><h2>qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper module<a class="headerlink" href="#module-qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.</span></span><span class="sig-name descname"><span class="pre">QmQkitWrapper</span></span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/qm_qkit_wrapper.html#QmQkitWrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper.close_files">
+<span class="sig-name descname"><span class="pre">close_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/qm_qkit_wrapper.html#QmQkitWrapper.close_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper.close_files" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper.measure">
+<span class="sig-name descname"><span class="pre">measure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/qm_qkit_wrapper.html#QmQkitWrapper.measure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper.measure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper.store_data">
+<span class="sig-name descname"><span class="pre">store_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/qm_qkit_wrapper.html#QmQkitWrapper.store_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.qm_qkit_wrapper.QmQkitWrapper.store_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="qkit-measure-timedomain-quantum-machine-qm-qubit-config-module">
+<h2>qkit.measure.timedomain.quantum_machine.qm_qubit_config module<a class="headerlink" href="#qkit-measure-timedomain-quantum-machine-qm-qubit-config-module" title="Link to this heading"></a></h2>
+</section>
+<section id="qkit-measure-timedomain-quantum-machine-qm-qubit-config-v2-module">
+<h2>qkit.measure.timedomain.quantum_machine.qm_qubit_config_V2 module<a class="headerlink" href="#qkit-measure-timedomain-quantum-machine-qm-qubit-config-v2-module" title="Link to this heading"></a></h2>
+</section>
+<section id="qkit-measure-timedomain-quantum-machine-quantum-jump-monitoring-module">
+<h2>qkit.measure.timedomain.quantum_machine.quantum_jump_monitoring module<a class="headerlink" href="#qkit-measure-timedomain-quantum-machine-quantum-jump-monitoring-module" title="Link to this heading"></a></h2>
+</section>
+<section id="qkit-measure-timedomain-quantum-machine-qubit-high-temp-module">
+<h2>qkit.measure.timedomain.quantum_machine.qubit_high_temp module<a class="headerlink" href="#qkit-measure-timedomain-quantum-machine-qubit-high-temp-module" title="Link to this heading"></a></h2>
+</section>
+<section id="qkit-measure-timedomain-quantum-machine-script-module">
+<h2>qkit.measure.timedomain.quantum_machine.script module<a class="headerlink" href="#qkit-measure-timedomain-quantum-machine-script-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-qkit.measure.timedomain.quantum_machine.script_pyqt">
+<span id="qkit-measure-timedomain-quantum-machine-script-pyqt-module"></span><h2>qkit.measure.timedomain.quantum_machine.script_pyqt module<a class="headerlink" href="#module-qkit.measure.timedomain.quantum_machine.script_pyqt" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.script_pyqt.ImageWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.quantum_machine.script_pyqt.</span></span><span class="sig-name descname"><span class="pre">ImageWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/script_pyqt.html#ImageWidget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.script_pyqt.ImageWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.script_pyqt.ImageWidget.updateIsocurve">
+<span class="sig-name descname"><span class="pre">updateIsocurve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/script_pyqt.html#ImageWidget.updateIsocurve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.script_pyqt.ImageWidget.updateIsocurve" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.script_pyqt.ImageWidget.updatePlot">
+<span class="sig-name descname"><span class="pre">updatePlot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/script_pyqt.html#ImageWidget.updatePlot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.script_pyqt.ImageWidget.updatePlot" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.measure.timedomain.quantum_machine.script_pyqt.</span></span><span class="sig-name descname"><span class="pre">MyStringAxis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/script_pyqt.html#MyStringAxis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AxisItem</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis.set_tick_dict">
+<span class="sig-name descname"><span class="pre">set_tick_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xdict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/script_pyqt.html#MyStringAxis.set_tick_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis.set_tick_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis.tickSpacing">
+<span class="sig-name descname"><span class="pre">tickSpacing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minVal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxVal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/script_pyqt.html#MyStringAxis.tickSpacing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis.tickSpacing" title="Link to this definition"></a></dt>
+<dd><p>Return values describing the desired spacing and offset of ticks.</p>
+<p>This method is called whenever the axis needs to be redrawn and is a
+good method to override in subclasses that require control over tick locations.</p>
+<p>The return value must be a list of tuples, one for each set of ticks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+    <span class="p">(</span><span class="n">major</span> <span class="n">tick</span> <span class="n">spacing</span><span class="p">,</span> <span class="n">offset</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">minor</span> <span class="n">tick</span> <span class="n">spacing</span><span class="p">,</span> <span class="n">offset</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">sub</span><span class="o">-</span><span class="n">minor</span> <span class="n">tick</span> <span class="n">spacing</span><span class="p">,</span> <span class="n">offset</span><span class="p">),</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis.tickStrings">
+<span class="sig-name descname"><span class="pre">tickStrings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/measure/timedomain/quantum_machine/script_pyqt.html#MyStringAxis.tickStrings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.measure.timedomain.quantum_machine.script_pyqt.MyStringAxis.tickStrings" title="Link to this definition"></a></dt>
+<dd><p>Return the strings that should be placed next to ticks. This method is called
+when redrawing the axis and is a good method to override in subclasses.
+The method is called with a list of tick values, a scaling factor (see below), and the
+spacing between ticks (this is required since, in some instances, there may be only
+one tick and thus no other way to determine the tick spacing)</p>
+<p>The scale argument is used when the axis label is displaying units which may have an SI scaling prefix.
+When determining the text to display, use value*scale to correctly account for this prefix.
+For example, if the axis label’s units are set to ‘V’, then a tick value of 0.001 might
+be accompanied by a scale value of 1000. This indicates that the label is displaying ‘mV’, and
+thus the tick should display 0.001 * 1000 = 1.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.measure.timedomain.quantum_machine">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.measure.timedomain.quantum_machine" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.measure.timedomain.awg.html" class="btn btn-neutral float-left" title="qkit.measure.timedomain.awg package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.measure.transport.html" class="btn btn-neutral float-right" title="qkit.measure.transport package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

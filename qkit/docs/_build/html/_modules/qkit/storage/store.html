@@ -1,0 +1,461 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.storage.store &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.storage.store</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.storage.store</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Library to ease the use of the file format hdf5 for datastorage</span>
+<span class="sd">It can be used with or without the qtlab environment.</span>
+
+<span class="sd">@author: hannes.rotzinger@kit.edu 2018</span>
+<span class="sd">@author: marco.pfirrmann@kit.edu 2018</span>
+<span class="sd">@version: 0.1</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.storage.hdf_file</span><span class="w"> </span><span class="kn">import</span> <span class="n">H5_file</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.storage.hdf_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">hdf_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.storage.hdf_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">ds_types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.storage.hdf_view</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataset_view</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.storage.hdf_DateTimeGenerator</span><span class="w"> </span><span class="kn">import</span> <span class="n">DateTimeGenerator</span>
+
+
+
+<div class="viewcode-block" id="Data">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Data</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Basic hdf5 class adopted to our needs.</span>
+<span class="sd">    </span>
+<span class="sd">    This class is the public API for the qkit users with the hdf5 file. It</span>
+<span class="sd">    is based in its core on h5py as well as our own adaptions in hdf_view, </span>
+<span class="sd">    hdf_file, and hdf_dataset. Here mostly have wrapper that operate on the</span>
+<span class="sd">    mentioned classes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># a types</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;r+&#39;</span><span class="p">,</span> <span class="n">copy_file</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an empty data set including the file, for which the currently</span>
+<span class="sd">        set file name generator is used or opens the h5 file at location &#39;name&#39;.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (string):  filename or absolute filepath</span>
+<span class="sd">            mode (string):  access mode to the hdf5 file, default: &#39;r+&#39; (read+write).</span>
+<span class="sd">                Other modes are &#39;a&#39; (read, write, and create)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filepath</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_generate_file_name</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">qkit</span><span class="o">.</span><span class="n">fid</span><span class="o">.</span><span class="n">add_h5_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filepath</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Could not add newly generated h5 File &#39;</span><span class="si">{}</span><span class="s2">&#39; to qkit.fid database: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_folder</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filepath</span><span class="p">)</span>
+        <span class="s2">&quot;setup the  file&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hf</span> <span class="o">=</span> <span class="n">H5_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filepath</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;File does not exist. Use argument </span><span class="se">\&quot;</span><span class="s1">mode=</span><span class="se">\&#39;</span><span class="s1">a</span><span class="se">\&#39;\&quot;</span><span class="s1"> to create a new h5 file.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">newfile</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_uuid&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_unix_timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;_localtime&quot;</span><span class="p">,</span> <span class="s2">&quot;_timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;_timemark&quot;</span><span class="p">,</span> <span class="s2">&quot;_datemark&quot;</span><span class="p">,</span> <span class="s2">&quot;_uuid&quot;</span><span class="p">,</span> <span class="s2">&quot;_filename&quot;</span><span class="p">,</span> <span class="s2">&quot;_folder&quot;</span><span class="p">,</span> <span class="s2">&quot;_relpath&quot;</span><span class="p">,</span> <span class="s2">&quot;_filepath&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">a</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">})</span>
+            <span class="k">if</span> <span class="s2">&quot;user&quot;</span> <span class="ow">in</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;_user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;run_id&quot;</span> <span class="ow">in</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;_run_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qkit</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;run_id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mapH5PathToObject</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">newfile</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;During creation of this file, the following error ocurred:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc_val</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_tb</span><span class="p">(</span><span class="n">exc_tb</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mapH5PathToObject</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function for automated data readout at Data object creation.</span>
+<span class="sd">        </span>
+<span class="sd">        This function gets called during the init of a data object. Here we </span>
+<span class="sd">        translate the attributes of all datasets into attributs of the </span>
+<span class="sd">        dummy-class &quot;group&quot;. These objects get added to the self.__dict__ what</span>
+<span class="sd">        makes them tabbable in a notebook.</span>
+<span class="sd">        We iterate over all atributes of all entries in analysis0 and data0 as</span>
+<span class="sd">        well as the &#39;comment&#39; entry on the respective group attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">group</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">pass</span>
+        
+        <span class="n">a</span> <span class="o">=</span> <span class="n">group</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="s1">&#39;/entry/analysis0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+            <span class="n">a</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">o</span>
+            <span class="k">for</span> <span class="n">nn</span><span class="p">,</span> <span class="n">oo</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">o</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">oo</span>
+        <span class="n">a</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;comment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">agrp</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comment&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">group</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="s1">&#39;/entry/data0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">o</span>
+            <span class="k">for</span> <span class="n">nn</span><span class="p">,</span> <span class="n">oo</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">o</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">oo</span>
+        <span class="n">d</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;comment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">dgrp</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comment&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;analysis&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="n">d</span><span class="p">})</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="k">del</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;NeXus_version&#39;</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;qkit&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate new file name using hdf_DateTimeGenerator.</span>
+<span class="sd">        </span>
+<span class="sd">        This sets:</span>
+<span class="sd">            _unix_timestamp</span>
+<span class="sd">            _localtime    </span>
+<span class="sd">            _timestamp</span>
+<span class="sd">            _timemark</span>
+<span class="sd">            _datemark</span>
+<span class="sd">            _uuid</span>
+<span class="sd">            _filename</span>
+<span class="sd">            _folder</span>
+<span class="sd">            _relpath</span>
+<span class="sd">            _filepath        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dtg</span> <span class="o">=</span> <span class="n">DateTimeGenerator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dtg</span><span class="o">.</span><span class="n">new_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_folder</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_folder</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_folder</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="s2">&quot;HDF5Data &#39;</span><span class="si">%s</span><span class="s2">&#39;, filename &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+<div class="viewcode-block" id="Data.get_filepath">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.get_filepath">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_filepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filepath</span></div>
+
+
+<div class="viewcode-block" id="Data.get_folder">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.get_folder">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_folder</span></div>
+
+
+<div class="viewcode-block" id="Data.add_comment">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.add_comment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">comment</span><span class="p">,</span> <span class="n">folder</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="n">folder</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">dgrp</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;comment&#39;</span><span class="p">,</span><span class="n">comment</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">folder</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">agrp</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;comment&quot;</span><span class="p">,</span><span class="n">comment</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Foler muset be either &#39;data&#39; (default) or &#39;analysis&#39;: &#39;</span><span class="si">%s</span><span class="s2">&#39; provided&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">folder</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span></div>
+
+
+<div class="viewcode-block" id="Data.add_textlist">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.add_textlist">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_textlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">comment</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="p">,</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a dataset containing only text to the h5 file.</span>
+<span class="sd">        </span>
+<span class="sd">        This function is a wrapper to create a hdf_dataset object with some </span>
+<span class="sd">        predefined arguments. name, comment, and folder are parsed to the hdf_dataset</span>
+<span class="sd">        init and the ds_type is set. The dataset does not have any axes.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: String to name the dataset.</span>
+<span class="sd">            comment: Optional string to put in any comment.</span>
+<span class="sd">            folder: Optional string (&#39;data&#39; or &#39;analysis&#39;).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            hdf_dataset object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ds</span> <span class="o">=</span>  <span class="n">hdf_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span> <span class="n">ds_type</span> <span class="o">=</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;txt&#39;</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ds</span></div>
+
+        
+<div class="viewcode-block" id="Data.add_coordinate">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.add_coordinate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_coordinate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">name</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span><span class="o">**</span><span class="n">meta</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a coordinate dataset to the h5 file.</span>
+<span class="sd">        </span>
+<span class="sd">        This function is a wrapper to create a hdf_dataset object with some </span>
+<span class="sd">        predefined arguments. name, unit, comment, and folder are parsed to the hdf_dataset</span>
+<span class="sd">        init and the ds_type is set. The dataset does not have any axes. The data</span>
+<span class="sd">        is specifically casted to 64bit float.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: String to name the dataset.</span>
+<span class="sd">            unit: Optional string.</span>
+<span class="sd">            comment: Optional string to put in any comment.</span>
+<span class="sd">            folder: Optional string (&#39;data&#39; or &#39;analysis&#39;).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            hdf_dataset object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ds</span> <span class="o">=</span>  <span class="n">hdf_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span> <span class="n">ds_type</span> <span class="o">=</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;coordinate&#39;</span><span class="p">],</span>
+                          <span class="n">comment</span><span class="o">=</span> <span class="n">comment</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ds</span></div>
+
+
+<div class="viewcode-block" id="Data.add_value_vector">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.add_value_vector">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_value_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span><span class="o">**</span><span class="n">meta</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a 1dim dataset to the h5 file.</span>
+<span class="sd">        </span>
+<span class="sd">        This function is a wrapper to create a hdf_dataset object with some </span>
+<span class="sd">        predefined arguments. name, x-axis, unit, comment, and folder are parsed</span>
+<span class="sd">        to the hdf_dataset init and the ds_type is set.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: String to name the dataset.</span>
+<span class="sd">            x: Optional hdf_dataset representing the x-coordinate of the vector.</span>
+<span class="sd">            unit: Optional string.</span>
+<span class="sd">            comment: Optional string to put in any comment.</span>
+<span class="sd">            folder: Optional string (&#39;data&#39; or &#39;analysis&#39;).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            hdf_dataset object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ds</span> <span class="o">=</span>  <span class="n">hdf_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span> <span class="n">ds_type</span> <span class="o">=</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;vector&#39;</span><span class="p">],</span>
+                          <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ds</span></div>
+
+
+<div class="viewcode-block" id="Data.add_value_matrix">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.add_value_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_value_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x</span> <span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span><span class="o">**</span><span class="n">meta</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a 2dim dataset to the h5 file.</span>
+<span class="sd">        </span>
+<span class="sd">        This function is a wrapper to create a hdf_dataset object with some </span>
+<span class="sd">        predefined arguments. name, x-axis, y-axis, unit, comment, and folder </span>
+<span class="sd">        are parsed to the hdf_dataset init and the ds_type is set.</span>
+<span class="sd">        Our convention here is: y-axis changes &quot;faster&quot; than the x-axis.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: String to name the dataset.</span>
+<span class="sd">            x: Optional hdf_dataset representing the x-coordinate of the matrix.</span>
+<span class="sd">            y: Optional hdf_dataset representing the y-coordinato of the matrix.</span>
+<span class="sd">            unit: Optional string.</span>
+<span class="sd">            comment: Optional string to put in any comment.</span>
+<span class="sd">            folder: Optional string (&#39;data&#39; or &#39;analysis&#39;).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            hdf_dataset object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ds</span> <span class="o">=</span>  <span class="n">hdf_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span> <span class="n">ds_type</span> <span class="o">=</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;matrix&#39;</span><span class="p">],</span>
+                          <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ds</span></div>
+
+
+<div class="viewcode-block" id="Data.add_value_box">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.add_value_box">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_value_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x</span> <span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span><span class="o">**</span><span class="n">meta</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a 3dim dataset to the h5 file.</span>
+<span class="sd">        </span>
+<span class="sd">        This function is a wrapper to create a hdf_dataset object with some </span>
+<span class="sd">        predefined arguments. name, x-axis, y-axis, z-axis, unit, comment, and folder </span>
+<span class="sd">        are parsed to the hdf_dataset init and the ds_type is set.</span>
+<span class="sd">        Our convention here is: y-axis changes &quot;faster&quot; than the x-axis.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            name: String to name the dataset.</span>
+<span class="sd">            x: Optional hdf_dataset representing the x-coordinate of the box.</span>
+<span class="sd">            y: Optional hdf_dataset representing the y-coordinato of the box.</span>
+<span class="sd">            z: Optional hdf_dataset representing the y-coordinato of the box.</span>
+<span class="sd">            unit: Optional string.</span>
+<span class="sd">            comment: Optional string to put in any comment.</span>
+<span class="sd">            folder: Optional string (&#39;data&#39; or &#39;analysis&#39;).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            hdf_dataset object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="n">ds</span> <span class="o">=</span>  <span class="n">hdf_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">,</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span> <span class="n">ds_type</span> <span class="o">=</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;box&#39;</span><span class="p">],</span>
+                          <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ds</span></div>
+
+
+<div class="viewcode-block" id="Data.add_view">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.add_view">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">x</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">view_params</span> <span class="o">=</span> <span class="p">{}):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a view to plot x-y data.</span>
+<span class="sd">        </span>
+<span class="sd">        This function is a wrapper to create a dataset_view.</span>
+<span class="sd">        x, y with the corresponding error are the datasets to display, e.g.</span>
+<span class="sd">        x = h5[&quot;/entry/data0/temperature&quot;]</span>
+<span class="sd">        y = h5[&quot;/entry/analysis0/frequency_fit&quot;]</span>
+<span class="sd">        error = h5[&quot;/entry/analysis0/frequency_fit_error&quot;]</span>
+<span class="sd">        filter is a string of reguar python code, which</span>
+<span class="sd">        accesses the x,y dataset returns arrays of (x,y)</span>
+<span class="sd">        (Fixme: not jet implemented)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ds</span> <span class="o">=</span>  <span class="n">dataset_view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">,</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">,</span> <span class="nb">filter</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">,</span> 
+                           <span class="n">ds_type</span> <span class="o">=</span> <span class="n">ds_types</span><span class="p">[</span><span class="s1">&#39;view&#39;</span><span class="p">],</span><span class="n">view_params</span> <span class="o">=</span> <span class="n">view_params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ds</span></div>
+
+
+<div class="viewcode-block" id="Data.add_fid_param">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.add_fid_param">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_fid_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a parameter (and value) to be read out with the file info database class.</span>
+<span class="sd">        </span>
+<span class="sd">        This function adds an entry to the atrribute dict of the self.hf agrp-entry. By default</span>
+<span class="sd">        this is set to the attribute0 folder. The dict may be read out by the file info database</span>
+<span class="sd">        class and in the end the entries can be sorted by all params.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            param: Parameter name</span>
+<span class="sd">            value: Parameter value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">agrp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="Data.get_dataset">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.get_dataset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ds_url</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">hdf_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="p">,</span><span class="n">ds_url</span> <span class="o">=</span> <span class="n">ds_url</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Data.save_finished">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.save_finished">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Data.flush">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.flush">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Data.close_file">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.close_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">close_file</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Data.close">
+<a class="viewcode-back" href="../../../qkit.storage.html#qkit.storage.store.Data.close">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hf</span><span class="o">.</span><span class="n">close_file</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,379 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.Keithley_2450_gla_old &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.Keithley_2450_gla_old</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.Keithley_2450_gla_old</h1><div class="highlight"><pre>
+<span></span><span class="c1"># filename: Keithley_2450.py</span>
+<span class="c1"># version 0.1 written by </span>
+<span class="c1"># QKIT driver for a Keithley Multimeter 2450</span>
+
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">visa</span> 
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span><span class="o">,</span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">atexit</span>
+<span class="c1">#import serial #used for GPIB connections</span>
+
+<div class="viewcode-block" id="Keithley_2450_gla">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Keithley_2450_gla</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is the driver for the Keithley 2450 Source Meter</span>
+<span class="sd">    Set ip address manually on instrument, e.g. TCPIP::10.22.197.50::5025::SOCKET</span>
+<span class="sd">    Usage:</span>
+<span class="sd">    Initialize with</span>
+<span class="sd">    &lt;name&gt; = qkit.instruments.create(&#39;&lt;name&gt;&#39;, &#39;Keithley_2450&#39;, address=&#39;&lt;IP address&gt;&#39;, reset=&lt;bool&gt;)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initializes the Keithley, and communicates with the wrapper.</span>
+<span class="sd">        </span>
+<span class="sd">        Input:</span>
+<span class="sd">            name (string)    : name of the instrument</span>
+<span class="sd">            address (string) : IP address</span>
+<span class="sd">            reset (bool)     : resets to default values, default=False</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Start VISA communication</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;: Initializing instrument Keithley 2450&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span> <span class="o">=</span> <span class="n">visa</span><span class="o">.</span><span class="n">instrument</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read_termination</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">5000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rvol</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rvc_mode</span>   <span class="o">=</span> <span class="kc">False</span> <span class="c1">#resistance via current</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">four_wire</span>  <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1">#self.setup(address) #used for GPIB connections</span>
+
+    <span class="c1">#def setup(self, device=&quot;COM1&quot;):</span>
+     <span class="c1">#   baudrate = 9600</span>
+     <span class="c1">#   timeout = None #0.1</span>
+        
+     <span class="c1">#   self.ser = self._std_open(device,baudrate,timeout)</span>
+     <span class="c1">#   atexit.register(self.ser.close)</span>
+        
+    <span class="c1">#def _std_open(self,device,baudrate,timeout):</span>
+        <span class="c1"># open serial port, 9600, 8,N,1, timeout 0.1</span>
+      <span class="c1">#  return serial.Serial(device, baudrate, timeout=timeout)</span>
+ 
+
+    <span class="c1"># def remote_cmd(self, cmd):</span>
+    <span class="c1">#     cmd += &quot;\r&quot;</span>
+
+    <span class="c1">#     # clear queue first, old data,etc</span>
+    <span class="c1">#     rem_char = self.ser.inWaiting()</span>
+    <span class="c1">#     if rem_char:</span>
+    <span class="c1">#         self.ser.read(rem_char)</span>
+        
+    <span class="c1">#     # send command</span>
+    <span class="c1">#     self.ser.write(str.encode(cmd))</span>
+    <span class="c1">#     # wait until data is processed</span>
+    <span class="c1">#     time.sleep(1)</span>
+    <span class="c1">#     # read back</span>
+    <span class="c1">#     rem_char = self.ser.inWaiting()</span>
+        
+    <span class="c1">#     retval = self.ser.read(rem_char)</span>
+    <span class="c1">#     #print(retval)</span>
+    <span class="c1">#     return retval #str(retval)#.strip(&#39;\r&#39;)</span>
+
+<div class="viewcode-block" id="Keithley_2450_gla.reset">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Resets the instrument to default values</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : resetting instrument&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;*RST&#39;</span><span class="p">)</span></div>
+
+        <span class="c1">#self.get_all()     </span>
+    
+    <span class="c1"># def get_current_dc(self):   #Return DC Current in auto-range</span>
+    <span class="c1">#     value = self.remote_cmd(&quot;:MEAS:CURR:DC?&quot;)</span>
+    <span class="c1">#     try:</span>
+    <span class="c1">#         return float(value)</span>
+    <span class="c1">#     except Exception as m:</span>
+    <span class="c1">#         print(m)</span>
+    <span class="c1">#         return </span>
+
+<div class="viewcode-block" id="Keithley_2450_gla.get_current_dc">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.get_current_dc">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current_dc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>   <span class="c1">#Return DC Current in auto-range</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;:MEAS:CURR:DC?&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="k">return</span>         </div>
+
+    
+<div class="viewcode-block" id="Keithley_2450_gla.get_voltage_dc">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.get_voltage_dc">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_voltage_dc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>   <span class="c1">#Return DC Current in auto-range</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;:MEAS:VOLT:DC?&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="k">return</span>       </div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.get_resistance">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.get_resistance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resistance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rvc_mode</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rvol</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">four_wire</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_resistance_4W</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_resistance_2W</span><span class="p">()</span></div>
+
+                
+<div class="viewcode-block" id="Keithley_2450_gla.get_data">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.get_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">startindex</span><span class="p">,</span> <span class="n">endindex</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Ending index of the buffer has to be specified&#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;:TRACe:DATA? </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">startindex</span><span class="p">,</span><span class="n">endindex</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">NaN</span>        </div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.get_resistance_2W">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.get_resistance_2W">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resistance_2W</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:OUTP ON&quot;</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;:MEAS:RES?&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:OUTP OFF&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+            
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">NaN</span></div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.get_resistance_4W">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.get_resistance_4W">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resistance_4W</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:OUTP ON&quot;</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;:MEAS:RES?&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:OUTP OFF&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">NaN</span></div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.set_measure_4W">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.set_measure_4W">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_measure_4W</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">four_wire</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; Sets 2 or 4 wire measurement mode &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">four_wire</span> <span class="o">=</span> <span class="n">four_wire</span></div>
+
+        
+    <span class="c1"># def set_resistance_via_current(self, status):</span>
+    <span class="c1">#     self.rvc_mode = status</span>
+    <span class="c1">#     self._visainstrument.write(str.encode(&quot;:SENS:CURR \r&quot;))  </span>
+    <span class="c1">#     self._visainstrument.write(str.encode(&quot;:SENS:CURR:DC:RANG:AUTO OFF \r&quot;))</span>
+    <span class="c1">#     self._visainstrument.write(str.encode(&quot;:SENS:CURR:DC:RANG 1e-3 \r&quot;))</span>
+
+<div class="viewcode-block" id="Keithley_2450_gla.set_resistance_via_current">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.set_resistance_via_current">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_resistance_via_current</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rvc_mode</span> <span class="o">=</span> <span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SENS:FUNC:CURR&quot;</span><span class="p">)</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SENS:CURR:DC:RANG:AUTO OFF&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SENS:CURR:DC:RANG 1e-3&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.set_reverence_voltage">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.set_reverence_voltage">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_reverence_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">voltage</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rvol</span> <span class="o">=</span> <span class="n">voltage</span></div>
+
+        
+    <span class="c1"># def set_current_range(self, range_value):</span>
+    <span class="c1">#     if 1e-3 &lt;= range_value &lt;= 1:</span>
+    <span class="c1">#         self._visainstrument.write(str.encode(&quot;:CURR:DC:RANG %.04f \r&quot;%(range_value)))</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         print(&quot;Range must be decimal power of 10 between 1A and 10mA&quot;)</span>
+
+<div class="viewcode-block" id="Keithley_2450_gla.set_current_range">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.set_current_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_current_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">range_value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SENS:CURR:RANG </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">range_value</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.set_output">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.set_output">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:OUTP ON&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:OUTP OFF&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.set_voltage_source">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.set_voltage_source">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_voltage_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volt</span><span class="p">):</span>
+        <span class="c1">#self._visainstrument.write(&quot;SENS:FUNC &#39;CURR&#39;&quot;) </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;SOUR:FUNC VOLT&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;SOUR:VOLT </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">volt</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.set_current_source">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.set_current_source">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_current_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curr</span><span class="p">):</span>
+        <span class="c1">#self._visainstrument.write(&quot;SENS:FUNC &#39;VOLT&#39;&quot;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;SOUR:FUNC CURR&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;SOUR:CURR </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curr</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.set_voltage_range">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.set_voltage_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_voltage_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">range_value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SENS:VOLT:RANG </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">range_value</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.set_current_range_auto">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.set_current_range_auto">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_current_range_auto</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auto</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">auto</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SENS:CURR:RANG:AUTO ON&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SENS:CURR:RANG:AUTO OFF&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Keithley_2450_gla.set_voltage_range_auto">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Keithley_2450_gla_old.Keithley_2450_gla.set_voltage_range_auto">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_voltage_range_auto</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auto</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">auto</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SENS:VOLT:RANG:AUTO ON&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:SENS:VOLT:RANG:AUTO OFF&quot;</span><span class="p">)</span></div>
+</div>
+
+              
+    <span class="c1">#def set_test(self):</span>
+     <span class="c1">#   self._visainstrument.write(&quot;*RST&quot;)</span>
+      <span class="c1">#  self._visainstrument.write(&quot;SENS:FUNC &quot;VOLT&quot;&quot;)</span>
+	
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">KEITH</span> <span class="o">=</span> <span class="n">Keithley_2450</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Keithley_2450&quot;</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="s2">&quot;10.22.197.8&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DC current: </span><span class="si">{:.4g}</span><span class="s2">A&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">KEITH</span><span class="o">.</span><span class="n">get_current_dc</span><span class="p">()))</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

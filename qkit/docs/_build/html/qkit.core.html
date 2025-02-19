@@ -1,0 +1,1559 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.core package &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.core.lib package" href="qkit.core.lib.html" />
+    <link rel="prev" title="qkit.config package" href="qkit.config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">qkit.core package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html">qkit.core.lib package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html">qkit.core.s_init package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qkit.core.flow">qkit.core.flow module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.flow.FlowControl"><code class="docutils literal notranslate"><span class="pre">FlowControl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.flow.exception_handler"><code class="docutils literal notranslate"><span class="pre">exception_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.flow.qtlab_exit"><code class="docutils literal notranslate"><span class="pre">qtlab_exit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qkit.core.instrument_base">qkit.core.instrument_base module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_base.GPIBInstrument"><code class="docutils literal notranslate"><span class="pre">GPIBInstrument</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_base.Instrument"><code class="docutils literal notranslate"><span class="pre">Instrument</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_base.InvalidInstrument"><code class="docutils literal notranslate"><span class="pre">InvalidInstrument</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qkit.core.instrument_basev2">qkit.core.instrument_basev2 module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_basev2.CachePolicy"><code class="docutils literal notranslate"><span class="pre">CachePolicy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_basev2.ModernInstrument"><code class="docutils literal notranslate"><span class="pre">ModernInstrument</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_basev2.ObjectTreeVisistor"><code class="docutils literal notranslate"><span class="pre">ObjectTreeVisistor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_basev2.PropertyMetadata"><code class="docutils literal notranslate"><span class="pre">PropertyMetadata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_basev2.QkitFunction"><code class="docutils literal notranslate"><span class="pre">QkitFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_basev2.QkitNativeVisitor"><code class="docutils literal notranslate"><span class="pre">QkitNativeVisitor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_basev2.QkitProperty"><code class="docutils literal notranslate"><span class="pre">QkitProperty</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_basev2.caching"><code class="docutils literal notranslate"><span class="pre">caching()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_basev2.interval_check"><code class="docutils literal notranslate"><span class="pre">interval_check()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qkit.core.instrument_tools">qkit.core.instrument_tools module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.instrument_tools.Insttools"><code class="docutils literal notranslate"><span class="pre">Insttools</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qkit.core.startup">qkit.core.startup module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qkit.core.startup.start"><code class="docutils literal notranslate"><span class="pre">start()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-qkit.core">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.tests.html">qkit.tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+      <li class="breadcrumb-item active">qkit.core package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-core-package">
+<h1>qkit.core package<a class="headerlink" href="#qkit-core-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qkit.core.lib.html">qkit.core.lib package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.com.html">qkit.core.lib.com package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#qkit-core-lib-com-info-client-module">qkit.core.lib.com.info_client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#module-qkit.core.lib.com.info_service">qkit.core.lib.com.info_service module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#module-qkit.core.lib.com.ri_client">qkit.core.lib.com.ri_client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#qkit-core-lib-com-ri-service-module">qkit.core.lib.com.ri_service module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#module-qkit.core.lib.com.signals">qkit.core.lib.com.signals module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.com.html#module-qkit.core.lib.com">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.file_service.html">qkit.core.lib.file_service package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#qkit-core-lib-file-service-file-info-database-module">qkit.core.lib.file_service.file_info_database module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#module-qkit.core.lib.file_service.file_info_database_lib">qkit.core.lib.file_service.file_info_database_lib module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.file_service.html#module-qkit.core.lib.file_service">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.network.html">qkit.core.lib.network package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.network.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.network.html#module-qkit.core.lib.network.tcpclient">qkit.core.lib.network.tcpclient module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.network.html#module-qkit.core.lib.network">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.html#module-qkit.core.lib.list_dict_DB">qkit.core.lib.list_dict_DB module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.Qobj"><code class="docutils literal notranslate"><span class="pre">Qobj</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.Qobj.copy"><code class="docutils literal notranslate"><span class="pre">Qobj.copy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB"><code class="docutils literal notranslate"><span class="pre">list_dict_DB</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.Q"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.Q()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.Qobj"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.Qobj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.add"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.add_attribute"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.add_attribute()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.isin"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.isin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.items"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.items()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.iteritems"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.iteritems()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.next"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.next()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.query"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.reindex"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.reindex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.remove"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.remove()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.list_dict_DB.list_dict_DB.update"><code class="docutils literal notranslate"><span class="pre">list_dict_DB.update()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.html#module-qkit.core.lib.misc">qkit.core.lib.misc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.misc.concat"><code class="docutils literal notranslate"><span class="pre">concat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.misc.get_ipython"><code class="docutils literal notranslate"><span class="pre">get_ipython()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.misc.get_traceback"><code class="docutils literal notranslate"><span class="pre">get_traceback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.misc.ipython_is_newer"><code class="docutils literal notranslate"><span class="pre">ipython_is_newer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.misc.is_ipython"><code class="docutils literal notranslate"><span class="pre">is_ipython()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.misc.register_exit"><code class="docutils literal notranslate"><span class="pre">register_exit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.misc.seconds_to_str"><code class="docutils literal notranslate"><span class="pre">seconds_to_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.misc.str3"><code class="docutils literal notranslate"><span class="pre">str3()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.html#module-qkit.core.lib.temp">qkit.core.lib.temp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File.close"><code class="docutils literal notranslate"><span class="pre">File.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File.create_name"><code class="docutils literal notranslate"><span class="pre">File.create_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File.flush"><code class="docutils literal notranslate"><span class="pre">File.flush()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File.get_file"><code class="docutils literal notranslate"><span class="pre">File.get_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File.read"><code class="docutils literal notranslate"><span class="pre">File.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File.remove"><code class="docutils literal notranslate"><span class="pre">File.remove()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File.remove_all"><code class="docutils literal notranslate"><span class="pre">File.remove_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File.reopen"><code class="docutils literal notranslate"><span class="pre">File.reopen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File.set_temp_dir"><code class="docutils literal notranslate"><span class="pre">File.set_temp_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.lib.html#qkit.core.lib.temp.File.write"><code class="docutils literal notranslate"><span class="pre">File.write()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.lib.html#module-qkit.core.lib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qkit.core.s_init.html">qkit.core.s_init package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S10_logging">qkit.core.s_init.S10_logging module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.CustomFormatter"><code class="docutils literal notranslate"><span class="pre">CustomFormatter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.CustomFormatter.FORMATS"><code class="docutils literal notranslate"><span class="pre">CustomFormatter.FORMATS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.CustomFormatter.blue"><code class="docutils literal notranslate"><span class="pre">CustomFormatter.blue</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.CustomFormatter.bold_red"><code class="docutils literal notranslate"><span class="pre">CustomFormatter.bold_red</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.CustomFormatter.format"><code class="docutils literal notranslate"><span class="pre">CustomFormatter.format()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.CustomFormatter.purple"><code class="docutils literal notranslate"><span class="pre">CustomFormatter.purple</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.CustomFormatter.red"><code class="docutils literal notranslate"><span class="pre">CustomFormatter.red</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.CustomFormatter.reset"><code class="docutils literal notranslate"><span class="pre">CustomFormatter.reset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.CustomFormatter.yellow"><code class="docutils literal notranslate"><span class="pre">CustomFormatter.yellow</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.cleanup_logfiles"><code class="docutils literal notranslate"><span class="pre">cleanup_logfiles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S10_logging.set_debug"><code class="docutils literal notranslate"><span class="pre">set_debug()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S14_setup_directories">qkit.core.s_init.S14_setup_directories module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S16_available_modules">qkit.core.s_init.S16_available_modules module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S16_available_modules.ModuleAvailable"><code class="docutils literal notranslate"><span class="pre">ModuleAvailable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S16_available_modules.ModuleAvailable.module_available"><code class="docutils literal notranslate"><span class="pre">ModuleAvailable.module_available()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S20_check_for_updates">qkit.core.s_init.S20_check_for_updates module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S25_info_service">qkit.core.s_init.S25_info_service module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S30_qkit_start">qkit.core.s_init.S30_qkit_start module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S65_load_RI_service">qkit.core.s_init.S65_load_RI_service module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S70_load_visa">qkit.core.s_init.S70_load_visa module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S70_load_visa.DummyVisa"><code class="docutils literal notranslate"><span class="pre">DummyVisa</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S80_load_file_service">qkit.core.s_init.S80_load_file_service module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S85_init_measurement">qkit.core.s_init.S85_init_measurement module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="qkit.core.s_init.html#qkit.core.s_init.S85_init_measurement.clickfunc"><code class="docutils literal notranslate"><span class="pre">clickfunc()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S98_started">qkit.core.s_init.S98_started module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init.S99_init_user">qkit.core.s_init.S99_init_user module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.s_init.html#module-qkit.core.s_init">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-qkit.core.flow">
+<span id="qkit-core-flow-module"></span><h2>qkit.core.flow module<a class="headerlink" href="#module-qkit.core.flow" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.flow.</span></span><span class="sig-name descname"><span class="pre">FlowControl</span></span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for flow control of the QT measurement environment.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.STATUS_RUNNING">
+<span class="sig-name descname"><span class="pre">STATUS_RUNNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#qkit.core.flow.FlowControl.STATUS_RUNNING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.STATUS_STOPPED">
+<span class="sig-name descname"><span class="pre">STATUS_STOPPED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#qkit.core.flow.FlowControl.STATUS_STOPPED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.check_abort">
+<span class="sig-name descname"><span class="pre">check_abort</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.check_abort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.check_abort" title="Link to this definition"></a></dt>
+<dd><p>Check whether an abort has been requested.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.exit_request">
+<span class="sig-name descname"><span class="pre">exit_request</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.exit_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.exit_request" title="Link to this definition"></a></dt>
+<dd><p>Run all registered exit handlers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.finished_starting">
+<span class="sig-name descname"><span class="pre">finished_starting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.finished_starting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.finished_starting" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.get_status">
+<span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.get_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.get_status" title="Link to this definition"></a></dt>
+<dd><p>Get status, one of “running”, “stopped”, “starting”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.is_measuring">
+<span class="sig-name descname"><span class="pre">is_measuring</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.is_measuring"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.is_measuring" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.is_paused">
+<span class="sig-name descname"><span class="pre">is_paused</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.is_paused"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.is_paused" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.measurement_end">
+<span class="sig-name descname"><span class="pre">measurement_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">abort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.measurement_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.measurement_end" title="Link to this definition"></a></dt>
+<dd><p>Indicate the end of a measurement.</p>
+<p>FIXME: The following is disabled due to lack of exception catching.
+This will decrement the internal measurement counter if abort=False,
+and set it to 0 in abort=True. If the counter reached zero (e.g. the
+last measurement was stopped, it will emit the ‘measurement-end’
+signal.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.measurement_idle">
+<span class="sig-name descname"><span class="pre">measurement_idle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.measurement_idle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.measurement_idle" title="Link to this definition"></a></dt>
+<dd><p>Indicate that the measurement is idle and handle events.</p>
+<p>This function will check whether an abort has been requested and
+handle queued events for a time up to ‘delay’ (in seconds).</p>
+<p>Be aware that both time.time and time.sleep have a granularity of around 15ms on windows.
+However, this should not be limiting.</p>
+<p>It starts by emitting the ‘measurement-idle’ signal to allow callbacks
+to be executed by the time this function handles the event queue.
+After that it handles events and sleeps for periods of 10msec. Every
+&lt;emit_interval&gt; seconds it will emit another measurement-idle signal.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.measurement_start">
+<span class="sig-name descname"><span class="pre">measurement_start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.measurement_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.measurement_start" title="Link to this definition"></a></dt>
+<dd><p>Indicate the start of a measurement.</p>
+<p>FIXME: The following is disabled due to lack of exception catching.
+This will increment the internal measurement counter, and if a
+measurement was not running, it will emit the ‘measurement-start’
+signal.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.register_exit_handler">
+<span class="sig-name descname"><span class="pre">register_exit_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.register_exit_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.register_exit_handler" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.register_exit_script">
+<span class="sig-name descname"><span class="pre">register_exit_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scriptfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.register_exit_script"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.register_exit_script" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.run_mainloop">
+<span class="sig-name descname"><span class="pre">run_mainloop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.run_mainloop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.run_mainloop" title="Link to this definition"></a></dt>
+<dd><p>Run mainloop for a maximum of &lt;delay&gt; seconds.
+If wait is True (default), sleep until &lt;delay&gt; seconds have passed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.set_abort">
+<span class="sig-name descname"><span class="pre">set_abort</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.set_abort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.set_abort" title="Link to this definition"></a></dt>
+<dd><p>Request an abort.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.flow.FlowControl.set_pause">
+<span class="sig-name descname"><span class="pre">set_pause</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pause</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#FlowControl.set_pause"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.FlowControl.set_pause" title="Link to this definition"></a></dt>
+<dd><p>Set / unset pause state.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.flow.exception_handler">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.flow.</span></span><span class="sig-name descname"><span class="pre">exception_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tb_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#exception_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.exception_handler" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.flow.qtlab_exit">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.flow.</span></span><span class="sig-name descname"><span class="pre">qtlab_exit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/flow.html#qtlab_exit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.flow.qtlab_exit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-qkit.core.instrument_base">
+<span id="qkit-core-instrument-base-module"></span><h2>qkit.core.instrument_base module<a class="headerlink" href="#module-qkit.core.instrument_base" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.GPIBInstrument">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_base.</span></span><span class="sig-name descname"><span class="pre">GPIBInstrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#GPIBInstrument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.GPIBInstrument" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.core.instrument_base.Instrument" title="qkit.core.instrument_base.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_base.</span></span><span class="sig-name descname"><span class="pre">Instrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for instruments.</p>
+<p>Usage:
+Instrument.get(&lt;variable name or list&gt;)
+Instrument.set(&lt;variable name or list&gt;)</p>
+<p>Implement an instrument:
+In __init__ call self.add_variable(&lt;name&gt;, &lt;option dict&gt;)
+Implement _do_get_&lt;variable&gt; and _do_set_&lt;variable&gt; functions</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.FLAG_GET">
+<span class="sig-name descname"><span class="pre">FLAG_GET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#qkit.core.instrument_base.Instrument.FLAG_GET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.FLAG_GETSET">
+<span class="sig-name descname"><span class="pre">FLAG_GETSET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#qkit.core.instrument_base.Instrument.FLAG_GETSET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.FLAG_GET_AFTER_SET">
+<span class="sig-name descname"><span class="pre">FLAG_GET_AFTER_SET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#qkit.core.instrument_base.Instrument.FLAG_GET_AFTER_SET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.FLAG_SET">
+<span class="sig-name descname"><span class="pre">FLAG_SET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#qkit.core.instrument_base.Instrument.FLAG_SET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.FLAG_SOFTGET">
+<span class="sig-name descname"><span class="pre">FLAG_SOFTGET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#qkit.core.instrument_base.Instrument.FLAG_SOFTGET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.RESERVED_NAMES">
+<span class="sig-name descname"><span class="pre">RESERVED_NAMES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('name',</span> <span class="pre">'type')</span></em><a class="headerlink" href="#qkit.core.instrument_base.Instrument.RESERVED_NAMES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.add_function">
+<span class="sig-name descname"><span class="pre">add_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.add_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.add_function" title="Link to this definition"></a></dt>
+<dd><p>Inform the Instrument wrapper class to expose a function.</p>
+<dl class="simple">
+<dt>Input:  (1) name of function (string)</dt><dd><ol class="arabic simple" start="2">
+<li><p>dictionary of extra options</p></li>
+</ol>
+</dd>
+</dl>
+<p>Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.add_parameter">
+<span class="sig-name descname"><span class="pre">add_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.add_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.add_parameter" title="Link to this definition"></a></dt>
+<dd><p>Create an instrument ‘parameter’ that is known by the whole
+environment (gui etc).</p>
+<p>This function creates the ‘get_&lt;name&gt;’ and ‘set_&lt;name&gt;’ wrapper
+functions that will perform checks on parameters and finally call
+‘_do_get_&lt;name&gt;’ and ‘_do_set_&lt;name&gt;’. The latter functions should
+be implemented in the instrument driver.</p>
+<dl>
+<dt>Input:</dt><dd><p>name (string): the name of the parameter (string)
+optional keywords:</p>
+<blockquote>
+<div><p>type: types.FloatType, types.StringType, etc.
+flags: bitwise or of <a href="#id1"><span class="problematic" id="id2">Instrument.FLAG_</span></a> constants.</p>
+<blockquote>
+<div><p>If not set, FLAG_GETSET is default</p>
+</div></blockquote>
+<dl class="simple">
+<dt>channels: tuple. Automagically create channels, e.g.</dt><dd><p>(1, 4) will make channels 1, 2, 3, 4.</p>
+</dd>
+</dl>
+<p>minval, maxval: values for bound checking
+units (string): units for this parameter
+maxstep (float): maximum step size when changing parameter
+stepdelay (float): delay when setting steps (in milliseconds)
+tags (array): tags for this parameter
+doc (string): documentation string to add to get/set functions
+listen_to (list of (ins, param) tuples): list of parameters</p>
+<blockquote>
+<div><p>to watch. If any of them changes, execute a get for this
+parameter. Useful for a parameter that depends on one
+(or more) other parameters.</p>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<p>Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.add_parameter_tag">
+<span class="sig-name descname"><span class="pre">add_parameter_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.add_parameter_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.add_parameter_tag" title="Link to this definition"></a></dt>
+<dd><p>Add tag to list of tags for parameter ‘name’.</p>
+<dl class="simple">
+<dt>Input:  (1) name of parameter (string)</dt><dd><ol class="arabic simple" start="2">
+<li><p>tag (string)</p></li>
+</ol>
+</dd>
+</dl>
+<p>Ouput:  None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.add_tag">
+<span class="sig-name descname"><span class="pre">add_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.add_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.add_tag" title="Link to this definition"></a></dt>
+<dd><p>Add tag to the tag list</p>
+<p>Input: tag (string)
+Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">funcname</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.call" title="Link to this definition"></a></dt>
+<dd><p>Call the exposed function ‘funcname’.</p>
+<dl class="simple">
+<dt>Input:  (1) function name (string)</dt><dd><ol class="arabic simple" start="2">
+<li><p>Optional keyword args that will be passed on.</p></li>
+</ol>
+</dd>
+</dl>
+<p>Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get" title="Link to this definition"></a></dt>
+<dd><p>Get one or more Instrument parameter values.</p>
+<dl>
+<dt>Input:</dt><dd><p>name (string or list/tuple of strings): name of parameter(s)
+query (bool): whether to query the instrument or return the</p>
+<blockquote>
+<div><p>last stored value</p>
+</div></blockquote>
+<p>fast (bool): legacy from qtlab
+kwargs: Optional keyword args that will be passed on.</p>
+</dd>
+<dt>Output: Single value, or dictionary of parameter -&gt; values</dt><dd><p>Type is whatever the instrument driver returns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_argspec_dict">
+<span class="sig-name descname"><span class="pre">get_argspec_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_argspec_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_argspec_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_function_names">
+<span class="sig-name descname"><span class="pre">get_function_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_function_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_function_names" title="Link to this definition"></a></dt>
+<dd><p>Return the list of exposed Instrument function names.</p>
+<p>Input: None
+Output: list of function names (list of strings)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_function_options">
+<span class="sig-name descname"><span class="pre">get_function_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_function_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_function_options" title="Link to this definition"></a></dt>
+<dd><p>Return options for an Instrument function.</p>
+<p>Input:  name of function (string)
+Output: dictionary of options for function ‘name’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_function_parameters">
+<span class="sig-name descname"><span class="pre">get_function_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_function_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_function_parameters" title="Link to this definition"></a></dt>
+<dd><p>Return info about parameters for function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_functions">
+<span class="sig-name descname"><span class="pre">get_functions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_functions" title="Link to this definition"></a></dt>
+<dd><p>Return the exposed functions dictionary.</p>
+<p>Input: None
+Ouput: Dictionary, keys are function  names, values are the options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_name">
+<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_name" title="Link to this definition"></a></dt>
+<dd><p>Returns the name of the instrument as a string</p>
+<p>Input: None
+Output: name of instrument (string)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_options">
+<span class="sig-name descname"><span class="pre">get_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_options" title="Link to this definition"></a></dt>
+<dd><p>Return instrument options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_parameter_groups">
+<span class="sig-name descname"><span class="pre">get_parameter_groups</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_parameter_groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_parameter_groups" title="Link to this definition"></a></dt>
+<dd><p>Return a dictionary with parameter group name -&gt; group members.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_parameter_names">
+<span class="sig-name descname"><span class="pre">get_parameter_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_parameter_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_parameter_names" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of parameter names.</p>
+<p>Input: None
+Output: all the paramter names (list of strings)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_parameter_options">
+<span class="sig-name descname"><span class="pre">get_parameter_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_parameter_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_parameter_options" title="Link to this definition"></a></dt>
+<dd><p>Return list of options for paramter.</p>
+<p>Input: name (string)
+Output: dictionary of options</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_parameter_tags">
+<span class="sig-name descname"><span class="pre">get_parameter_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_parameter_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_parameter_tags" title="Link to this definition"></a></dt>
+<dd><p>Return tags for parameter ‘name’.</p>
+<p>Input:  name of parameter (string)
+Ouput:  array of tags</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_parameters">
+<span class="sig-name descname"><span class="pre">get_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_parameters" title="Link to this definition"></a></dt>
+<dd><p>Return the parameter dictionary.</p>
+<p>Input: None
+Ouput: Dictionary, keys are parameter names, values are the options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_shared_parameter_options">
+<span class="sig-name descname"><span class="pre">get_shared_parameter_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_shared_parameter_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_shared_parameter_options" title="Link to this definition"></a></dt>
+<dd><p>Return list of options for paramter.</p>
+<p>Input: name (string)
+Output: dictionary of options</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_shared_parameters">
+<span class="sig-name descname"><span class="pre">get_shared_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_shared_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_shared_parameters" title="Link to this definition"></a></dt>
+<dd><p>Return the parameter dictionary, with non-shareable items stripped.</p>
+<p>Input: None
+Ouput: Dictionary, keys are parameter names, values are the options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_tags">
+<span class="sig-name descname"><span class="pre">get_tags</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_tags" title="Link to this definition"></a></dt>
+<dd><p>Returns array of tags</p>
+<p>Input: None
+Output: array of strings</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_threaded">
+<span class="sig-name descname"><span class="pre">get_threaded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_threaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_threaded" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.get_type">
+<span class="sig-name descname"><span class="pre">get_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.get_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.get_type" title="Link to this definition"></a></dt>
+<dd><p>Return type of instrument as a string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.has_parameter">
+<span class="sig-name descname"><span class="pre">has_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.has_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.has_parameter" title="Link to this definition"></a></dt>
+<dd><p>Return whether instrument has a parameter called ‘name’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.has_tag">
+<span class="sig-name descname"><span class="pre">has_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.has_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.has_tag" title="Link to this definition"></a></dt>
+<dd><p>Return whether instrument has any tag in ‘tags’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.initialize" title="Link to this definition"></a></dt>
+<dd><p>Currently unsupported; might be used in the future to perform
+extra initialization in sub-classed Instruments.</p>
+<p>Input: None
+Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.is_initialized">
+<span class="sig-name descname"><span class="pre">is_initialized</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.is_initialized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.is_initialized" title="Link to this definition"></a></dt>
+<dd><p>Return whether Instrument is initialized.</p>
+<p>Input: None
+Output: Boolean</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.reload">
+<span class="sig-name descname"><span class="pre">reload</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.reload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.reload" title="Link to this definition"></a></dt>
+<dd><p>Reloads the instrument. Make sure to only use the new instance
+of the instrument, which is returned here!</p>
+<dl class="simple">
+<dt>Input:</dt><dd><p>None</p>
+</dd>
+<dt>Output:</dt><dd><p>New instance of instrument</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.remove" title="Link to this definition"></a></dt>
+<dd><p>Notify the instrument collection that this instrument should be
+removed. Override this in a sub-classed Instrument to perform
+cleanup.</p>
+<p>Input: None
+Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.remove_parameter">
+<span class="sig-name descname"><span class="pre">remove_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.remove_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.remove_parameter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.set" title="Link to this definition"></a></dt>
+<dd><p>Set one or more Instrument parameter values.</p>
+<p>Checks whether the Instrument is locked and checks value bounds,
+if specified by minval / maxval.</p>
+<dl>
+<dt>Input:</dt><dd><dl class="simple">
+<dt>name (string or dict): which parameter to set, or dictionary of</dt><dd><p>parameter -&gt; value</p>
+</dd>
+</dl>
+<p>value (any): the value to set
+fast (bool): if True perform as fast as possible, e.g. don’t</p>
+<blockquote>
+<div><p>emit a signal to update the GUI.</p>
+</div></blockquote>
+<p>kwargs: Optional keyword args that will be passed on.</p>
+</dd>
+<dt>Output: True or False whether the operation succeeded.</dt><dd><p>For multiple sets return False if any of the parameters failed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.set_channel_bounds">
+<span class="sig-name descname"><span class="pre">set_channel_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.set_channel_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.set_channel_bounds" title="Link to this definition"></a></dt>
+<dd><p>Change the bounds for a channel.</p>
+<dl class="simple">
+<dt>Input:  (1) name of parameter (string)</dt><dd><ol class="arabic simple" start="2">
+<li><p>channel number (int)</p></li>
+<li><p>minimum value</p></li>
+<li><p>maximum value</p></li>
+</ol>
+</dd>
+</dl>
+<p>Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.set_parameter_bounds">
+<span class="sig-name descname"><span class="pre">set_parameter_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.set_parameter_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.set_parameter_bounds" title="Link to this definition"></a></dt>
+<dd><p>Change the bounds for a parameter.</p>
+<dl class="simple">
+<dt>Input:  (1) name of parameter (string)</dt><dd><ol class="arabic simple" start="2">
+<li><p>minimum value</p></li>
+<li><p>maximum value</p></li>
+</ol>
+</dd>
+</dl>
+<p>Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.set_parameter_options">
+<span class="sig-name descname"><span class="pre">set_parameter_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.set_parameter_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.set_parameter_options" title="Link to this definition"></a></dt>
+<dd><p>Change parameter options.</p>
+<p>Input:  name of parameter (string)
+Ouput:  None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.Instrument.set_parameter_rate">
+<span class="sig-name descname"><span class="pre">set_parameter_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepdelay</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#Instrument.set_parameter_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.Instrument.set_parameter_rate" title="Link to this definition"></a></dt>
+<dd><p>Change the rate properties for a channel.</p>
+<dl class="simple">
+<dt>Input:</dt><dd><p>stepsize (float): the maximum step size
+stepdelay (float): the delay after each step</p>
+</dd>
+<dt>Output:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.InvalidInstrument">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_base.</span></span><span class="sig-name descname"><span class="pre">InvalidInstrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instype</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#InvalidInstrument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.InvalidInstrument" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.core.instrument_base.Instrument" title="qkit.core.instrument_base.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a></p>
+<p>Placeholder class for instruments that fail to load, mainly to support
+reloading.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.InvalidInstrument.get_create_kwargs">
+<span class="sig-name descname"><span class="pre">get_create_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#InvalidInstrument.get_create_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.InvalidInstrument.get_create_kwargs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_base.InvalidInstrument.get_type">
+<span class="sig-name descname"><span class="pre">get_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_base.html#InvalidInstrument.get_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_base.InvalidInstrument.get_type" title="Link to this definition"></a></dt>
+<dd><p>Return type of instrument as a string.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.core.instrument_basev2">
+<span id="qkit-core-instrument-basev2-module"></span><h2>qkit.core.instrument_basev2 module<a class="headerlink" href="#module-qkit.core.instrument_basev2" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.CachePolicy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_basev2.</span></span><span class="sig-name descname"><span class="pre">CachePolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#CachePolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.CachePolicy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.CachePolicy.ALWAYS_REFRESH">
+<span class="sig-name descname"><span class="pre">ALWAYS_REFRESH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.CachePolicy.ALWAYS_REFRESH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.CachePolicy.NONE">
+<span class="sig-name descname"><span class="pre">NONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.CachePolicy.NONE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.CachePolicy.SOFT_GET">
+<span class="sig-name descname"><span class="pre">SOFT_GET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.CachePolicy.SOFT_GET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_basev2.</span></span><span class="sig-name descname"><span class="pre">ModernInstrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.core.instrument_base.Instrument" title="qkit.core.instrument_base.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a></p>
+<p>Base class for instruments.</p>
+<p>Use &#64;QkitProperty() to convert a getter to a property.
+Use &#64;$prop_name$.setter to add a setter to a property.
+Do note, that the function name of the getter and setter must be the same.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.FLAG_GET">
+<span class="sig-name descname"><span class="pre">FLAG_GET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.FLAG_GET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.FLAG_GETSET">
+<span class="sig-name descname"><span class="pre">FLAG_GETSET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.FLAG_GETSET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.FLAG_GET_AFTER_SET">
+<span class="sig-name descname"><span class="pre">FLAG_GET_AFTER_SET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.FLAG_GET_AFTER_SET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.FLAG_SET">
+<span class="sig-name descname"><span class="pre">FLAG_SET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.FLAG_SET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.FLAG_SOFTGET">
+<span class="sig-name descname"><span class="pre">FLAG_SOFTGET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.FLAG_SOFTGET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.WrappedFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">WrappedFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.WrappedFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedFunction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.WrappedFunction.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.WrappedFunction.call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedFunction.call" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.WrappedFunction.from_qkit_function">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_qkit_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_object</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">function</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedFunction" title="qkit.core.instrument_basev2.ModernInstrument.WrappedFunction"><span class="pre">ModernInstrument.WrappedFunction</span></a></span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.WrappedFunction.from_qkit_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedFunction.from_qkit_function" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.WrappedProperty">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">WrappedProperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">getter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qkit.core.instrument_basev2.PropertyMetadata" title="qkit.core.instrument_basev2.PropertyMetadata"><span class="pre">PropertyMetadata</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.WrappedProperty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A wrapper around QKit-Property with the object information required
+to call the functions on an object.
+Qkit-Property does not belong to an instance, but to an class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.build_options">
+<span class="sig-name descname"><span class="pre">build_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.WrappedProperty.build_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.build_options" title="Link to this definition"></a></dt>
+<dd><p>Backwards compatibility to the old ways of QKit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.from_qkit_property">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_qkit_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_object</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qkit.core.instrument_basev2.QkitProperty" title="qkit.core.instrument_basev2.QkitProperty"><span class="pre">QkitProperty</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty" title="qkit.core.instrument_basev2.ModernInstrument.WrappedProperty"><span class="pre">WrappedProperty</span></a></span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.WrappedProperty.from_qkit_property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.from_qkit_property" title="Link to this definition"></a></dt>
+<dd><p>Converts a QKitProperty into a Wrapped Property to be handled in a ModernInstrument Instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.WrappedProperty.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.get" title="Link to this definition"></a></dt>
+<dd><p>Returns the property value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.get_metadata">
+<span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qkit.core.instrument_basev2.PropertyMetadata" title="qkit.core.instrument_basev2.PropertyMetadata"><span class="pre">PropertyMetadata</span></a></span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.WrappedProperty.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.get_metadata" title="Link to this definition"></a></dt>
+<dd><p>Returns the properties metadata</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.WrappedProperty.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty.set" title="Link to this definition"></a></dt>
+<dd><p>Sets the property value.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.add_parameter">
+<span class="sig-name descname"><span class="pre">add_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.add_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.add_parameter" title="Link to this definition"></a></dt>
+<dd><p>Create an instrument ‘parameter’ that is known by the whole
+environment (gui etc).</p>
+<p>This function creates the ‘get_&lt;name&gt;’ and ‘set_&lt;name&gt;’ wrapper
+functions that will perform checks on parameters and finally call
+‘_do_get_&lt;name&gt;’ and ‘_do_set_&lt;name&gt;’. The latter functions should
+be implemented in the instrument driver.</p>
+<dl>
+<dt>Input:</dt><dd><p>name (string): the name of the parameter (string)
+optional keywords:</p>
+<blockquote>
+<div><p>type: types.FloatType, types.StringType, etc.
+flags: bitwise or of <a href="#id3"><span class="problematic" id="id4">Instrument.FLAG_</span></a> constants.</p>
+<blockquote>
+<div><p>If not set, FLAG_GETSET is default</p>
+</div></blockquote>
+<dl class="simple">
+<dt>channels: tuple. Automagically create channels, e.g.</dt><dd><p>(1, 4) will make channels 1, 2, 3, 4.</p>
+</dd>
+</dl>
+<p>minval, maxval: values for bound checking
+units (string): units for this parameter
+maxstep (float): maximum step size when changing parameter
+stepdelay (float): delay when setting steps (in milliseconds)
+tags (array): tags for this parameter
+doc (string): documentation string to add to get/set functions
+listen_to (list of (ins, param) tuples): list of parameters</p>
+<blockquote>
+<div><p>to watch. If any of them changes, execute a get for this
+parameter. Useful for a parameter that depends on one
+(or more) other parameters.</p>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<p>Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.add_parameter_tag">
+<span class="sig-name descname"><span class="pre">add_parameter_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.add_parameter_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.add_parameter_tag" title="Link to this definition"></a></dt>
+<dd><p>Add tag to list of tags for parameter ‘name’.</p>
+<dl class="simple">
+<dt>Input:  (1) name of parameter (string)</dt><dd><ol class="arabic simple" start="2">
+<li><p>tag (string)</p></li>
+</ol>
+</dd>
+</dl>
+<p>Ouput:  None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.call" title="Link to this definition"></a></dt>
+<dd><p>Call the exposed function ‘funcname’.</p>
+<dl class="simple">
+<dt>Input:  (1) function name (string)</dt><dd><ol class="arabic simple" start="2">
+<li><p>Optional keyword args that will be passed on.</p></li>
+</ol>
+</dd>
+</dl>
+<p>Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.discover_capabilities">
+<span class="sig-name descname"><span class="pre">discover_capabilities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.discover_capabilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.discover_capabilities" title="Link to this definition"></a></dt>
+<dd><p>Call this method from init to self-discover QkitNative functions and properties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get" title="Link to this definition"></a></dt>
+<dd><p>Get one or more Instrument parameter values.</p>
+<dl>
+<dt>Input:</dt><dd><p>name (string or list/tuple of strings): name of parameter(s)
+query (bool): whether to query the instrument or return the</p>
+<blockquote>
+<div><p>last stored value</p>
+</div></blockquote>
+<p>fast (bool): legacy from qtlab
+kwargs: Optional keyword args that will be passed on.</p>
+</dd>
+<dt>Output: Single value, or dictionary of parameter -&gt; values</dt><dd><p>Type is whatever the instrument driver returns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_name">
+<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_name" title="Link to this definition"></a></dt>
+<dd><p>Return the name of the instrument</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_options">
+<span class="sig-name descname"><span class="pre">get_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_options" title="Link to this definition"></a></dt>
+<dd><p>Return the user provided instrument options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_parameter_groups">
+<span class="sig-name descname"><span class="pre">get_parameter_groups</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_parameter_groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_parameter_groups" title="Link to this definition"></a></dt>
+<dd><p>Return a dictionary with parameter group name -&gt; group members.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_parameter_names">
+<span class="sig-name descname"><span class="pre">get_parameter_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_parameter_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_parameter_names" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of parameter names.</p>
+<p>Input: None
+Output: all the paramter names (list of strings)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_parameter_options">
+<span class="sig-name descname"><span class="pre">get_parameter_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_parameter_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_parameter_options" title="Link to this definition"></a></dt>
+<dd><p>Return list of options for paramter.</p>
+<p>Input: name (string)
+Output: dictionary of options</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_parameter_tags">
+<span class="sig-name descname"><span class="pre">get_parameter_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_parameter_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_parameter_tags" title="Link to this definition"></a></dt>
+<dd><p>Return tags for parameter ‘name’.</p>
+<p>Input:  name of parameter (string)
+Ouput:  array of tags</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_parameters">
+<span class="sig-name descname"><span class="pre">get_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_parameters" title="Link to this definition"></a></dt>
+<dd><p>Return the parameter dictionary.</p>
+<p>Input: None
+Ouput: Dictionary, keys are parameter names, values are the options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_shared_parameter_options">
+<span class="sig-name descname"><span class="pre">get_shared_parameter_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_shared_parameter_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_shared_parameter_options" title="Link to this definition"></a></dt>
+<dd><p>Return list of options for paramter.</p>
+<p>Input: name (string)
+Output: dictionary of options</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_shared_parameters">
+<span class="sig-name descname"><span class="pre">get_shared_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_shared_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_shared_parameters" title="Link to this definition"></a></dt>
+<dd><p>Return the parameter dictionary, with non-shareable items stripped.</p>
+<p>Input: None
+Ouput: Dictionary, keys are parameter names, values are the options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_tags">
+<span class="sig-name descname"><span class="pre">get_tags</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_tags" title="Link to this definition"></a></dt>
+<dd><p>Return the user provided instrument tags.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.get_type">
+<span class="sig-name descname"><span class="pre">get_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.get_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.get_type" title="Link to this definition"></a></dt>
+<dd><p>Return the type of the instrument as a string.
+Might behave unexpectedly in case of new drivers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.has_parameter">
+<span class="sig-name descname"><span class="pre">has_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.has_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.has_parameter" title="Link to this definition"></a></dt>
+<dd><p>Return whether instrument has a parameter called ‘name’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.has_tag">
+<span class="sig-name descname"><span class="pre">has_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.has_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.has_tag" title="Link to this definition"></a></dt>
+<dd><p>Return whether instrument has any tag in ‘tags’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.initialize" title="Link to this definition"></a></dt>
+<dd><p>Currently unsupported; might be used in the future to perform
+extra initialization in sub-classed Instruments.</p>
+<p>Input: None
+Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.is_initialized">
+<span class="sig-name descname"><span class="pre">is_initialized</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.is_initialized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.is_initialized" title="Link to this definition"></a></dt>
+<dd><p>Return whether Instrument is initialized.</p>
+<p>Input: None
+Output: Boolean</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.remove" title="Link to this definition"></a></dt>
+<dd><p>Notify the instrument collection that this instrument should be
+removed. Override this in a sub-classed Instrument to perform
+cleanup.</p>
+<p>Input: None
+Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.remove_parameter">
+<span class="sig-name descname"><span class="pre">remove_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.remove_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.remove_parameter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.set" title="Link to this definition"></a></dt>
+<dd><p>Set one or more Instrument parameter values.</p>
+<p>Checks whether the Instrument is locked and checks value bounds,
+if specified by minval / maxval.</p>
+<dl>
+<dt>Input:</dt><dd><dl class="simple">
+<dt>name (string or dict): which parameter to set, or dictionary of</dt><dd><p>parameter -&gt; value</p>
+</dd>
+</dl>
+<p>value (any): the value to set
+fast (bool): if True perform as fast as possible, e.g. don’t</p>
+<blockquote>
+<div><p>emit a signal to update the GUI.</p>
+</div></blockquote>
+<p>kwargs: Optional keyword args that will be passed on.</p>
+</dd>
+<dt>Output: True or False whether the operation succeeded.</dt><dd><p>For multiple sets return False if any of the parameters failed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.set_channel_bounds">
+<span class="sig-name descname"><span class="pre">set_channel_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.set_channel_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.set_channel_bounds" title="Link to this definition"></a></dt>
+<dd><p>Change the bounds for a channel.</p>
+<dl class="simple">
+<dt>Input:  (1) name of parameter (string)</dt><dd><ol class="arabic simple" start="2">
+<li><p>channel number (int)</p></li>
+<li><p>minimum value</p></li>
+<li><p>maximum value</p></li>
+</ol>
+</dd>
+</dl>
+<p>Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.set_parameter_bounds">
+<span class="sig-name descname"><span class="pre">set_parameter_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.set_parameter_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.set_parameter_bounds" title="Link to this definition"></a></dt>
+<dd><p>Change the bounds for a parameter.</p>
+<dl class="simple">
+<dt>Input:  (1) name of parameter (string)</dt><dd><ol class="arabic simple" start="2">
+<li><p>minimum value</p></li>
+<li><p>maximum value</p></li>
+</ol>
+</dd>
+</dl>
+<p>Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.set_parameter_options">
+<span class="sig-name descname"><span class="pre">set_parameter_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.set_parameter_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.set_parameter_options" title="Link to this definition"></a></dt>
+<dd><p>Change parameter options.</p>
+<p>Input:  name of parameter (string)
+Ouput:  None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ModernInstrument.set_parameter_rate">
+<span class="sig-name descname"><span class="pre">set_parameter_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepdelay</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ModernInstrument.set_parameter_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ModernInstrument.set_parameter_rate" title="Link to this definition"></a></dt>
+<dd><p>Change the rate properties for a channel.</p>
+<dl class="simple">
+<dt>Input:</dt><dd><p>stepsize (float): the maximum step size
+stepdelay (float): the delay after each step</p>
+</dd>
+<dt>Output:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ObjectTreeVisistor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_basev2.</span></span><span class="sig-name descname"><span class="pre">ObjectTreeVisistor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qkit.core.instrument_basev2.ModernInstrument" title="qkit.core.instrument_basev2.ModernInstrument"><span class="pre">ModernInstrument</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ObjectTreeVisistor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ObjectTreeVisistor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>A visitor visiting class members to register them as properties and functions of</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ObjectTreeVisistor.derive_name_from_path">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">derive_name_from_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">(</span></span><span class="pre">str</span><span class="p"><span class="pre">)</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ObjectTreeVisistor.derive_name_from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ObjectTreeVisistor.derive_name_from_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ObjectTreeVisistor.get_property_metadata">
+<span class="sig-name descname"><span class="pre">get_property_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">property</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qkit.core.instrument_basev2.PropertyMetadata" title="qkit.core.instrument_basev2.PropertyMetadata"><span class="pre">PropertyMetadata</span></a></span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ObjectTreeVisistor.get_property_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ObjectTreeVisistor.get_property_metadata" title="Link to this definition"></a></dt>
+<dd><p>Provides an instance of [PropertyMetadata] for a discovered property if we were
+not able to automatically derive it from [&#64;QkitProperty].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ObjectTreeVisistor.visit_function">
+<span class="sig-name descname"><span class="pre">visit_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ObjectTreeVisistor.visit_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ObjectTreeVisistor.visit_function" title="Link to this definition"></a></dt>
+<dd><p>Handles a function [func] of [obj] with the name [name].
+Registers it in discovered functions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ObjectTreeVisistor.visit_instance">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">visit_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ObjectTreeVisistor.visit_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ObjectTreeVisistor.visit_instance" title="Link to this definition"></a></dt>
+<dd><p>Visists an object and disects it into usable pieces.
+If some method is intended to be used as a function, call [visit_function]
+If some property is inteded to be used as a property, call [visit_property]
+If some array or iterable and indexable structure is channel-like, call [visit_channel]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ObjectTreeVisistor.visit_property">
+<span class="sig-name descname"><span class="pre">visit_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ObjectTreeVisistor.visit_property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ObjectTreeVisistor.visit_property" title="Link to this definition"></a></dt>
+<dd><p>Handles a property [prop] of [obj] with the name [name].
+Registers it in discovered properties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ObjectTreeVisistor.wrap_function">
+<span class="sig-name descname"><span class="pre">wrap_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedFunction" title="qkit.core.instrument_basev2.ModernInstrument.WrappedFunction"><span class="pre">WrappedFunction</span></a></span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ObjectTreeVisistor.wrap_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ObjectTreeVisistor.wrap_function" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.ObjectTreeVisistor.wrap_property">
+<span class="sig-name descname"><span class="pre">wrap_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">property</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qkit.core.instrument_basev2.ModernInstrument.WrappedProperty" title="qkit.core.instrument_basev2.ModernInstrument.WrappedProperty"><span class="pre">WrappedProperty</span></a></span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#ObjectTreeVisistor.wrap_property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.ObjectTreeVisistor.wrap_property" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.PropertyMetadata">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_basev2.</span></span><span class="sig-name descname"><span class="pre">PropertyMetadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_checker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscribe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#PropertyMetadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.PropertyMetadata" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Stores metadata about a property. Is read out by [ObjectTreeVisistor]
+to create wrapped properties for [ModernInstrument]</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.PropertyMetadata.check_arg">
+<span class="sig-name descname"><span class="pre">check_arg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#PropertyMetadata.check_arg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.PropertyMetadata.check_arg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitFunction">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_basev2.</span></span><span class="sig-name descname"><span class="pre">QkitFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#QkitFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.QkitFunction" title="Link to this definition"></a></dt>
+<dd><p>A wrapper of functions to facilitate easy self-discovery.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitNativeVisitor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_basev2.</span></span><span class="sig-name descname"><span class="pre">QkitNativeVisitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qkit.core.instrument_basev2.ModernInstrument" title="qkit.core.instrument_basev2.ModernInstrument"><span class="pre">ModernInstrument</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#QkitNativeVisitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.QkitNativeVisitor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.core.instrument_basev2.ObjectTreeVisistor" title="qkit.core.instrument_basev2.ObjectTreeVisistor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectTreeVisistor</span></code></a></p>
+<p>This visitor is good for home-made drivers. It assumes that all properties we want to register
+have been properly marked as QkitProperty. It will not support other properties.</p>
+<p>You can take inspiration from this approach to write your own visitor to shim regular properties
+with [QkitProperty.from_property()] and setting the __dict__ entry.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitNativeVisitor.visit_instance">
+<span class="sig-name descname"><span class="pre">visit_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#QkitNativeVisitor.visit_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.QkitNativeVisitor.visit_instance" title="Link to this definition"></a></dt>
+<dd><p>Visists an object and disects it into usable pieces.
+If some method is intended to be used as a function, call [visit_function]
+If some property is inteded to be used as a property, call [visit_property]
+If some array or iterable and indexable structure is channel-like, call [visit_channel]</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitProperty">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_basev2.</span></span><span class="sig-name descname"><span class="pre">QkitProperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#QkitProperty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.QkitProperty" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A store of metadata for properties, which shall be handled in QKit.
+It does no range checking whatsoever.</p>
+<p>Do note, that this is a member of a class. You will need an object to perform calls.
+For this reason [WrappedProperty] exists.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitProperty.QKIT_CACHE_NAME">
+<span class="sig-name descname"><span class="pre">QKIT_CACHE_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'_qkit_cache'</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.QkitProperty.QKIT_CACHE_NAME" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitProperty.ValueCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ValueCache</span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#QkitProperty.ValueCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.QkitProperty.ValueCache" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitProperty.ValueCache.dirty">
+<span class="sig-name descname"><span class="pre">dirty</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.QkitProperty.ValueCache.dirty" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitProperty.ValueCache.last_value">
+<span class="sig-name descname"><span class="pre">last_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#qkit.core.instrument_basev2.QkitProperty.ValueCache.last_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitProperty.from_property">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">property</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qkit.core.instrument_basev2.PropertyMetadata" title="qkit.core.instrument_basev2.PropertyMetadata"><span class="pre">PropertyMetadata</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qkit.core.instrument_basev2.QkitProperty" title="qkit.core.instrument_basev2.QkitProperty"><span class="pre">QkitProperty</span></a></span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#QkitProperty.from_property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.QkitProperty.from_property" title="Link to this definition"></a></dt>
+<dd><p>Convert a regular python property into a QkitProperty.
+Used to install a shim to notify us if regular calls are made.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitProperty.get_metadata">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qkit.core.instrument_basev2.PropertyMetadata" title="qkit.core.instrument_basev2.PropertyMetadata"><span class="pre">PropertyMetadata</span></a></span></span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#QkitProperty.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.QkitProperty.get_metadata" title="Link to this definition"></a></dt>
+<dd><p>If the key is a QkitProperty of obj return its Metadata.
+Otherwise return None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitProperty.set_cache_policy">
+<span class="sig-name descname"><span class="pre">set_cache_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qkit.core.instrument_basev2.CachePolicy" title="qkit.core.instrument_basev2.CachePolicy"><span class="pre">CachePolicy</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_after_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#QkitProperty.set_cache_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.QkitProperty.set_cache_policy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.QkitProperty.setter">
+<span class="sig-name descname"><span class="pre">setter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#QkitProperty.setter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.QkitProperty.setter" title="Link to this definition"></a></dt>
+<dd><p>Decorator to create the</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.caching">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_basev2.</span></span><span class="sig-name descname"><span class="pre">caching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qkit.core.instrument_basev2.CachePolicy" title="qkit.core.instrument_basev2.CachePolicy"><span class="pre">CachePolicy</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_after_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#caching"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.caching" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.instrument_basev2.interval_check">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_basev2.</span></span><span class="sig-name descname"><span class="pre">interval_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_basev2.html#interval_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_basev2.interval_check" title="Link to this definition"></a></dt>
+<dd><p>Return a callable which returns true if its argument lies between the provided lower and upper bound.</p>
+</dd></dl>
+
+</section>
+<section id="module-qkit.core.instrument_tools">
+<span id="qkit-core-instrument-tools-module"></span><h2>qkit.core.instrument_tools module<a class="headerlink" href="#module-qkit.core.instrument_tools" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.core.instrument_tools.</span></span><span class="sig-name descname"><span class="pre">Insttools</span></span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.InstrumentBoundsError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InstrumentBoundsError</span></span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.InstrumentBoundsError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.InstrumentBoundsError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Base Error to raise when instrument is out of bounds</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.add" title="Link to this definition"></a></dt>
+<dd><p>Add instrument to the internal instruments list and listen
+to signals emitted by the instrument.</p>
+<p>Input:  Instrument object
+Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.auto_load">
+<span class="sig-name descname"><span class="pre">auto_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.auto_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.auto_load" title="Link to this definition"></a></dt>
+<dd><p>Automatically load all instruments detected by ‘driver’ (an
+instrument_plugin module). This works only if it is supported by the
+driver by implementing a detect_instruments() function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instype</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.create" title="Link to this definition"></a></dt>
+<dd><p>Create an instrument called ‘name’ of type ‘type’.</p>
+<dl class="simple">
+<dt>Input:  (1) name of the newly created instrument (string)</dt><dd><ol class="arabic simple" start="2">
+<li><p>type of instrument (string)</p></li>
+<li><p>optional: keyword arguments.
+(1) tags, array of strings representing tags
+(2) many instruments require address=&lt;address&gt;</p></li>
+</ol>
+</dd>
+</dl>
+<p>Output: Instrument object (Proxy)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.get" title="Link to this definition"></a></dt>
+<dd><p>Return Instrument object with name ‘name’.</p>
+<p>Input:  name of instrument (string)
+Output: Instrument object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.get_instrument_names">
+<span class="sig-name descname"><span class="pre">get_instrument_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.get_instrument_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.get_instrument_names" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.get_instruments">
+<span class="sig-name descname"><span class="pre">get_instruments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.get_instruments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.get_instruments" title="Link to this definition"></a></dt>
+<dd><p>Return the instruments dictionary of name -&gt; Instrument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.get_instruments_by_type">
+<span class="sig-name descname"><span class="pre">get_instruments_by_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.get_instruments_by_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.get_instruments_by_type" title="Link to this definition"></a></dt>
+<dd><p>Return all existing Instrument instances of type ‘typename’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.get_tags">
+<span class="sig-name descname"><span class="pre">get_tags</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.get_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.get_tags" title="Link to this definition"></a></dt>
+<dd><p>Return list of tags present in instruments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.get_type_arguments">
+<span class="sig-name descname"><span class="pre">get_type_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.get_type_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.get_type_arguments" title="Link to this definition"></a></dt>
+<dd><p>Return info about the arguments of the constructor of ‘typename’.</p>
+<dl class="simple">
+<dt>Input:</dt><dd><p>typename (string)</p>
+</dd>
+<dt>Output:</dt><dd><p>Tuple of (args, varargs, varkw, defaults)
+args: argument names
+varargs: name of ‘*’ argument
+varkw: name of ‘**’ argument
+defaults: default values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.get_types">
+<span class="sig-name descname"><span class="pre">get_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.get_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.get_types" title="Link to this definition"></a></dt>
+<dd><p>Return list of supported instrument types</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.reload">
+<span class="sig-name descname"><span class="pre">reload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ins</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.reload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.reload" title="Link to this definition"></a></dt>
+<dd><p>Try to reload the module associated with instrument ‘ins’ and return
+the new instrument.</p>
+<p>In general about reloading: your milage may vary!</p>
+<dl class="simple">
+<dt>Input:</dt><dd><p>ins (Instrument or string): the instrument to reload</p>
+</dd>
+<dt>Output:</dt><dd><p>Reloaded instrument (Proxy)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.reload_module">
+<span class="sig-name descname"><span class="pre">reload_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.reload_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.reload_module" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.remove" title="Link to this definition"></a></dt>
+<dd><p>Remove instrument from list and emit instrument-removed signal.</p>
+<p>Input:  (1) instrument name
+Output: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.core.instrument_tools.Insttools.type_exists">
+<span class="sig-name descname"><span class="pre">type_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/instrument_tools.html#Insttools.type_exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.instrument_tools.Insttools.type_exists" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.core.startup">
+<span id="qkit-core-startup-module"></span><h2>qkit.core.startup module<a class="headerlink" href="#module-qkit.core.startup" title="Link to this heading"></a></h2>
+<p>This file sets up the logger and loads the core modules of the Qkit framework.
+Runs all the setup scripts in the s_init directory.</p>
+<p>This start() function is called by the qkit/__init__.py file.
+Based on the environment file variables in qkit/config/environment.py,
+, it loads the core modules of the Qkit framework.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.core.startup.start">
+<span class="sig-prename descclassname"><span class="pre">qkit.core.startup.</span></span><span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/core/startup.html#start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.core.startup.start" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-qkit.core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.core" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.config.html" class="btn btn-neutral float-left" title="qkit.config package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.core.lib.html" class="btn btn-neutral float-right" title="qkit.core.lib package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

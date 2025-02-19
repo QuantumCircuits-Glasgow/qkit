@@ -1,0 +1,641 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.virtual_measure_spec &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.virtual_measure_spec</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.virtual_measure_spec</h1><div class="highlight"><pre>
+<span></span><span class="c1"># virtual_measure_spec.py</span>
+<span class="c1"># initiated by M. Jerger</span>
+
+<span class="c1"># wrapper virtual instrument; used to acquire data from the adc card</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">usage:</span>
+
+<span class="sd">* load spec (which is the adc card driver) first on computer with adc card physically installed</span>
+<span class="sd">mspec = qkit.instruments.create(&#39;mspec&#39;,&#39;virtual_measure_spec&#39;,spec,samples=1)</span>
+<span class="sd">* set gate function afterwards or pass in the call as gate_func</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+
+
+<span class="c1"># import time</span>
+
+
+<div class="viewcode-block" id="virtual_measure_spec">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">virtual_measure_spec</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    perform time-resolved and averaged measurement with the spectrum card</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">_offsets</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">card</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">segments</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">averages</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">blocks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">multimode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">gate_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trigger_rate</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            perform time-resolved averaged measurements with the spectrum card</span>
+
+<span class="sd">            parameters:</span>
+<span class="sd">                card - spectrum card to use</span>
+<span class="sd">                samples - number of samples per trigger</span>
+<span class="sd">                segments - number of different measurements in a row</span>
+<span class="sd">                averages - number of acquisitions per block</span>
+<span class="sd">                blocks - number of blocks to aquire</span>
+<span class="sd">                channels - bit map of channels to use:</span>
+<span class="sd">                        B&quot;01&quot; = ch0, B&quot;10&quot; = ch1, B&quot;11&quot; = ch0 and ch1, B here denotes binary</span>
+<span class="sd">                multimode - use multiple recording mode?</span>
+<span class="sd">                gate_func - called at the start/end of each block with parameter True/False</span>
+<span class="sd">                trigger_rate - expected rate of triggers for calculation of proper timeouts</span>
+<span class="sd">                offsets - offset added to the channel values</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;virtual&#39;</span><span class="p">])</span>
+
+        <span class="c1"># parameters</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;samples&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;samplerate&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;segments&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;averages&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;blocks&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;offsets&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;channels&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;multimode&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;trigger_rate&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;spec_trigger_delay&#39;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="c1"># measurement functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_clock&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;set_gate_func&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;acquire&#39;</span><span class="p">)</span>
+        <span class="c1"># self.add_function(&#39;measure_1d_avg&#39;)</span>
+        <span class="c1"># self.add_function(&#39;measure_1d&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;spec_start&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;spec_stop&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initializing</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># fixed parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span> <span class="o">=</span> <span class="n">card</span>
+
+        <span class="c1"># changeable parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="mi">32</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_samples</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_segments</span><span class="p">(</span><span class="n">segments</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_averages</span><span class="p">(</span><span class="n">averages</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_channels</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_multimode</span><span class="p">(</span><span class="n">multimode</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">offsets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_offsets</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">,)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_offsets</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_trigger_rate</span><span class="p">(</span><span class="n">trigger_rate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_gate_func</span><span class="p">(</span><span class="n">gate_func</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+
+        <span class="c1"># initialize card</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initializing</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_card</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_trigger_ORmask_tmask_ext0</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">trigger_mode_pos</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bit_blocksize</span> <span class="o">=</span> <span class="mi">32</span>  <span class="c1"># This defines how fine trigger_delay and samples can be defined on the board. The rest is done by truncating the data.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bit_pre</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Number of bits to truncate at the start...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bit_post</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># ...and at the end of the measurement.</span>
+
+<div class="viewcode-block" id="virtual_measure_spec.get_all">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.get_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_samples</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_segments</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_averages</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_blocks</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_offsets</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_channels</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_multimode</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_trigger_rate</span><span class="p">()</span>  <span class="c1"># JB</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.init_card">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.init_card">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_card</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># abort if still starting up</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_initializing</span><span class="p">):</span> <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="c1"># acquisition mode</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_multimode</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_card_multi</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_card_single</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.init_card_single">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.init_card_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_card_single</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_single_mode</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_timeout</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>  <span class="c1"># todo: replace by sensible default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_memsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_post_trigger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">-</span> <span class="mi">32</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.init_card_multi">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.init_card_multi">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_card_multi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_multi_mode</span><span class="p">()</span>
+        <span class="n">acq_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_timeout</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="p">(</span><span class="mi">5</span> <span class="o">+</span> <span class="n">acq_time</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">get_ramsize</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;meas_spec: card memory is not sufficient to store _segments and _averages requested&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_segmentsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_memsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_post_trigger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">-</span> <span class="mi">32</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.spec_start">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.spec_start">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">spec_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.spec_stop">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.spec_stop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">spec_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.set_input_amp">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.set_input_amp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_input_amp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_input_amp_ch0</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_input_amp_ch1</span><span class="p">(</span><span class="n">level</span><span class="p">)</span></div>
+
+
+    <span class="c1"># make spec.timeout settable by mspec via remote</span>
+<div class="viewcode-block" id="virtual_measure_spec.do_set_spec_timeout">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_spec_timeout">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_spec_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_spec_timeout">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_spec_timeout">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_spec_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_set_spec_trigger_delay">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_spec_trigger_delay">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_spec_trigger_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bit_pre</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_post</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_trigger_delay</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_spec_trigger_delay">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_spec_trigger_delay">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_spec_trigger_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">get_trigger_delay</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.set_window">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.set_window">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_window</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the start and end of the acquisition window. These values can be chosen arbitrarily and do not have to be divisible by 16 or 32.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">c_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_blocksize</span>  <span class="c1"># floor</span>
+        <span class="n">c_start</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_blocksize</span>
+        <span class="c1"># self.bit_pre = int(start) - c_start</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> <span class="o">-</span> <span class="n">c_start</span>
+        <span class="n">c_samples</span> <span class="o">=</span> <span class="p">(</span><span class="n">samples</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_blocksize</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_blocksize</span>  <span class="c1"># ceil</span>
+        <span class="n">c_samples</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_blocksize</span>
+        <span class="c1"># self.bit_post = c_samples - samples</span>
+        <span class="c1"># print &quot;setting card to %g samples and a delay of %g&quot;%(c_samples,c_start)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spec_stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_spec_trigger_delay</span><span class="p">(</span><span class="n">c_start</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_samples</span><span class="p">(</span><span class="n">c_samples</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bit_pre</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">-</span> <span class="n">c_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bit_post</span> <span class="o">=</span> <span class="n">samples</span> <span class="o">-</span> <span class="n">c_samples</span>  <span class="c1"># this is done here, to keep set_spec_trigger_delay and set_samples functional standalone.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_post</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bit_post</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># we later call result[self.bit_pre:self.bit_post], so bit_post has to be None instead of 0 to get the full array.</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_set_samples">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_samples">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bit_pre</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_post</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">samples</span> <span class="o">&lt;</span> <span class="mi">32</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;meas_spec: minimum number of samples per trace is 32.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">samples</span> <span class="o">%</span> <span class="mi">16</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;meas_spec: number of samples per trace must be divisible by 16.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="n">samples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_card</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_samples">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_samples">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_samplerate">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_samplerate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_samplerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">get_spc_samplerate</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_set_samplerate">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_samplerate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_samplerate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">set_spc_samplerate</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_set_channels">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_channels">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">channels</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">channels</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">)):</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;meas_spec: channels must be B&quot;01&quot;, B&quot;10&quot; or B&quot;11&quot;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span> <span class="o">=</span> <span class="n">channels</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">channels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">channels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="c1"># channel setup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">select_channel0</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">select_channel1</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channels</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">select_channel01</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_card</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_channels">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_channels">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_set_segments">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_segments">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segments</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">=</span> <span class="n">segments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_card</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_segments">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_segments">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_set_averages">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_averages">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">averages</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">averages</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_card</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_averages">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_averages">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_set_blocks">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_blocks">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocks</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_blocks</span> <span class="o">=</span> <span class="n">blocks</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_blocks">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_blocks">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocks</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_set_trigger_rate">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_trigger_rate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_trigger_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_rate</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; set expected trigger rate. used to calculate timeouts. &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_rate</span> <span class="o">=</span> <span class="n">trigger_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_card</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_trigger_rate">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_trigger_rate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_trigger_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_rate</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_set_offsets">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_offsets">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_offsets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offsets</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;one offset per channel is required&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span> <span class="o">=</span> <span class="n">offsets</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_offsets">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_offsets">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_offsets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.set_gate_func">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.set_gate_func">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_gate_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gate_func</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; function called at start of new block &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gate_func</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gate_func</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">gate_func</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gate_func</span> <span class="o">=</span> <span class="n">gate_func</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_set_multimode">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_set_multimode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_multimode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multimode</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_multimode</span> <span class="o">=</span> <span class="n">multimode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_card</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.do_get_multimode">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.do_get_multimode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_multimode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multimode</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.get_clock">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.get_clock">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_clock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">get_spc_samplerate</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="virtual_measure_spec.acquire">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.virtual_measure_spec.virtual_measure_spec.acquire">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        wrapper to the acquire function corresponding to the current mode setting</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># acquire data</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_multimode</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_multimode</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_singlemode</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gate_func</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># reset gate_func (&quot;stop&quot; awg output)</span>
+
+        <span class="c1"># apply offsets</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="c1"># shape of result is (samples, channels)</span>
+                    <span class="n">result</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># shape of result is (samples, channels, segments)</span>
+                    <span class="n">result</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offsets</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_pre</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_post</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_pre</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_post</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_acquire_multimode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        acquire the number of traces specified by the _averages and _blocks parameters</span>
+<span class="sd">        and return the averaged trace. measurement is done in multiple recording mode.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># measure first block</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_multimode_prepare</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_blocks</span><span class="p">):</span>
+            <span class="c1"># retrieve current block</span>
+            <span class="n">dat_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_multimode_extract</span><span class="p">(</span><span class="n">blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">averaged</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dat_block</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dat_block is empty&quot;</span><span class="p">)</span>
+            <span class="c1"># background-measure next block</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocks</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_multimode_prepare</span><span class="p">()</span>
+            <span class="c1"># process current block</span>
+            <span class="c1"># dat_block = numpy.asfarray(dat_block, numpy.float32)</span>
+            <span class="c1"># dat_block = numpy.mean(dat_block, axis = 1)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># fast averaging</span>
+                <span class="nb">sum</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_averages</span><span class="p">):</span>
+                        <span class="nb">sum</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+=</span> <span class="n">dat_block</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span>
+                <span class="n">dat_block</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asfarray</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># fast averaging</span>
+                <span class="nb">sum</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_averages</span><span class="p">):</span>
+                        <span class="nb">sum</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dat_block</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                <span class="n">dat_block</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asfarray</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span>
+
+                <span class="c1"># faster averaging over 2d structure</span>
+                <span class="c1"># dat_block.shape = (self._averages, self._samples*self._numchannels)</span>
+                <span class="c1"># sum = numpy.zeros((self._samples*self._numchannels), numpy.int32)</span>
+                <span class="c1"># for i in range(self._averages):</span>
+                <span class="c1">#    sum += dat_block[i, :]</span>
+                <span class="c1"># dat_block = numpy.asfarray(sum.reshape((self._samples, self._numchannels))) / self._averages</span>
+            <span class="n">dat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dat_block</span><span class="p">)</span>
+        <span class="c1"># average over blocks</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dat</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_acquire_multimode_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        prepare and start a measurement in multipe recording mode.</span>
+<span class="sd">        return control to the main program while the card is measuring.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gate_func</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gate_func</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">invalidate_buffer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">start_with_trigger</span><span class="p">()</span>
+        <span class="c1"># self._dacq.start_with_trigger_and_waitready()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gate_func</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gate_func</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_acquire_multimode_extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">averaged</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        return averaged traces acquired in multiple recording mode.</span>
+
+<span class="sd">        blocking - if False, return to the main program if acquisition is not complete yet</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">blocking</span><span class="p">):</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">waitready</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">err</span> <span class="o">==</span> <span class="mi">263</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;measure_spec: Timeout during data acquisition.&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">get_card_status</span><span class="p">()</span>
+            <span class="c1"># &#39;ready&#39; or &#39;waitdma&#39; flag, see p138 of the manual</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="p">(</span><span class="n">status</span> <span class="o">&amp;</span> <span class="mh">0x4</span><span class="p">)</span> <span class="o">|</span> <span class="o">~</span><span class="p">(</span><span class="n">status</span> <span class="o">&amp;</span> <span class="mh">0x200</span><span class="p">)):</span> <span class="k">return</span> <span class="kc">None</span>
+            <span class="c1"># todo: assumes that no error occured when status&amp;4 occurs</span>
+
+        <span class="c1"># time is on axis 0</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">readout_doublechannel_multimode_bin</span><span class="p">()</span>  <span class="c1"># channel, segment, sample</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">readout_singlechannel_multimode_bin</span><span class="p">()</span>  <span class="c1"># channel, segment, sample</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># sample, segment, channel</span>
+        <span class="c1"># add segments axis at the end</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">))</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">averaged</span><span class="p">):</span>
+                <span class="n">dat</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asfarray</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                <span class="n">dat</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># sample, channel</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">averaged</span><span class="p">):</span>
+                <span class="c1"># two times faster than numpy.mean</span>
+                <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multimode_average</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dat</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_multimode_average1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; faster-than-numpy averaging &#39;&#39;&#39;</span>
+        <span class="n">shp</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">shp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shp</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">shp</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">shp</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+                <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">asfarray</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="n">j</span><span class="p">],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_multimode_average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; faster-than-numpy averaging &#39;&#39;&#39;</span>
+        <span class="n">shp</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">shape</span>
+        <span class="nb">sum</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">shp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shp</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">shp</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="nb">sum</span> <span class="o">+=</span> <span class="n">dat</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="n">shp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_acquire_singlemode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        acquire the number of traces specified by the _averages parameter</span>
+<span class="sd">        and return the averaged trace. measurement is done in single mode.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">averaged</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span><span class="p">):</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">start_with_trigger_and_waitready</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">err</span> <span class="o">==</span> <span class="mi">263</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;measure_spec: Timeout during data acquisition.&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span><span class="p">;</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dacq</span><span class="o">.</span><span class="n">readout_doublechannel_singlemode_bin</span><span class="p">()</span>
+            <span class="n">averaged</span><span class="o">.</span><span class="fm">__iadd__</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># numpy.array(data, numpy.float32)</span>
+        <span class="k">return</span> <span class="n">averaged</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_averages</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

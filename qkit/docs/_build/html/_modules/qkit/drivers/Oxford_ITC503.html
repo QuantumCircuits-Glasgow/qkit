@@ -1,0 +1,711 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.Oxford_ITC503 &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.Oxford_ITC503</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.Oxford_ITC503</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Oxford_ITC503.py driver for Oxford ITC503 temperature controller connected </span>
+<span class="c1"># via a Prologix GPIB ethernet controller</span>
+<span class="c1"># Micha Wildermuth, micha.wildermuth@kit.edu 2019</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">visa</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+        
+
+<div class="viewcode-block" id="Oxford_ITC503">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Oxford_ITC503</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the driver for the Oxford ITC503 temperature controller</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes VISA communication with the instrument Keithley 2636A.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: string</span>
+<span class="sd">            Name of the instrument (driver).</span>
+<span class="sd">        address: string</span>
+<span class="sd">            IP address for the communication with the instrument.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        </span>
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; import qkit</span>
+<span class="sd">        QKIT configuration initialized -&gt; available as qkit.cfg[...]</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; qkit.start()</span>
+<span class="sd">        Starting QKIT framework ... -&gt; qkit.core.startup</span>
+<span class="sd">        Loading module ... S10_logging.py</span>
+<span class="sd">        Loading module ... S12_lockfile.py</span>
+<span class="sd">        Loading module ... S14_setup_directories.py</span>
+<span class="sd">        Loading module ... S20_check_for_updates.py</span>
+<span class="sd">        Loading module ... S25_info_service.py</span>
+<span class="sd">        Loading module ... S30_qkit_start.py</span>
+<span class="sd">        Loading module ... S65_load_RI_service.py</span>
+<span class="sd">        Loading module ... S70_load_visa.py</span>
+<span class="sd">        Loading module ... S80_load_file_service.py</span>
+<span class="sd">        Loading module ... S85_init_measurement.py</span>
+<span class="sd">        Loading module ... S98_started.py</span>
+<span class="sd">        Loading module ... S99_init_user.py</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; ITC503 = qkit.instruments.create(&#39;ITC503&#39;, &#39;Oxford_ITC503&#39;, address=&#39;ASRL1::INSTR&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="vm">__name__</span>
+        <span class="c1"># Start VISA communication</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;: Initializing instrument Oxford ITC 503 temperature control&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span> <span class="o">=</span> <span class="n">visa</span><span class="o">.</span><span class="n">instrument</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read_termination</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span>
+    
+<div class="viewcode-block" id="Oxford_ITC503.write">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.write">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a visa command &lt;cmd&gt; to the Device.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cmd: str</span>
+<span class="sd">            Command that is send to the instrument via pyvisa and NI-VISA backend.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#if cmd == &#39;*CLS&#39;: cmd = &#39;Q0&#39;</span>
+        <span class="n">ans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>  <span class="c1"># Use query, since it returns first letter of &lt;cmd&gt;, e.g. u&#39;O&#39;</span>
+        <span class="k">return</span> <span class="n">ans</span></div>
+
+    
+<div class="viewcode-block" id="Oxford_ITC503.query">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.query">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clears the communication buffer, sends a visa command &lt;cmd&gt; and returns the read answer &lt;ans&gt;.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cmd: str</span>
+<span class="sd">            Command that is send to the instrument via pyvisa and NI-VISA backend.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ans: str</span>
+<span class="sd">            Answer that is returned at query after the sent &lt;cmd&gt;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Q0&#39;</span><span class="p">)</span>  <span class="c1"># usually defines the communication protocol, but can be used to clear the the communications buffer</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Oxford_ITC503.get_IDN">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.get_IDN">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_IDN</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the identification query of the device.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        IDN: (str)</span>
+<span class="sd">            Identification query.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Get IDN&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;V&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot get IDN&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot get IDN</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span></div>
+
+    
+<div class="viewcode-block" id="Oxford_ITC503.get_status">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.get_status">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets status entries.</span>
+<span class="sd">        </span>
+<span class="sd">        Meanings are:</span>
+<span class="sd">            X: SYSTEM STATUS (Always zero currently)</span>
+<span class="sd">            A: AUTO/MAN STATUS (n as for A COMMAND but see below)</span>
+<span class="sd">            C: LOC/REM/LOCK STATUS (n as for C COMMAND)</span>
+<span class="sd">            S: SWEEP STATUS (nn=0-32 as follows)</span>
+<span class="sd">                nn=0 SWEEP NOT RUNNING</span>
+<span class="sd">                nn=2P-1 SWEEPING to step P</span>
+<span class="sd">                nn=2P HOLDING at step P</span>
+<span class="sd">            H: CONTROL SENSOR (n as for H COMMAND)</span>
+<span class="sd">            L: AUTO-PID STATUS (n as for L COMMAND)</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        *args: (str)</span>
+<span class="sd">            variables of interest</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        status: (dict)</span>
+<span class="sd">            All or selected entries of status query.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: XnAnCnSnnHnLn = X</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Get status&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="n">ans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[A-Za-z]+&#39;</span><span class="p">,</span> <span class="n">ans</span><span class="p">),</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span> <span class="n">ans</span><span class="p">))}</span>
+            <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="n">var</span><span class="p">:</span> <span class="n">status</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">args</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">status</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot get status&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot get status</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span></div>
+
+        
+<div class="viewcode-block" id="Oxford_ITC503.set_control">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_control">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">unlocked</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the device into LOCAL or REMOTE and determines whether the LOC/REM button is LOCKED or active.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        remote: (int)</span>
+<span class="sd">            0 for local, 1 for remote</span>
+<span class="sd">        unlocked: (int)</span>
+<span class="sd">            0 to lock, 1 to unlock</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Cn</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Set control to {:r}, {:r}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">remote</span><span class="p">,</span> <span class="n">unlocked</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;C</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">remote</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unlocked</span><span class="p">),</span> <span class="mi">2</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set control to </span><span class="si">{!r}</span><span class="s1">, </span><span class="si">{!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">remote</span><span class="p">,</span> <span class="n">unlocked</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set control o </span><span class="si">{!r}</span><span class="s1">, </span><span class="si">{!r}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">remote</span><span class="p">,</span> <span class="n">unlocked</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+    
+<div class="viewcode-block" id="Oxford_ITC503.set_display">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_display">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the front panel display to channel &lt;channel&gt;.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: (int)</span>
+<span class="sd">            Channel to read. Possible channels are:</span>
+<span class="sd">                0: SET TEMPERATURE</span>
+<span class="sd">                1: SENSOR 1 TEMPERATURE</span>
+<span class="sd">                2: SENSOR 2 TEMPERATURE</span>
+<span class="sd">                3: SENSOR 3 TEMPERATURE</span>
+<span class="sd">                4: TEMPERATURE ERROR</span>
+<span class="sd">                5: HEATER O/P (as %)</span>
+<span class="sd">                6: HEATER O/P (as V)</span>
+<span class="sd">                7: GAS FLOW O/P (a.u.)</span>
+<span class="sd">                8: PROPORTIONAL BAND</span>
+<span class="sd">                9: INTEGRAL ACTION TIME</span>
+<span class="sd">                10: DERIVATIVE ACTION TIME</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Fnn</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;Argument must be an integer.&#39;</span>
+        <span class="k">assert</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">11</span><span class="p">),</span> <span class="s1">&#39;Argument is not a valid number.&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Get value of channel </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;F</span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set front pannel to channel </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set front pannel to channel </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span></div>
+
+    
+<div class="viewcode-block" id="Oxford_ITC503.get_value">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.get_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the current value of channel &lt;channel&gt;.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        channel: (int)</span>
+<span class="sd">            Channel to read. Possible channels are:</span>
+<span class="sd">                0: SET TEMPERATURE</span>
+<span class="sd">                1: SENSOR 1 TEMPERATURE</span>
+<span class="sd">                2: SENSOR 2 TEMPERATURE</span>
+<span class="sd">                3: SENSOR 3 TEMPERATURE</span>
+<span class="sd">                4: TEMPERATURE ERROR</span>
+<span class="sd">                5: HEATER O/P (as %)</span>
+<span class="sd">                6: HEATER O/P (as V)</span>
+<span class="sd">                7: GAS FLOW O/P (a.u.)</span>
+<span class="sd">                8: PROPORTIONAL BAND</span>
+<span class="sd">                9: INTEGRAL ACTION TIME</span>
+<span class="sd">                10: DERIVATIVE ACTION TIME</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        val: (float)</span>
+<span class="sd">            answer of queried variable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Rn</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;Argument must be an integer.&#39;</span>
+        <span class="k">assert</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">11</span><span class="p">),</span> <span class="s1">&#39;Argument is not a valid number.&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Get value of channel </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">display</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_display</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;R</span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;R+&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot get value of channel  </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot get value of channel  </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span></div>
+
+    
+<div class="viewcode-block" id="Oxford_ITC503.get_Temp">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.get_Temp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Temp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets temperature of thermometer channel &lt;channel&gt;.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sensor: int</span>
+<span class="sd">            Number of sensor of interest. Must be 1 (Sorb), 2 (RuOx) or 3 (Cernox). Default is 2.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        temp: float</span>
+<span class="sd">            Temperature in K.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Rn</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">sensor</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;Argument must be an integer.&#39;</span>
+        <span class="k">assert</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;Argument is not a valid number.&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Get temperature of sensor </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">sensor</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;R</span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sensor</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;R+&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot get temperature of sensor </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">sensor</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot get temperature of sensor </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span></div>
+
+        
+<div class="viewcode-block" id="Oxford_ITC503.set_proportional">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_proportional">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_proportional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proportional</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the proportional band.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        proportional: (float)</span>
+<span class="sd">            Proportional band, in steps of 0.0001K.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Pnnnn</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Set proportional band to </span><span class="si">{:f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">proportional</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;P</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">proportional</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set proportional band to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">proportional</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set proportional band to </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">proportional</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+        
+<div class="viewcode-block" id="Oxford_ITC503.set_integral">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_integral">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_integral</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">integral</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the integral action time.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        integral: (float)</span>
+<span class="sd">            Integral action time, in steps of 0.1 minute. Ranges from 0 to 140 minutes.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Innnn</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Set integral action time to </span><span class="si">{:f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">integral</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;I</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">integral</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set integral action time to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">integral</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set integral action time to </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">integral</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+        
+<div class="viewcode-block" id="Oxford_ITC503.set_derivative">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_derivative">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_derivative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">derivative</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the derivative action time.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        derivative: (float)</span>
+<span class="sd">            Derivative action time. Ranges from 0 to 273 minutes.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Dnnnn</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Set derivative action time to </span><span class="si">{:f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">derivative</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;D</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">derivative</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set derivative action time to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">derivative</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set derivative action time to </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">derivative</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="Oxford_ITC503.set_temperature">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_temperature">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.010</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Change the temperature set point.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature: (float)</span>
+<span class="sd">            Temperature set point in Kelvin. Default is 0.010</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Tnnnnn</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="s1">&#39;argument must be a number&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Set temperature set point to </span><span class="si">{:f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">temperature</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;T</span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1000</span><span class="o">*</span><span class="n">temperature</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set temperature set point to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">temperature</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set temperature set point to </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+        
+<div class="viewcode-block" id="Oxford_ITC503.set_heater_sensor">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_heater_sensor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_heater_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Selects the heater sensor.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sensor: (int)</span>
+<span class="sd">            Heater sensor corresponding to the three input channels. Should be 1, 2, or 3, corresponding to the heater on the front panel.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Hn</span>
+        <span class="k">assert</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;Heater not on list.&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Set heater sensor. to </span><span class="si">{:f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">sensor</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;H</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sensor</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set heater sensor. to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">sensor</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set heater sensor. to </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+            
+<div class="viewcode-block" id="Oxford_ITC503.set_heater_maximum">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_heater_maximum">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_heater_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the maximum heater voltage that ITC503 may deliver</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            The maximum heater voltage is specified as a decimal number with a resolution of 0.1 volt, and is approximate. 0 may be used to specify a dynamically varying limit.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Mnnn</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Set maximum heater voltage to </span><span class="si">{:f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;M</span><span class="si">{:04.1F}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set maximum heater voltage to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set maximum heater voltage to </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+    
+<div class="viewcode-block" id="Oxford_ITC503.set_heater_output">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_heater_output">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_heater_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the heater output level &lt;val&gt;.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: float</span>
+<span class="sd">            Sets the percent of the maximum heater output in units of 0.1%. Ranges from 0 to 99.9.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Onnn</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Set heater output to </span><span class="si">{:f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;O</span><span class="si">{:04.1F}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set heater output to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set heater output to </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+    
+<div class="viewcode-block" id="Oxford_ITC503.set_gas_output">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_gas_output">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_gas_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the gas (needle valve) output level &lt;gas_output&gt;.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val: (float)</span>
+<span class="sd">            Sets the percent of the maximum gas output in units of 0.1%. Ranges from 0 to 99.9.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: Gnnn</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Set gas output to </span><span class="si">{:f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;G</span><span class="si">{:04.1F}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set gas output to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set gas output to </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+    
+<div class="viewcode-block" id="Oxford_ITC503.set_auto_control">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_auto_control">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_auto_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">heater_auto</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">gas_auto</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets automatic control for heater and gas flow (needle valve).</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        heater_auto: (bool)</span>
+<span class="sd">            Status of heater function.</span>
+<span class="sd">        gas_auto: (bool)</span>
+<span class="sd">            Status of gas flow control function.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Corresponding Command: An</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:s}</span><span class="s1">: Set automatic control for heater to </span><span class="si">{:d}</span><span class="s1"> and gas flow to </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">heater_auto</span><span class="p">,</span> <span class="n">gas_auto</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;A</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">gas_auto</span><span class="p">))</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">heater_auto</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set automatic control for heater to </span><span class="si">{!s}</span><span class="s1"> and gas flow to </span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">heater_auto</span><span class="p">,</span> <span class="n">gas_auto</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="s1">&#39;</span><span class="si">{!s}</span><span class="s1">: Cannot set automatic control for heater to </span><span class="si">{!s}</span><span class="s1"> and gas flow to </span><span class="si">{!s}</span><span class="se">\n</span><span class="si">{!s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">heater_auto</span><span class="p">,</span> <span class="n">gas_auto</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span></div>
+
+    
+<div class="viewcode-block" id="Oxford_ITC503.set_sweeps">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Oxford_ITC503.Oxford_ITC503.set_sweeps">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_sweeps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_parameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the parameters for all sweeps.</span>
+
+<span class="sd">        This fills up a dictionary with all the possible steps in a sweep. If a step number is not found in the sweep_parametersdictionary, then it will create the sweep step with all parameters set to 0.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sweep_parameters: (dict)</span>
+<span class="sd">            Keys are the step numbers and range fron 1 to 16. The value of each key is a dictionary whose keys are the parameters in the sweep table (see _setSweepStep).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">17</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">sweep_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_sweep_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">sweep_parameters</span><span class="p">[</span><span class="n">step</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_sweep_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;set_point&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;sweep_time&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;hold_time&#39;</span><span class="p">:</span> <span class="mi">0</span> <span class="p">})</span>  <span class="c1"># default is 0</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_sweep_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_step</span><span class="p">,</span> <span class="n">sweep_table</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the parameters for a sweep step by setting the step pointer (x) to the proper step, the step parameters (y1, y2, y3) to the values dictated by the sweep_table and resetting the x and y pointers to 0.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sweep_step: (int)</span>
+<span class="sd">            The sweep step to be modified. Ranges from 1 to 16</span>
+<span class="sd">        sweep_table: (int)</span>
+<span class="sd">            A dictionary of parameters describing the sweep. Keys are set_point, sweep_time and hold_time.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;x</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sweep_step</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;y1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;s</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sweep_table</span><span class="p">[</span><span class="s1">&#39;set_point&#39;</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;y2&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;s</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sweep_table</span><span class="p">[</span><span class="s1">&#39;sweep_time&#39;</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;y3&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;s</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sweep_table</span><span class="p">[</span><span class="s1">&#39;hold_time&#39;</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_sweep_table_pointers</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reset_sweep_table_pointers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the table pointers to x=0 and y=0 to prevent accidental sweep table changes.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;x0&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;y0&#39;</span><span class="p">)</span></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

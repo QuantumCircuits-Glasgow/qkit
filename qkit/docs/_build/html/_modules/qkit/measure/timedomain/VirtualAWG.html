@@ -1,0 +1,868 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.timedomain.VirtualAWG &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.measure.timedomain.VirtualAWG</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.measure.timedomain.VirtualAWG</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Started by A.Stehli@KIT 04/2018</span>
+<span class="c1"># time domain virtual AWG class</span>
+
+
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">widgets</span><span class="p">,</span> <span class="n">Layout</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit.measure.timedomain.pulse_sequence</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit.measure.timedomain.awg.load_tawg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">load_tawg</span>
+
+<span class="n">PLOT_ENABLE</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+    <span class="n">PLOT_ENABLE</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="c1"># Helper functions</span>
+<div class="viewcode-block" id="all_are_same">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.all_are_same">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">all_are_same</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if all elements of a list are the same.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">item</span> <span class="o">==</span> <span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">array</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_vars_len</span><span class="p">(</span><span class="n">variables</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]):</span>
+    <span class="k">if</span> <span class="n">variables</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>  <span class="c1"># No variables in dictionary</span>
+
+
+<div class="viewcode-block" id="dictify_variable_lists">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.dictify_variable_lists">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dictify_variable_lists</span><span class="p">(</span><span class="n">variables</span><span class="p">):</span>
+    <span class="c1"># type: (Dict[List[float]]) -&gt; Generator[Dict[float]]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_vars_len</span><span class="p">(</span><span class="n">variables</span><span class="p">)):</span>
+        <span class="n">single_variables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">single_variables</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">yield</span> <span class="n">single_variables</span></div>
+
+
+
+<div class="viewcode-block" id="TdChannel">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TdChannel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class managing the channels for the VirtualAWG class.</span>
+<span class="sd">    These channels are similar to the channel of an awg.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        add_sequence:      add sequence maintaining currently stored sequences</span>
+<span class="sd">        set_sequence:      add sequence deleting previously stored sequences</span>
+<span class="sd">        delete_sequence:   delete previously stored sequences</span>
+<span class="sd">        set_interleave:    turn interleaving of sequences on/off</span>
+
+<span class="sd">        get_sequence_dict: returns a dictionary containing all important channel attributes</span>
+<span class="sd">        plot:              plot the pulse sequences</span>
+
+<span class="sd">    TODO:</span>
+<span class="sd">        Add option to compensate linearly (for Bias Tees with finite decay time).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inits TdChannel with sample and name:</span>
+<span class="sd">            sample: sample object</span>
+<span class="sd">            name:   name of the channel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span> <span class="o">=</span> <span class="n">sample</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sequences</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: List[Dict[List[float]]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interleave</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Dictionary for x-axis scaling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;ms&quot;</span><span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s2">&quot;us&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="s2">&quot;ns&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sequence_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of loaded sequences.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequences</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TdChannel.add_sequence">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.add_sequence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_sequence</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">PulseSequence</span><span class="p">,</span> <span class="o">**</span><span class="n">variables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Append sequence to sequences currently stored in channel.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence:     sequence object</span>
+<span class="sd">            **variables:  One or multiple keywords matching the variable names of time functions and each containing a list of values.</span>
+<span class="sd">                          In a T1 measurement this would be the wait time between pi-pulse and readout tone.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check that lists are given for all necessary variables</span>
+        <span class="k">if</span> <span class="n">sequence</span><span class="o">.</span><span class="n">variable_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">variables</span> <span class="ow">or</span> <span class="n">sequence</span><span class="o">.</span><span class="n">variable_names</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;Lists for the variables of the sequence have to be specified. Given variables do not match with required ones. &quot;</span>
+                    <span class="o">+</span> <span class="s2">&quot;The following keyword arguments are required: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sequence</span><span class="o">.</span><span class="n">variable_names</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Check if all variable lists have the same length and are non-empty</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">all_are_same</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">()]):</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Length of variable lists do not match.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="n">_vars_len</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;The lists containing values of the variables must not be empty.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Add sequence and variable lists to channel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+
+        <span class="c1"># Check if interleaving should be done and if so, if it is still possible</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequences</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interleave</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_interleave</span><span class="p">():</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;Dimension of new time array does not fit previous inputs.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="o">+</span> <span class="s2">&quot;Interleaving no longer possible.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="TdChannel.set_sequence">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.set_sequence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">variables</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set sequence in channel to sequence deleting previously stored sequences.</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            sequence:     sequence object</span>
+<span class="sd">            **variables:  One or multiple keywords matching the variable names of time functions and each containing a list of values.</span>
+<span class="sd">                          In a T1 measurement this would be the wait time between pi-pulse and readout tone.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Delete previously stored sequences</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete_sequence</span><span class="p">()</span>
+
+        <span class="c1"># Add new sequence</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">variables</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TdChannel.delete_sequence">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.delete_sequence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq_nr</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete sequence number seq_nr (counting from 0).</span>
+<span class="sd">        If seq_nr is None, all sequences are deleted.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            seq_nr: Number of the sequence to be deleted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">seq_nr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sequences</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sequences</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">seq_nr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">seq_nr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="TdChannel.get_sequence">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.get_sequence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># type: (int) -&gt; Tuple[PulseSequence, Dict[str, List[Any]]]</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the PulseSequence object and variables for a given index.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequences</span><span class="p">[</span><span class="n">num</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">[</span><span class="n">num</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TdChannel.get_sequence_dict">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.get_sequence_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sequence_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary featuring all important channel attributes:</span>
+<span class="sd">            sequence_i: list of all pulses of sequences number i (counting from 0)</span>
+<span class="sd">            par_i: parameter values for which sequence is called (usually this parameter is a time, e.g. separating two pulses)</span>
+<span class="sd">            value of the interleave attribute</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">seq_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequences</span><span class="p">)):</span>
+            <span class="n">seq_dict</span><span class="p">[</span><span class="s2">&quot;sequence_</span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequences</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_pulses</span><span class="p">()</span>
+            <span class="n">seq_dict</span><span class="p">[</span><span class="s2">&quot;par_</span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">seq_dict</span><span class="p">:</span>
+            <span class="n">seq_dict</span><span class="p">[</span><span class="s2">&quot;interleave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interleave</span>
+        <span class="k">return</span> <span class="n">seq_dict</span></div>
+
+
+<div class="viewcode-block" id="TdChannel.set_interleave">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.set_interleave">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_interleave</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_interleave</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sequences with an equal number of timesteps may be interleaved.</span>
+<span class="sd">        In order for this to work they must have the same number of time steps.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            use_interleave: if true, the sequences in this channel are interleaved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># By default, interleave mode is off</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interleave</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">use_interleave</span><span class="p">:</span>
+            <span class="c1"># Disabling interleave mode always works</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">:</span>
+            <span class="c1"># If there are no sequences yet, one can also turn on interleave mode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interleave</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Check if all variable vectors have same length</span>
+        <span class="c1"># (Only need to check first variable of each vector, as within we already checked during add procedure)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">all_are_same</span><span class="p">([</span><span class="n">_vars_len</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span> <span class="k">for</span> <span class="n">vs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">]):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;Only sequences that have the same number of variables can be interleaved.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interleave</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_interleaved</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;If the sequences in this channel are to be played interleaved.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interleave</span>
+
+<div class="viewcode-block" id="TdChannel.plot">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.TdChannel.plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show_quadrature</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">x_unit</span><span class="o">=</span><span class="s2">&quot;ns&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots the sequences stored in channel.</span>
+<span class="sd">        A slider provides the option to sweep through different time values.</span>
+<span class="sd">        Readout pulse is fixed at t = 0, where is t&gt;0 before the readout tone.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x_unit: unit of the x-axis in the plot. Options are &quot;s&quot;, &quot;ms&quot;, &quot;us&quot;, &quot;ns&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">show_iq</span> <span class="o">=</span> <span class="n">show_quadrature</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">]</span>
+        <span class="n">sequences</span><span class="p">,</span> <span class="n">readout_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sequences</span><span class="p">(</span><span class="n">IQ_mixing</span><span class="o">=</span><span class="n">show_iq</span><span class="p">)</span>
+        <span class="n">seq_max</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">readout_indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="c1"># If there is no complex information in there, we just present the real part:</span>
+        <span class="n">has_complex_values</span> <span class="o">=</span> <span class="nb">any</span><span class="p">([</span><span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">iscomplex</span><span class="p">(</span><span class="n">seq</span><span class="p">))</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">show_quadrature</span> <span class="o">==</span> <span class="s2">&quot;I&quot;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_complex_values</span><span class="p">:</span>
+            <span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">show_quadrature</span> <span class="o">==</span> <span class="s2">&quot;Q&quot;</span><span class="p">:</span>
+            <span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">]</span>
+
+        <span class="n">bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_boundaries</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">readout_indices</span><span class="p">,</span> <span class="n">x_unit</span><span class="p">)</span>
+
+        <span class="n">interact</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">sequence</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot_sequence</span><span class="p">(</span>
+                <span class="n">sequences</span><span class="p">[</span><span class="n">sequence</span><span class="p">],</span> <span class="n">readout_indices</span><span class="p">[</span><span class="n">sequence</span><span class="p">],</span> <span class="n">x_unit</span><span class="p">,</span> <span class="n">bounds</span>
+            <span class="p">),</span>
+            <span class="n">sequence</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">seq_max</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;98%&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;50px&quot;</span><span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_plot_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">ro_ind</span><span class="p">,</span> <span class="n">x_unit</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">,</span> <span class="n">plot_readout</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The actual plotting of the sequences happens here.</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            seq:    sequence (as array) to be plotted</span>
+<span class="sd">            ro_ind: index of the readout in seq</span>
+<span class="sd">            x_unit: x_unit for the time axis</span>
+<span class="sd">            bounds: boundaries for the plot (xmin, xmax, ymin, ymax)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">PLOT_ENABLE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;matplotlib not found.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">plot_readout</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">bounds</span>
+        <span class="n">samplerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">clock</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">ro_ind</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">samplerate</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span><span class="p">[</span><span class="n">x_unit</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="c1"># make sure last point of the waveform goes to zero</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">readout_tone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">rec_pulselength</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">readout_tone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_tone_length</span>
+
+        <span class="c1"># plot sequence</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="c1"># plot readout</span>
+        <span class="k">if</span> <span class="n">plot_readout</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="o">-</span><span class="n">readout_tone</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span><span class="p">[</span><span class="n">x_unit</span><span class="p">],</span>
+                    <span class="o">-</span><span class="n">readout_tone</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span><span class="p">[</span><span class="n">x_unit</span><span class="p">],</span>
+                <span class="p">],</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C7&quot;</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># add label for readout</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">readout_tone</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span><span class="p">[</span><span class="n">x_unit</span><span class="p">],</span>
+                <span class="n">ymax</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span>
+                <span class="s2">&quot;readout&quot;</span><span class="p">,</span>
+                <span class="n">horizontalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                <span class="n">verticalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="c1"># adjust bounds</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">xmin</span> <span class="o">+</span> <span class="mf">0.005</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">),</span> <span class="n">xmax</span> <span class="o">-</span> <span class="mf">0.006</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">+</span> <span class="mf">0.025</span> <span class="o">*</span> <span class="p">(</span><span class="n">ymax</span> <span class="o">-</span> <span class="n">ymin</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time &quot;</span> <span class="o">+</span> <span class="n">x_unit</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_boundaries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">readout_indices</span><span class="p">,</span> <span class="n">x_unit</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns plot boundaries for a given x-unit.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequences:       list of all sequences stored in the channel</span>
+<span class="sd">            readout_indices: indices of the readout for each sequence in sequences</span>
+<span class="sd">            x_unit:          see dictionary</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of boundaries (xmin, xmax, ymin, ymax)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">readout_tone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">rec_pulselength</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">readout_tone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_tone_length</span>
+
+        <span class="n">xmin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">readout_indices</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span><span class="p">[</span><span class="n">x_unit</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">clock</span><span class="p">)</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="o">-</span><span class="p">(</span>
+                <span class="nb">max</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">])</span>
+                    <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">readout_indices</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">clock</span>
+                <span class="o">+</span> <span class="n">readout_tone</span>
+            <span class="p">)</span>
+            <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span><span class="p">[</span><span class="n">x_unit</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">ymin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">sequences</span><span class="p">))</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">sequences</span><span class="p">))</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">bounds</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">IQ_mixing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Explicitly calculate the waveforms of all sequences at their input time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            IQ_mixing: if true all waveforms are complex arrays where real and imaginary part encode I and Q</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            List of waveform arrays.</span>
+<span class="sd">            List of readout indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">samplerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">clock</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">samplerate</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">seq_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ro_inds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">variables</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequences</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">single_variables</span> <span class="ow">in</span> <span class="n">dictify_variable_lists</span><span class="p">(</span><span class="n">variables</span><span class="p">):</span>
+                    <span class="n">seq</span><span class="p">,</span> <span class="n">ro_ind</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">(</span>
+                        <span class="n">IQ_mixing</span><span class="o">=</span><span class="n">IQ_mixing</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="n">samplerate</span><span class="p">,</span> <span class="o">**</span><span class="n">single_variables</span>
+                    <span class="p">)</span>
+                    <span class="n">seq_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+                    <span class="n">ro_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ro_ind</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># No variables</span>
+                <span class="n">seq</span><span class="p">,</span> <span class="n">ro_ind</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">(</span><span class="n">IQ_mixing</span><span class="o">=</span><span class="n">IQ_mixing</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="n">samplerate</span><span class="p">)</span>
+                <span class="n">seq_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+                <span class="n">ro_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ro_ind</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">seq_list</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No sequence stored in channel &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interleave</span><span class="p">:</span>
+            <span class="n">seqs_temp</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">ro_inds_temp</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">time_dim</span> <span class="o">=</span> <span class="n">_vars_len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">time_dim</span><span class="p">):</span>
+                <span class="n">seqs_temp</span> <span class="o">+=</span> <span class="n">seq_list</span><span class="p">[</span><span class="n">i</span><span class="p">::</span><span class="n">time_dim</span><span class="p">]</span>
+                <span class="n">ro_inds_temp</span> <span class="o">+=</span> <span class="n">ro_inds</span><span class="p">[</span><span class="n">i</span><span class="p">::</span><span class="n">time_dim</span><span class="p">]</span>
+            <span class="n">seq_list</span> <span class="o">=</span> <span class="n">seqs_temp</span>
+            <span class="n">ro_inds</span> <span class="o">=</span> <span class="n">ro_inds_temp</span>
+        <span class="k">return</span> <span class="n">seq_list</span><span class="p">,</span> <span class="n">ro_inds</span></div>
+
+
+
+<div class="viewcode-block" id="VirtualAWG">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VirtualAWG</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class managing multiple manipulation channels for a timedomain experiment (virtual AWG).</span>
+<span class="sd">    Each channel stores pulse sequences which can be loaded onto your device.</span>
+<span class="sd">    The readout pulse of each sequences is used to align sequences of multiple channles.</span>
+
+<span class="sd">    Important attributes:</span>
+<span class="sd">        self.channel[nr]: channel object - sequences can be added and plotted</span>
+<span class="sd">        add_sequences:    add sequence(s) object (see pulse_sequence.py), maintaining currently stored sequences</span>
+<span class="sd">        set_sequences:    add sequence(s) object (see pulse_sequence.py), deleting previously stored sequences</span>
+<span class="sd">        delete_sequence:  delete previously stored sequences</span>
+<span class="sd">        set_interleave:   for a specified channel turn interleaving of sequences on/off</span>
+
+<span class="sd">        get_sequence_dicts: returns a dictionary containing all important channel attributes</span>
+<span class="sd">        plot: plot the pulse sequences of all channels</span>
+<span class="sd">        load: load sequences of specified channel(s) on your physical device</span>
+
+<span class="sd">    TODO:</span>
+<span class="sd">        Write .load fct to directly load the pulse sequences on a device, i.e. VirtualAWG.load(device).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inits VirtualAWG with sample and number of channels:</span>
+<span class="sd">            sample:   sample object</span>
+<span class="sd">            channels: number of channels of the virtual AWG</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span> <span class="o">=</span> <span class="n">sample</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_chans</span> <span class="o">=</span> <span class="n">channels</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>  <span class="c1"># type: List[TdChannel]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="n">TdChannel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="p">,</span> <span class="s2">&quot;channel_</span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Dictionary for x-axis scaling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;ms&quot;</span><span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s2">&quot;us&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="s2">&quot;ns&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">}</span>
+        <span class="c1"># Dictonary for channel colors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chancols</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;C0&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;C2&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;C3&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s2">&quot;C4&quot;</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="s2">&quot;C5&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="s2">&quot;C6&quot;</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">channel_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of existing channels.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_chans</span>
+
+<div class="viewcode-block" id="VirtualAWG.add_sequence">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.add_sequence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">variables</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sequence is added to current sequences.</span>
+<span class="sd">        If channel is None all sequence is added to all channels.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence:     sequence or list of sequences.</span>
+<span class="sd">            channel:      channel number in which sequence will be loaded.</span>
+<span class="sd">            **variables:  keyword arguments matching the variable names of time functions and each containing a list of values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">channel</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_chans</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Channel number </span><span class="si">{:d}</span><span class="s2"> is larger than total number of channels </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">channel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_chans</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">add_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">variables</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">channel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+                <span class="n">channel</span><span class="o">.</span><span class="n">add_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">variables</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="VirtualAWG.set_sequence">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.set_sequence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">variables</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete previously added sequences, replacing them with sequence.</span>
+<span class="sd">        If channel is None set all sequences in all channels to sequence.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence:     sequence or list of sequences.</span>
+<span class="sd">            channel:      channel number in which sequence will be loaded.</span>
+<span class="sd">            **variables:  keyword arguments matching the variable names of time functions and each containing a list of values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">variables</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">channel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+                <span class="n">channel</span><span class="o">.</span><span class="n">set_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">variables</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="VirtualAWG.delete_sequence">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.delete_sequence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq_nr</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete sequence seq_nr in stated channel.</span>
+<span class="sd">        If channel is None sequence seq_nr is deleted from all channels.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            seq_nr:  number of the sequence to be deleted</span>
+<span class="sd">            channel: channel number</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">delete_sequence</span><span class="p">(</span><span class="n">seq_nr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">delete_sequence</span><span class="p">(</span><span class="n">seq_nr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="VirtualAWG.get_sequence_dicts">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.get_sequence_dicts">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sequence_dicts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For each channel, returns a dictionary featuring all important channel attributes:</span>
+<span class="sd">            sequence_i: list of all pulses of sequnces number i (counting from 0)</span>
+<span class="sd">            time_i: time values for which sequence is called</span>
+<span class="sd">            value of the interleave attribute</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chan_dicts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">chan_dicts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chan</span><span class="o">.</span><span class="n">get_sequence_dict</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">chan_dicts</span></div>
+
+
+<div class="viewcode-block" id="VirtualAWG.set_interleave">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.set_interleave">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_interleave</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For each channel, sequences with an equal number of timesteps may be interleaved.</span>
+<span class="sd">        In order for this to work the squences must have the same number of time steps.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value:   if true, the sequences in this channel are interleaved.</span>
+<span class="sd">            channel: number of the channel where sequences should be interleaved.</span>
+<span class="sd">                     If channel is None action applies to all channels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">set_interleave</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">set_interleave</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="VirtualAWG.plot">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show_quadrature</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">x_unit</span><span class="o">=</span><span class="s2">&quot;ns&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots the sequences stored in all channels.</span>
+<span class="sd">        A slider provides the option to sweep through the sequences.</span>
+<span class="sd">        Readout pulse is fixed at t = 0, where is t&gt;0 before the readout tone.</span>
+<span class="sd">        By default, the amplitude of each sequence is plotted.</span>
+<span class="sd">        This may be changed by setting the show_quadrature option to either &quot;I&quot; or &quot;Q&quot;.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            show_quadrature: set to &quot;I&quot; or &quot;Q&quot; if you want to display either quadrature instead of the amplitude</span>
+<span class="sd">            x_unit:          unit of the x-axis in the plot (options are &quot;s&quot;, &quot;ms&quot;, &quot;us&quot;, &quot;ns&quot;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">seqs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ro_inds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">seq_max</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+        <span class="n">show_iq</span> <span class="o">=</span> <span class="n">show_quadrature</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">sequences</span><span class="p">,</span> <span class="n">readout_indices</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">_get_sequences</span><span class="p">(</span><span class="n">IQ_mixing</span><span class="o">=</span><span class="n">show_iq</span><span class="p">)</span>
+
+            <span class="c1"># If there is no complex information in there, we just present the real part:</span>
+            <span class="n">has_complex_values</span> <span class="o">=</span> <span class="nb">any</span><span class="p">([</span><span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">iscomplex</span><span class="p">(</span><span class="n">seq</span><span class="p">))</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">show_quadrature</span> <span class="o">==</span> <span class="s2">&quot;I&quot;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_complex_values</span><span class="p">:</span>
+                <span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">show_quadrature</span> <span class="o">==</span> <span class="s2">&quot;Q&quot;</span><span class="p">:</span>
+                <span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">]</span>
+
+            <span class="n">seq_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">seq_max</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">readout_indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
+            <span class="n">ro_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">readout_indices</span><span class="p">)</span>
+
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">_get_boundaries</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">readout_indices</span><span class="p">,</span> <span class="n">x_unit</span><span class="p">)</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">xmax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ymin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">ymax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+        <span class="n">interact</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">sequence</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot_sequences</span><span class="p">(</span>
+                <span class="n">sequence</span><span class="p">,</span> <span class="n">seqs</span><span class="p">,</span> <span class="n">ro_inds</span><span class="p">,</span> <span class="n">x_unit</span><span class="p">,</span> <span class="p">[</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">]</span>
+            <span class="p">),</span>
+            <span class="n">sequence</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">seq_max</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;11in&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;50px&quot;</span><span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_plot_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq_ind</span><span class="p">,</span> <span class="n">seqs</span><span class="p">,</span> <span class="n">ro_inds</span><span class="p">,</span> <span class="n">x_unit</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The actual plotting of the sequences happens here.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            seqs:            list of sequences to be plotted (i.e. one list of sequence for each channel)</span>
+<span class="sd">            ro_inds:         indices of the readout</span>
+<span class="sd">            x_unit:          x_unit for the time axis</span>
+<span class="sd">            bounds:          boundaries of the plot (xmin, xmax, ymin, ymax)</span>
+<span class="sd">            show_quadrature: set to &quot;I&quot; or &quot;Q&quot; if you want to display either quadrature instead of the amplitude</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">PLOT_ENABLE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;matplotlib not found.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">readout_tone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">rec_pulselength</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">readout_tone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_tone_length</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">bounds</span>
+        <span class="n">samplerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">clock</span>
+        <span class="c1"># plot sequence</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">chan</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ro_inds</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">seq_ind</span><span class="p">:</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">_plot_sequence</span><span class="p">(</span>
+                    <span class="n">seqs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">seq_ind</span><span class="p">],</span>
+                    <span class="n">ro_inds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">seq_ind</span><span class="p">],</span>
+                    <span class="n">x_unit</span><span class="p">,</span>
+                    <span class="n">bounds</span><span class="p">,</span>
+                    <span class="n">col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_chancols</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+                    <span class="n">plot_readout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># plot readout</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="o">-</span><span class="n">readout_tone</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span><span class="p">[</span><span class="n">x_unit</span><span class="p">],</span>
+                <span class="o">-</span><span class="n">readout_tone</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span><span class="p">[</span><span class="n">x_unit</span><span class="p">],</span>
+            <span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C7&quot;</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># add label for readout</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+            <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">readout_tone</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_unit</span><span class="p">[</span><span class="n">x_unit</span><span class="p">],</span>
+            <span class="n">ymax</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span>
+            <span class="s2">&quot;readout&quot;</span><span class="p">,</span>
+            <span class="n">horizontalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="n">verticalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># adjust plot limits</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">xmin</span> <span class="o">+</span> <span class="mf">0.005</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">),</span> <span class="n">xmax</span> <span class="o">-</span> <span class="mf">0.006</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">+</span> <span class="mf">0.025</span> <span class="o">*</span> <span class="p">(</span><span class="n">ymax</span> <span class="o">-</span> <span class="n">ymin</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time &quot;</span> <span class="o">+</span> <span class="n">x_unit</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">IQ_mixing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of waveforms for each channel, as well as a list of indices for the readout timing.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            IQ_mixing: if true all waveforms are complex arrays where real and imaginary part encode I and Q</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of lists (one for each channel) of numpy arrays</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">seqs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ro_inds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">sequences</span><span class="p">,</span> <span class="n">readout_indices</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">_get_sequences</span><span class="p">(</span><span class="n">IQ_mixing</span><span class="p">)</span>
+            <span class="n">seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
+            <span class="n">ro_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">readout_indices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">seqs</span><span class="p">,</span> <span class="n">ro_inds</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Synchronize sequences of all channels to the same readout time.</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            sequences:       list of synchronized sequences as arrays (one each channel)</span>
+<span class="sd">            readout_indices: array of new readout indices</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">seqs</span><span class="p">,</span> <span class="n">ro_inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sequences</span><span class="p">(</span><span class="n">IQ_mixing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># find maximum readout indices</span>
+        <span class="n">lens</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">ro_ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ro_ind</span> <span class="ow">in</span> <span class="n">ro_inds</span><span class="p">]</span>
+        <span class="n">readout_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">lens</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lens</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lens</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="n">readout_indices</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">readout_indices</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">ro_inds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+
+        <span class="n">ind</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sequences</span><span class="o">.</span><span class="n">extend</span><span class="p">([]</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">seqs</span><span class="p">)</span>
+        <span class="k">while</span> <span class="nb">any</span><span class="p">(</span><span class="n">seqs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">seq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">seqs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">seq</span><span class="p">:</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">readout_indices</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">-</span> <span class="n">ro_inds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">ind</span><span class="p">])))</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">sequences</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">ind</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">readout_indices</span>
+
+<div class="viewcode-block" id="VirtualAWG.load">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.VirtualAWG.VirtualAWG.load">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show_progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the sequences stored in the channels of the virtual AWG to your physical device (awg, fpga).</span>
+<span class="sd">        Currently only enabled for the tabor awg.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Case discrimination:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">awg</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="ow">is</span> <span class="s2">&quot;Tabor_WX1284C&quot;</span><span class="p">:</span>
+            <span class="n">sequences</span><span class="p">,</span> <span class="n">readout_inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sync</span><span class="p">()</span>
+            <span class="n">load_tawg</span><span class="o">.</span><span class="n">load_tabor</span><span class="p">(</span>
+                <span class="n">sequences</span><span class="p">,</span>
+                <span class="n">readout_inds</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="p">,</span>
+                <span class="n">reset</span><span class="o">=</span><span class="n">reset</span><span class="p">,</span>
+                <span class="n">show_progress_bar</span><span class="o">=</span><span class="n">show_progress_bar</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unknown device type! Unable to load sequences.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

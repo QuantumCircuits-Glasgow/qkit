@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.LDA_203 &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.LDA_203</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.LDA_203</h1><div class="highlight"><pre>
+<span></span><span class="c1"># qtLAB driver for microwave Attenuator LDA_203 (*)</span>
+<span class="c1"># filename: LDA_203.py</span>
+<span class="c1"># Wridhdhisom Karar &lt;w.karar.1@research.gla.ac.uk &gt;, 2023</span>
+<span class="c1"># Quantum  Circuits Group, University of Glasgow  &lt;eng-weideslab@glasgow.ac.uk&gt;  </span>
+
+<span class="c1"># (*) ramping functions not implemented in this driver</span>
+
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">qkit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">visa</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.drivers.LDA_attn.ldaEthcli</span><span class="w"> </span><span class="kn">import</span> <span class="n">CLI_Vaunix_Attn</span> <span class="c1">#imports from the relative folder</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ctypes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
+
+
+<div class="viewcode-block" id="LDA_203">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.LDA_203.LDA_203">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LDA_203</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span> 
+<span class="c1">#inherit from Instrument class but we can use the functions of the driver helper</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Usage:</span>
+<span class="sd">        Initialise with</span>
+<span class="sd">        &lt;name&gt; = instruments.create(&#39;&lt;name&gt;&#39;, type=&#39;LDA_203&#39; ,address=&#39;&lt;IP address&gt;&#39; )</span>
+
+<span class="sd">        then call the functions below with</span>
+
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span><span class="n">model</span><span class="o">=</span><span class="s1">&#39;LDA_203&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialises the Attenuator and connects to the IP and checks</span>
+<span class="sd">        if the IP is valid and the device is connected</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            name (string)    : name of the instrument , &#39;control Attn&#39;</span>
+<span class="sd">            address (string) : IP address of the device</span>
+<span class="sd">            model (string)   : model of the device , should be the same as type</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Initializing instrument LDA_203&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+
+        <span class="c1">#local class variables DEVIOCE SPECIFIC and CONSTAants</span>
+        <span class="c1"># changeable variables are the parameters of the attenuator MODEL SPECIFIC</span>
+        
+      
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="o">=</span> <span class="n">address</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="c1">#convert to bytes</span>
+        <span class="n">ATTN</span><span class="o">=</span><span class="n">CLI_Vaunix_Attn</span><span class="p">()</span>
+
+        <span class="n">DEVICE_STATUS</span><span class="o">=</span><span class="n">ATTN</span><span class="o">.</span><span class="n">check_deviceexists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">DEVICE_STATUS</span><span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1">#VERY IMPORTANT else the other functions will throw an error </span>
+            <span class="nb">print</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device found at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> Initializing the device dll&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">=</span> <span class="n">CLI_Vaunix_Attn</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#connect to the device</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device not found at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="si">}</span><span class="s2"> . Check the IP address&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+
+        <span class="c1">#connect to the device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_modelname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#get the model name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_serialNumber</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_serial_number</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#get the serial number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_swVersion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_swversion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#get the software version</span>
+        <span class="n">IPMODE</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_ipmode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#get the ip mode</span>
+        <span class="n">SUBNETMASK</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_subnetmask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#get the ip mode</span>
+        <span class="n">GATEWAY</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_gateway</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#get the ip mode</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ip</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ipMode&#39;</span><span class="p">:</span> <span class="n">IPMODE</span><span class="p">,</span><span class="s1">&#39;ipAdress&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="p">,</span><span class="s1">&#39;subnet&#39;</span><span class="p">:</span><span class="n">SUBNETMASK</span> <span class="p">,</span><span class="s1">&#39;GATEWAY&#39;</span><span class="p">:</span><span class="n">GATEWAY</span><span class="p">}</span>  <span class="c1">#get the ip mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_MIN_FREQ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_minfrequency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#get the min frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_FREQ</span> <span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_maxfrequency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#get the max frequency </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_MIN_ATT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_minattenuation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#get the min attenuation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_ATT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_maxattenuation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span> <span class="c1">#get the max attenuation</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span><span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;frequency&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span><span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span><span class="n">minval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_MIN_FREQ</span><span class="p">,</span><span class="n">maxval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_MAX_FREQ</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="s1">&#39;MHz&#39;</span><span class="p">)</span>
+                           
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span><span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span><span class="n">minval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_MIN_ATT</span><span class="p">,</span><span class="n">maxval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_MAX_ATT</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="s1">&#39;dB&#39;</span><span class="p">,</span><span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_all&#39;</span><span class="p">)</span> <span class="c1">#must implement else will throw error  </span>
+
+
+
+<div class="viewcode-block" id="LDA_203.get_all">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.LDA_203.LDA_203.get_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_channel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_frequency</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_attenuation</span><span class="p">()</span></div>
+
+
+        
+
+        <span class="c1">#Start defining the functons</span>
+<div class="viewcode-block" id="LDA_203.do_get_channel">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.LDA_203.LDA_203.do_get_channel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets the channel number of the attenuator</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_currentchannel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="LDA_203.do_set_channel">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.LDA_203.LDA_203.do_set_channel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the channel number of the attenuator</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">set_channel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">,</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_currentchannel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span></div>
+
+    
+
+<div class="viewcode-block" id="LDA_203.do_get_frequency">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.LDA_203.LDA_203.do_get_frequency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets the frequency of the attenuator and set it within bounds ,that should be done automatically by the minval/maxval options</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_currentfrequency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="LDA_203.do_set_frequency">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.LDA_203.LDA_203.do_set_frequency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">freq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the frequency of the attenuator and set it within bounds ,that should be done automatically by the minval/maxval options</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">set_frequency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">,</span><span class="n">freq</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_currentfrequency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="LDA_203.do_get_attenuation">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.LDA_203.LDA_203.do_get_attenuation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_attenuation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets the attenuation of the attenuator and set it within bounds ,that should be done automatically by the minval/maxval options</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_currentattenuation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="LDA_203.do_set_attenuation">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.LDA_203.LDA_203.do_set_attenuation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_attenuation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">att</span><span class="p">):</span>   
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the attenuation of the attenuator and set it within bounds ,that should be done automatically by the minval/maxval options</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">set_attenuation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">,</span><span class="n">att</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_currentattenuation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span></div>
+
+    
+
+<div class="viewcode-block" id="LDA_203.do_get_all">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.LDA_203.LDA_203.do_get_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets all the parameters of the attenuator</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instrument</span><span class="o">.</span><span class="n">get_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span></div>
+
+    
+    <span class="c1">#---------------------------SHORTCUTS----------------------------------</span>
+
+<div class="viewcode-block" id="LDA_203.attn">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.LDA_203.LDA_203.attn">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">attn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">att</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Shortcut for setting the attenuation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_set_attenuation</span><span class="p">(</span><span class="n">att</span><span class="p">)</span></div>
+
+
+
+
+
+
+    <span class="c1">#---------------------------LOG details----------------------------</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Overwrites the print function to print the name of the instrument</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Model : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="si">}</span><span class="s2"> @ IP : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">        Serial Number : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_serialNumber</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">        Software Version : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_swVersion</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">        IP Mode : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ip</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">        Min Frequency : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_MIN_FREQ</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">        Max Frequency : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_MAX_FREQ</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">        Min Attenuation : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_MIN_ATT</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">        Max Attenuation : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_MAX_ATT</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> &quot;</span></div>
+
+        
+    
+<span class="c1">#  The properties of the attenator , extracted from the manualApi and the dll file</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">The properties of the attenator :</span>
+
+<span class="sd">    Model Name:&quot;,attobj.get_modelname(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Serial #:&quot;,attobj.get_serial_number(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    SW Version:&quot;,attobj.get_swversion(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    IP Mode:&quot;,attobj.get_ipmode(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    IP Address:&quot;,attobj.get_ipaddress(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Subnet Mask:&quot;,attobj.get_subnetmask(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Gateway:&quot;,attobj.get_gateway(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Min Frequency(MHz):&quot;,attobj.get_minfrequency(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Max Frequency(MHz):&quot;,attobj.get_maxfrequency(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Min Attenuation(dB):&quot;,attobj.get_minattenuation(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Max Attenuation(dB):&quot;,attobj.get_maxattenuation(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Channel #:&quot;,attobj.get_currentchannel(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Frequency(MHz):&quot;,attobj.get_currentfrequency(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Attenuation(dB):&quot;,attobj.get_currentattenuation(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    </span>
+<span class="sd">    #TODO later </span>
+<span class="sd">    Ramp Start Attn(dB):&quot;,attobj.get_rampstart(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Ramp End Attn(dB):&quot;,attobj.get_rampend(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Dwell Time(ms):&quot;,attobj.get_dwelltime(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Idle Time(ms):&quot;,attobj.get_idletime(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Hold Time:&quot;,attobj.get_holdtime(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Bi-directional Dwell Time:&quot;,attobj.get_bidirectional_dwelltime(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Profile Count:&quot;,attobj.get_profilecount(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Profile Maxlength:&quot;,attobj.get_profilemaxlength(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Profile dwelltime(ms):&quot;,attobj.get_profiledwelltime(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Profile idletime(ms):&quot;,attobj.get_profileidletime(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">    Profile index:&quot;,attobj.get_profileindex(ctypes.c_char_p(ipaddress)))</span>
+<span class="sd">&#39;&#39;&#39;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

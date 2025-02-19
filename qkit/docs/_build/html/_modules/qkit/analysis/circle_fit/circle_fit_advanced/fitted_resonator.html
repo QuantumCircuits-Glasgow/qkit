@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator</h1><div class="highlight"><pre>
+<span></span>
+<span class="c1"># from resonator import Resonator</span>
+<span class="c1"># import numpy as np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.resonator</span><span class="w"> </span><span class="kn">import</span> <span class="n">PowerResonator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.circle_fitter</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.constants</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">const</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<div class="viewcode-block" id="FittedResonator">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_advanced.html#qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FittedResonator</span><span class="p">(</span><span class="n">PowerResonator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    builds upon the resonator class and adds the fitting and photon pproperties</span>
+<span class="sd">    Attributes:</span>
+
+<span class="sd">    </span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">    1. __init__ : Constructor</span>
+<span class="sd">    </span>
+<span class="sd">    #TODO update so that its an array of resonator objects at different powers</span>
+<span class="sd">    #TODO : Update the attributes useing a property so that its either a list or a single value if one power.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sij</span><span class="p">,</span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,],</span> <span class="n">delay</span><span class="p">:</span><span class="nb">float</span><span class="o">=-</span><span class="mf">50e-9</span><span class="p">,</span><span class="n">temp</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span><span class="mf">26e-3</span><span class="p">,</span><span class="n">fit</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sij</span><span class="p">,</span><span class="n">frequency</span><span class="p">,</span><span class="n">power</span><span class="o">=</span><span class="n">power</span><span class="p">,</span><span class="n">temp</span><span class="o">=</span><span class="n">temp</span><span class="p">)</span>
+        <span class="c1"># Resonator.Ql=0.0 # does not change the local variable</span>
+
+        <span class="c1"># LOCAL vars</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">=</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centers</span><span class="p">:</span><span class="nb">complex</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radii</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photon_number</span> <span class="o">=</span> <span class="n">power</span> <span class="c1">#update this later</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fit</span><span class="o">=</span><span class="n">fit</span> <span class="c1"># flag to check if the fitting has been done</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fit_params</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># list of fitting parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot</span><span class="o">=</span><span class="kc">False</span>
+
+        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="o">=</span> <span class="n">delay</span> <span class="c1"># electrical delay FIXED for all the resonators, depends on wire</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">)</span> <span class="c1"># to update when fitting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">)</span><span class="c1"># to update when fitting #TODO: update that its arg(A) and make A complex while fitting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">)</span> <span class="c1"># impedance mismatch</span>
+        <span class="c1"># self.Ql = 0.0 # list for all the Qls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">)</span><span class="c1"># to update when fitting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Qc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Qc_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">)</span>  <span class="c1"># errors for Qcx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Qi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Qi_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ql</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ql_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fr_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">delay_remaining</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">Qi_absqc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Qi_absqc_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        
+
+        <span class="c1">#update these internally/privately</span>
+
+
+    
+<div class="viewcode-block" id="FittedResonator.photon_from_P">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_advanced.html#qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.photon_from_P">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">photon_from_P</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">P</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">fr</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">Ql</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">Qc</span><span class="p">:</span><span class="nb">float</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">float</span><span class="p">:</span> <span class="c1">#fr in GhZ</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the photon number from the input power</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">hbar</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">hbar</span>
+        <span class="n">pw</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="n">P</span><span class="o">/</span><span class="mi">10</span><span class="p">))</span><span class="o">/</span><span class="mf">1e3</span> <span class="c1"># mW down to chip level</span>
+        <span class="c1"># photnum_1p = 2*pw/(hbar*(2*3.14159*frvec_1p*1e9)**2)*(Qlvec_1p**2)/(Qcvec_1p)</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="o">*</span><span class="n">pw</span><span class="o">/</span><span class="p">(</span><span class="n">hbar</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">fr</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">Ql</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">Qc</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="FittedResonator.fit">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_advanced.html#qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sij</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">power</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">plot</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">plot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Fits the resonator using circle fit only with the complex data provided</span>
+<span class="sd">        and returns the result dictionary,</span>
+<span class="sd">        data flows from the fit-&gt;circle_fitter-&gt;notch_port and the results are retured back</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">notch_port</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">sij</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span><span class="n">power</span><span class="o">=</span><span class="n">power</span><span class="p">)</span><span class="o">.</span><span class="n">fit_result</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="n">plot</span><span class="p">,</span><span class="n">prefit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prefit</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="FittedResonator.fitter">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_advanced.html#qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.fitter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sij</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">power</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">plot</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        to Debug, access the fitter object</span>
+<span class="sd">        Fits the resonator using circle fit only with the complex data provided</span>
+<span class="sd">        and returns the result dictionary,</span>
+<span class="sd">        data flows from the fit-&gt;circle_fitter-&gt;notch_port and the results are retured back</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">notch_port</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">sij</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">)</span></div>
+
+    
+        
+        
+
+<div class="viewcode-block" id="FittedResonator.fit_all">
+<a class="viewcode-back" href="../../../../../qkit.analysis.circle_fit.circle_fit_advanced.html#qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.fit_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="p">:</span><span class="nb">int</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Fits the resonator for all the powers</span>
+<span class="sd">        and updates all the object attributes</span>
+<span class="sd">        from the result of the fit</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_powers</span><span class="o">&gt;</span><span class="mi">1</span> <span class="p">:</span> <span class="c1"># here sij is 2D</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prefit</span><span class="o">=</span><span class="n">defaultdict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">power</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pow</span><span class="p">))):</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fitting for power </span><span class="si">{</span><span class="n">power</span><span class="si">}</span><span class="s2"> ------------&gt;&quot;</span><span class="p">)</span>
+                <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sij</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">_f</span><span class="p">,</span><span class="n">power</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span> <span class="c1">#result is a dictionary #FIX this which index to take later TODO</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fit_params</span><span class="o">=</span><span class="n">result</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fit_params</span><span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">power</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">phi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Qc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;Qc&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Qc_err</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;absQc_err&quot;</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">Qi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;Qi&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Qi_err</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;Qi_err&quot;</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">Ql</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;Ql&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Ql_err</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;Ql_err&quot;</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">fr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;fr&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fr_err</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;fr_err&quot;</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">delay_remaining</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;delay_remaining&quot;</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">Qi_absqc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;Qi_no_dia_corr&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Qi_absqc_err</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;Qi_no_dia_corr_err&quot;</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">photon_number</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">photon_from_P</span><span class="p">(</span><span class="n">power</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">Ql</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Qc</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">centers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">radii</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;r0&quot;</span><span class="p">])</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">prefit</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">ResonatorDF</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ResonatorDF</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_fit_params</span><span class="p">]))</span> 
+                
+
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prefit</span><span class="o">=</span><span class="kc">None</span>
+            <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sij</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_f</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_pow</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fit_params</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sij</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_f</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_pow</span><span class="p">,</span><span class="n">delay</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span> <span class="c1">#result is a dictionary but all the inputs are 1D</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fit_params</span><span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pow</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Qc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;Qc&quot;</span><span class="p">]</span> <span class="c1"># setting will update the local variable, in setter fixed.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Qc_err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;absQc_err&quot;</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">Qi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;Qi&quot;</span><span class="p">]</span> <span class="c1">#TODO updates only the local this-class variable directly</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Qi_err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;Qi_err&quot;</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">Ql</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;Ql&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Ql_err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;Ql_err&quot;</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">fr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;fr&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fr_err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;fr_err&quot;</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">delay_remaining</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;delay_remaining&quot;</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">Qi_absqc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;Qi_no_dia_corr&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Qi_absqc_err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;Qi_no_dia_corr_err&quot;</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">photon_number</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">photon_from_P</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pow</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fr</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">Ql</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Qc</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">centers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">radii</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;r0&quot;</span><span class="p">])</span>
+
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">ResonatorDF</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_fit_params</span><span class="p">])</span> <span class="c1">#append the dataframe to the list of dataframes</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ResonatorDF</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;power&#39;</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fit</span><span class="o">=</span><span class="kc">True</span></div>
+</div>
+
+        
+
+<span class="c1">#-------------------Test-------------------</span>
+<span class="c1"># #Test the FittedResonator class</span>
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">fr</span> <span class="o">=</span> <span class="n">FittedResonator</span><span class="p">([</span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span><span class="mi">2</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">,</span><span class="mi">3</span><span class="o">+</span><span class="mi">3</span><span class="n">j</span><span class="p">],</span><span class="mf">5.0e9</span><span class="p">,</span><span class="n">power</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">fr</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+    <span class="n">fr</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="c1"># fr = FittedResonator([1+1j,2+2j,3+3j],5.0e9,1.0,300)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

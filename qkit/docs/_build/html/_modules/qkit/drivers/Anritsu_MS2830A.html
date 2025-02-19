@@ -1,0 +1,484 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.Anritsu_MS2830A &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.Anritsu_MS2830A</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.Anritsu_MS2830A</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Anritsu MS2830A</span>
+<span class="c1"># Julius Krause &lt;julius.krause@student.kit.edu&gt; 2016</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="c1"># Refer to the &#39;MS2690A/MS2691A/MS2692A or MS2830A Signal</span>
+<span class="c1"># Analyzer Operation Manual (Mainframe Remote Control)&#39; for detailed</span>
+<span class="c1"># specifications on IEEE488.2 common device messages and application</span>
+<span class="c1"># common device messages. </span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">visa</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+
+<div class="viewcode-block" id="Anritsu_MS2830A">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Anritsu_MS2830A</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is the python driver for the Anritsu MS2830A Signal Source Analyzer</span>
+<span class="sd">    It only provides very basic functionality</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">    Initialise with</span>
+<span class="sd">    &lt;name&gt; = instruments.create(&#39;&lt;name&gt;&#39;, address=&#39;&lt;GPIB address&gt;&#39;, reset=&lt;bool&gt;)</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">comp_mode</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">channel_index</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initializes </span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            name (string)    : name of the instrument</span>
+<span class="sd">            address (string) : GPIB address</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Initializing instrument&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_comp_mode</span> <span class="o">=</span> <span class="n">comp_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span> <span class="o">=</span> <span class="n">visa</span><span class="o">.</span><span class="n">instrument</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span>
+
+        <span class="c1"># Implement parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;centerfreq&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span>
+            <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">26.5e9</span><span class="p">,</span>
+            <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;nop&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span>
+            <span class="n">minval</span><span class="o">=</span><span class="mi">155</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">30001</span><span class="p">,</span>
+            <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;freqspan&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span><span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>                    
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;powerunit&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span><span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;startfreq&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span><span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;stopfreq&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span><span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;sweeptime&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET</span><span class="p">,</span><span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;resolutionBW&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span><span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;videoBW&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span><span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sweep&#39;</span><span class="p">])</span>           
+            
+        <span class="c1"># Implement functions</span>
+        <span class="c1">#self.add_function(&#39;set_continuous_sweep_mode&#39;)</span>
+        <span class="c1">#self.add_function(&#39;set_freq_center&#39;)</span>
+        <span class="c1">#self.add_function(&#39;set_freq_span&#39;)</span>
+        <span class="c1">#self.add_function(&#39;set_marker&#39;)</span>
+        <span class="c1">#self.add_function(&#39;set_powerunit&#39;)</span>
+        <span class="c1">#self.add_function(&#39;get_marker_level&#39;)</span>
+        <span class="c1">#self.add_function(&#39;avg_clear&#39;)</span>
+        <span class="c1">#self.add_function(&#39;avg_status&#39;)</span>
+        
+        <span class="c1">#self._oldspan = self.get_span()</span>
+        <span class="c1">#self._oldnop = self.get_nop()</span>
+        <span class="c1">#if self._oldspan==0.002:</span>
+        <span class="c1">#  self.set_zerospan(True)</span>
+        
+        <span class="c1">#self.get_all()</span>
+    
+<div class="viewcode-block" id="Anritsu_MS2830A.get_all">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.get_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_marker_level</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+        
+    <span class="c1">###</span>
+    <span class="c1">#Communication with device</span>
+    <span class="c1">###    </span>
+    
+    
+    <span class="c1">##new below</span>
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_set_resolutionBW">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_set_resolutionBW">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_resolutionBW</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">BW</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        sets the resolution bandwidth</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;:BWID </span><span class="si">%e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">BW</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_resolutionBW">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_resolutionBW">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_resolutionBW</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gets the resolution bandwidth</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;:BWID?&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_set_videoBW">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_set_videoBW">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_videoBW</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">BW</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        sets the video bandwidth</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;:BWID:VID </span><span class="si">%e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">BW</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_videoBW">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_videoBW">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_videoBW</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gets the video bandwidth</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;:BWID:VID?&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_sweeptime">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_sweeptime">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_sweeptime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gets the center frequency</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;swe:time?&#39;</span><span class="p">))</span></div>
+
+
+    
+<div class="viewcode-block" id="Anritsu_MS2830A.do_set_centerfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_set_centerfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_centerfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centerfreq</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        sets the center frequency</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;freq:cent </span><span class="si">%e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">centerfreq</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_centerfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_centerfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_centerfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gets the center frequency</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;freq:cent?&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_set_freqspan">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_set_freqspan">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_freqspan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freqspan</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        sets the frequency span</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;freq:span </span><span class="si">%e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">freqspan</span><span class="p">))</span></div>
+
+    
+    
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_freqspan">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_freqspan">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_freqspan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        get the frequency span</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;freq:span?&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_set_startfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_set_startfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_startfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;freq:star </span><span class="si">%e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">freq</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_startfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_startfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_startfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;freq:star?&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_set_stopfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_set_stopfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_stopfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;freq:stop </span><span class="si">%e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">freq</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_stopfreq">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_stopfreq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_stopfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;freq:stop?&#39;</span><span class="p">))</span></div>
+
+        
+<div class="viewcode-block" id="Anritsu_MS2830A.do_set_nop">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_set_nop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_nop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nop</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;swe:poin </span><span class="si">%i</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">nop</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_nop">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_nop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_nop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;swe:poin?&#39;</span><span class="p">))</span></div>
+
+        
+<div class="viewcode-block" id="Anritsu_MS2830A.do_set_powerunit">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_set_powerunit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_powerunit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unit</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        sets the unit for powers</span>
+<span class="sd">        provide unit as a string! (&quot;DBm&quot;)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;unit:pow </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">unit</span><span class="p">))</span></div>
+
+        
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_powerunit">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_powerunit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_powerunit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gets the power unit for powers</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;unit:pow?&#39;</span><span class="p">)</span></div>
+
+        
+        
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_averages">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_averages">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get number of averages</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            None</span>
+<span class="sd">        Output:</span>
+<span class="sd">            number of averages</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;:AVER:COUNT?&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Anritsu_MS2830A.do_get_sweeptime_averages">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.do_get_sweeptime_averages">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_sweeptime_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Average</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sweeptime</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_averages</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sweeptime</span><span class="p">()</span>        </div>
+
+    
+<div class="viewcode-block" id="Anritsu_MS2830A.set_marker">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.set_marker">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_marker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">marker</span><span class="p">,</span><span class="n">frequency</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        sets marker number marker to frequency</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;calc:mark</span><span class="si">%i</span><span class="s1">:x </span><span class="si">%e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="n">frequency</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_marker</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Anritsu_MS2830A.get_marker">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.get_marker">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_marker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">marker</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gets frequency of marker</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;calc:mark</span><span class="si">%i</span><span class="s1">:x?&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">marker</span><span class="p">)))</span></div>
+
+    
+<div class="viewcode-block" id="Anritsu_MS2830A.get_marker_level">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.get_marker_level">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_marker_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">marker</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gets power level of indicated marker</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="s1">&#39;calc:mark</span><span class="si">%i</span><span class="s1">:y?&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">marker</span><span class="p">)))</span>
+        
+<span class="c1">#    def set_continuous_sweep_mode(self,value):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        value=&#39;ON&#39; Continuous sweep</span>
+<span class="sd">        value=&#39;OFF&#39; Single sweep</span>
+<span class="sd">        &#39;&#39;&#39;</span></div>
+
+        <span class="c1">#self._visainstrument.write(&#39;INIT:CONT %s&#39;%(value))    </span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_frequencies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns an array with the frequencies of the points returned by get_trace()</span>
+<span class="sd">        ideally suitable as x-axis for plots</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_startfreq</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">get_stopfreq</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">get_nop</span><span class="p">())</span>
+    
+<div class="viewcode-block" id="Anritsu_MS2830A.enable_marker">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.enable_marker">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">enable_marker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">marker</span><span class="p">,</span><span class="n">state</span><span class="o">=</span><span class="s1">&#39;ON&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        ON or OFF</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;CALC:MARK</span><span class="si">%i</span><span class="s1">:STAT </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span><span class="n">state</span><span class="p">))</span>    </div>
+
+    
+<div class="viewcode-block" id="Anritsu_MS2830A.sweep">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.sweep">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        perform a sweep and wait for it to finish</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;INIT; *WAI&#39;</span><span class="p">)</span>    </div>
+
+    
+<div class="viewcode-block" id="Anritsu_MS2830A.get_trace">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.get_trace">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tracenumber</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query_ascii_values</span><span class="p">(</span><span class="s1">&#39;:trac:data? trace</span><span class="si">%i</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">tracenumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comp_mode</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="n">tmp</span><span class="p">,</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">tmp</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">tmp</span></div>
+
+    
+<div class="viewcode-block" id="Anritsu_MS2830A.get_frequencies">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.get_frequencies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_frequencies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns an array with the frequencies of the points returned by get_trace()</span>
+<span class="sd">        ideally suitable as x-axis for plots</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_startfreq</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">get_stopfreq</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">get_nop</span><span class="p">())</span></div>
+
+
+    
+    <span class="c1">##enable for debugging and testing new functions:</span>
+
+<div class="viewcode-block" id="Anritsu_MS2830A.write">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.write">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>    </div>
+
+    
+<div class="viewcode-block" id="Anritsu_MS2830A.ask">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Anritsu_MS2830A.Anritsu_MS2830A.ask">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">command</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">ask</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>    </div>
+</div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

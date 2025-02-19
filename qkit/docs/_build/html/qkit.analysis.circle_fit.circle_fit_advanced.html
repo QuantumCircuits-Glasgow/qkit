@@ -1,0 +1,716 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.analysis.circle_fit.circle_fit_advanced package &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qkit.analysis.circle_fit.circle_fit_classic package" href="qkit.analysis.circle_fit.circle_fit_classic.html" />
+    <link rel="prev" title="qkit.analysis.circle_fit.circle_fit_2019 package" href="qkit.analysis.circle_fit.circle_fit_2019.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="qkit.html">qkit package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="qkit.analysis.html">qkit.analysis package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qkit.analysis.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="qkit.analysis.circle_fit.html">qkit.analysis.circle_fit package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#module-qkit.analysis.CurveXtractor">qkit.analysis.CurveXtractor module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#qkit-analysis-iv-curve-module">qkit.analysis.IV_curve module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#qkit-analysis-iv-curve2-module">qkit.analysis.IV_curve2 module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#qkit-analysis-iv-curve3-module">qkit.analysis.IV_curve3 module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#module-qkit.analysis.avoided_crossing_fit">qkit.analysis.avoided_crossing_fit module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#qkit-analysis-iq-cloud-analysis-module">qkit.analysis.iq_cloud_analysis module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#module-qkit.analysis.manual_point_picker">qkit.analysis.manual_point_picker module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#qkit-analysis-pointtracker-module">qkit.analysis.pointtracker module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#module-qkit.analysis.qfit">qkit.analysis.qfit module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#qkit-analysis-qps-rings-module">qkit.analysis.qps_rings module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#module-qkit.analysis.resonator">qkit.analysis.resonator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qkit.analysis.html#module-qkit.analysis">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.config.html">qkit.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.core.html">qkit.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.drivers.html">qkit.drivers package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.gui.html">qkit.gui package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.measure.html">qkit.measure package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.services.html">qkit.services package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.storage.html">qkit.storage package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qkit.tests.html">qkit.tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="qkit.html">qkit package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.analysis.html">qkit.analysis package</a></li>
+          <li class="breadcrumb-item"><a href="qkit.analysis.circle_fit.html">qkit.analysis.circle_fit package</a></li>
+      <li class="breadcrumb-item active">qkit.analysis.circle_fit.circle_fit_advanced package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qkit.analysis.circle_fit.circle_fit_advanced.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qkit-analysis-circle-fit-circle-fit-advanced-package">
+<h1>qkit.analysis.circle_fit.circle_fit_advanced package<a class="headerlink" href="#qkit-analysis-circle-fit-circle-fit-advanced-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter">
+<span id="qkit-analysis-circle-fit-circle-fit-advanced-circle-fitter-module"></span><h2>qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter module<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter" title="Link to this heading"></a></h2>
+<p>&#64;author: Wridhdhisom Karar ,2024</p>
+<p>inspired by and based on resonator tools of Sebastian Probst
+<a class="reference external" href="https://github.com/sebastianprobst/resonator_tools">https://github.com/sebastianprobst/resonator_tools</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.</span></span><span class="sig-name descname"><span class="pre">CircleFitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for common routines and definitions shared between both ports.</p>
+<p>inputs:
+- f_data: Frequencies for which scattering data z_data_raw is taken
+- z_data_raw: Measured values for scattering parameter S11 or S21 taken at</p>
+<blockquote>
+<div><p>frequencies f_data</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.Sij">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sij</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Qc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter.Sij"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.Sij" title="Link to this definition"></a></dt>
+<dd><p>Full model for S11 of single-port reflection measurements or S21 of
+notch configuration measurements. The models only differ in a factor of
+2 which is set by the dedicated port classes inheriting from this class.</p>
+<p>inputs:
+- fr: Resonance frequency
+- Ql: Loaded quality factor
+- Qc: Coupling (aka external) quality factor. Calculated with</p>
+<blockquote>
+<div><p>diameter correction method, i.e. 1/Qc = Re{1/<a href="#id1"><span class="problematic" id="id2">|Qc|</span></a> * exp(i*phi)}</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>phi (opt.): Angle of the circle’s rotation around the off-resonant</dt><dd><p>point due to impedance mismatches or Fano interference.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>a, alpha (opt.): Arbitrary scaling and rotation of the circle w.r.t.</dt><dd><p>origin</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>delay (opt.): Time delay between output and input signal leading to</dt><dd><p>linearly frequency dependent phase shift</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.autofit">
+<span class="sig-name descname"><span class="pre">autofit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isolation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter.autofit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.autofit" title="Link to this definition"></a></dt>
+<dd><p>Automatically calibrate data, normalize it and extract quality factors.
+If the autofit fails or the results look bad, please discuss with
+author.</p>
+<p>no need to pass delay if given during init,</p>
+<p>prefit, gets the fit results from the previous fit, and uses it as a guess for the current fit
+suitable for higher powers, where the Ql changes and the Qc changes, and the radius changes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.calc_fano_range">
+<span class="sig-name descname"><span class="pre">calc_fano_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isolation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter.calc_fano_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.calc_fano_range" title="Link to this definition"></a></dt>
+<dd><p>Calculates the systematic Qi (and Qc) uncertainty range based on
+Fano interference with given strength of the background path
+(cf. Rieger &amp; Guenzler et al., arXiv:2209.03036).</p>
+<p>inputs: either of
+- isolation (dB): Suppression of the interference path by this value.</p>
+<blockquote>
+<div><p>The corresponding relative background amplitude b
+is calculated with b = 10**(-isolation/20).</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>b (lin): Relative background path amplitude of Fano.</p></li>
+</ul>
+<p>outputs (added to fitresults dictionary):
+- Qi_min, Qi_max: Systematic uncertainty range for Qi
+- Qc_min, Qc_max: Systematic uncertainty range for Qc
+- fano_b: Relative background path amplitude of Fano.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.fit_result">
+<span class="sig-name descname"><span class="pre">fit_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter.fit_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.fit_result" title="Link to this definition"></a></dt>
+<dd><p>Returns the fit results as a dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.get_photons_in_resonator">
+<span class="sig-name descname"><span class="pre">get_photons_in_resonator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dBm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diacorr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter.get_photons_in_resonator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.get_photons_in_resonator" title="Link to this definition"></a></dt>
+<dd><p>returns the average number of photons
+for a given power in units of W
+unit can be ‘dBm’ or ‘watt’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.get_single_photon_limit">
+<span class="sig-name descname"><span class="pre">get_single_photon_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dBm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diacorr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter.get_single_photon_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.get_single_photon_limit" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>returns the amout of power in units of W necessary</dt><dd><p>to maintain one photon on average in the cavity
+unit can be ‘dBm’ or ‘watt’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.phase_centered">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">phase_centered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter.phase_centered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.phase_centered" title="Link to this definition"></a></dt>
+<dd><p>Yields the phase response of a strongly overcoupled (Qi &gt;&gt; Qc) resonator
+in reflection which corresponds to a circle centered around the origin.
+Additionally, a linear background slope is accounted for if needed.</p>
+<p>inputs:
+- fr: Resonance frequency
+- Ql: Loaded quality factor (and since Qi &gt;&gt; Qc also Ql = Qc)
+- theta: Offset phase
+- delay (opt.): Time delay between output and input signal leading to</p>
+<blockquote>
+<div><p>linearly frequency dependent phase shift</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.plotall">
+<span class="sig-name descname"><span class="pre">plotall</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter.plotall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.plotall" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.plotcalibrateddata">
+<span class="sig-name descname"><span class="pre">plotcalibrateddata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter.plotcalibrateddata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.plotcalibrateddata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.plotrawdata">
+<span class="sig-name descname"><span class="pre">plotrawdata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#CircleFitter.plotrawdata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter.plotrawdata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.notch_port">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.</span></span><span class="sig-name descname"><span class="pre">notch_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circle_fitter.html#notch_port"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.notch_port" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter" title="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.CircleFitter"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircleFitter</span></code></a></p>
+<p>Circlefit class for two-port resonator probed in transmission.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.notch_port.n_ports">
+<span class="sig-name descname"><span class="pre">n_ports</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circle_fitter.notch_port.n_ports" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_advanced.circuit">
+<span id="qkit-analysis-circle-fit-circle-fit-advanced-circuit-module"></span><h2>qkit.analysis.circle_fit.circle_fit_advanced.circuit module<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_advanced.circuit" title="Link to this heading"></a></h2>
+<p>&#64;author: Wridhdhisom Karar (<a class="reference external" href="mailto:w&#46;karar&#46;1&#37;&#52;&#48;research&#46;gla&#46;ac&#46;uk">w<span>&#46;</span>karar<span>&#46;</span>1<span>&#64;</span>research<span>&#46;</span>gla<span>&#46;</span>ac<span>&#46;</span>uk</a>) / 2024</p>
+<p>inspired by and based on resonator tools of Sebastian Probst
+<a class="reference external" href="https://github.com/sebastianprobst/resonator_tools">https://github.com/sebastianprobst/resonator_tools</a></p>
+<p>an update to all the circle fit models
+- iterative with scipy-curvefit / gradient based
+- iterative with lmfit
+- algebric moments method
+- ML,model based (yet to implement)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.circuit.</span></span><span class="sig-name descname"><span class="pre">circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circuit.html#circuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for common routines and definitions shared between both ports.</p>
+<p>inputs:
+- f_data: Frequencies for which scattering data z_data_raw is taken
+- z_data_raw: Measured values for scattering parameter S11 or S21 taken at</p>
+<blockquote>
+<div><p>frequencies f_data</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.Sij">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sij</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Qc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circuit.html#circuit.Sij"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.Sij" title="Link to this definition"></a></dt>
+<dd><p>Full model for S11 of single-port reflection measurements or S21 of
+notch configuration measurements. The models only differ in a factor of
+2 which is set by the dedicated port classes inheriting from this class.</p>
+<p>inputs:
+- fr: Resonance frequency
+- Ql: Loaded quality factor
+- Qc: Coupling (aka external) quality factor. Calculated with</p>
+<blockquote>
+<div><p>diameter correction method, i.e. 1/Qc = Re{1/<a href="#id3"><span class="problematic" id="id4">|Qc|</span></a> * exp(i*phi)}</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>phi (opt.): Angle of the circle’s rotation around the off-resonant</dt><dd><p>point due to impedance mismatches or Fano interference.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>a, alpha (opt.): Arbitrary scaling and rotation of the circle w.r.t.</dt><dd><p>origin</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>delay (opt.): Time delay between output and input signal leading to</dt><dd><p>linearly frequency dependent phase shift</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.autofit">
+<span class="sig-name descname"><span class="pre">autofit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calc_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isolation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circuit.html#circuit.autofit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.autofit" title="Link to this definition"></a></dt>
+<dd><p>Automatically calibrate data, normalize it and extract quality factors.
+If the autofit fails or the results look bad, please discuss with
+author.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.calc_fano_range">
+<span class="sig-name descname"><span class="pre">calc_fano_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isolation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circuit.html#circuit.calc_fano_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.calc_fano_range" title="Link to this definition"></a></dt>
+<dd><p>Calculates the systematic Qi (and Qc) uncertainty range based on
+Fano interference with given strength of the background path
+(cf. Rieger &amp; Guenzler et al., arXiv:2209.03036).</p>
+<p>inputs: either of
+- isolation (dB): Suppression of the interference path by this value.</p>
+<blockquote>
+<div><p>The corresponding relative background amplitude b
+is calculated with b = 10**(-isolation/20).</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>b (lin): Relative background path amplitude of Fano.</p></li>
+</ul>
+<p>outputs (added to fitresults dictionary):
+- Qi_min, Qi_max: Systematic uncertainty range for Qi
+- Qc_min, Qc_max: Systematic uncertainty range for Qc
+- fano_b: Relative background path amplitude of Fano.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.phase_centered">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">phase_centered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circuit.html#circuit.phase_centered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.phase_centered" title="Link to this definition"></a></dt>
+<dd><p>Yields the phase response of a strongly overcoupled (Qi &gt;&gt; Qc) resonator
+in reflection which corresponds to a circle centered around the origin.
+Additionally, a linear background slope is accounted for if needed.</p>
+<p>inputs:
+- fr: Resonance frequency
+- Ql: Loaded quality factor (and since Qi &gt;&gt; Qc also Ql = Qc)
+- theta: Offset phase
+- delay (opt.): Time delay between output and input signal leading to</p>
+<blockquote>
+<div><p>linearly frequency dependent phase shift</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.plotall">
+<span class="sig-name descname"><span class="pre">plotall</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circuit.html#circuit.plotall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.plotall" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.plotcalibrateddata">
+<span class="sig-name descname"><span class="pre">plotcalibrateddata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circuit.html#circuit.plotcalibrateddata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.plotcalibrateddata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.plotrawdata">
+<span class="sig-name descname"><span class="pre">plotrawdata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circuit.html#circuit.plotrawdata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit.plotrawdata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.notch_port">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.circuit.</span></span><span class="sig-name descname"><span class="pre">notch_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circuit.html#notch_port"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.notch_port" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit" title="qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">circuit</span></code></a></p>
+<p>Circlefit class for two-port resonator probed in transmission.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.notch_port.n_ports">
+<span class="sig-name descname"><span class="pre">n_ports</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.0</span></em><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.notch_port.n_ports" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.reflection_port">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.circuit.</span></span><span class="sig-name descname"><span class="pre">reflection_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_data_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/circuit.html#reflection_port"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.reflection_port" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit" title="qkit.analysis.circle_fit.circle_fit_advanced.circuit.circuit"><code class="xref py py-class docutils literal notranslate"><span class="pre">circuit</span></code></a></p>
+<p>Circlefit class for single-port resonator probed in reflection.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.circuit.reflection_port.n_ports">
+<span class="sig-name descname"><span class="pre">n_ports</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.circuit.reflection_port.n_ports" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator">
+<span id="qkit-analysis-circle-fit-circle-fit-advanced-fitted-resonator-module"></span><h2>qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator module<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.</span></span><span class="sig-name descname"><span class="pre">FittedResonator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-5e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.026</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/fitted_resonator.html#FittedResonator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.PowerResonator" title="qkit.analysis.circle_fit.circle_fit_advanced.resonator.PowerResonator"><code class="xref py py-class docutils literal notranslate"><span class="pre">PowerResonator</span></code></a></p>
+<p>builds upon the resonator class and adds the fitting and photon pproperties
+Attributes:</p>
+<p>Methods:
+1. __init__ : Constructor</p>
+<p>#TODO update so that its an array of resonator objects at different powers
+#TODO : Update the attributes useing a property so that its either a list or a single value if one power.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/fitted_resonator.html#FittedResonator.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.fit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.fit_all">
+<span class="sig-name descname"><span class="pre">fit_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/fitted_resonator.html#FittedResonator.fit_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.fit_all" title="Link to this definition"></a></dt>
+<dd><p>Fits the resonator for all the powers
+and updates all the object attributes
+from the result of the fit</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.fitter">
+<span class="sig-name descname"><span class="pre">fitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/fitted_resonator.html#FittedResonator.fitter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.fitter" title="Link to this definition"></a></dt>
+<dd><p>to Debug, access the fitter object
+Fits the resonator using circle fit only with the complex data provided
+and returns the result dictionary,
+data flows from the fit-&gt;circle_fitter-&gt;notch_port and the results are retured back</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.photon_from_P">
+<span class="sig-name descname"><span class="pre">photon_from_P</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ql</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Qc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/fitted_resonator.html#FittedResonator.photon_from_P"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.fitted_resonator.FittedResonator.photon_from_P" title="Link to this definition"></a></dt>
+<dd><p>Returns the photon number from the input power</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_advanced.helper_functions">
+<span id="qkit-analysis-circle-fit-circle-fit-advanced-helper-functions-module"></span><h2>qkit.analysis.circle_fit.circle_fit_advanced.helper_functions module<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_advanced.helper_functions" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.Watt2dBm">
+<span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.</span></span><span class="sig-name descname"><span class="pre">Watt2dBm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/helper_functions.html#Watt2dBm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.Watt2dBm" title="Link to this definition"></a></dt>
+<dd><p>converts from units of watts to dBm</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.dBm2Watt">
+<span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.</span></span><span class="sig-name descname"><span class="pre">dBm2Watt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/helper_functions.html#dBm2Watt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.dBm2Watt" title="Link to this definition"></a></dt>
+<dd><p>converts from units of watts to dBm</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.data_smoother">
+<span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.</span></span><span class="sig-name descname"><span class="pre">data_smoother</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.data_smoother" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.soft_averager">
+<span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.</span></span><span class="sig-name descname"><span class="pre">soft_averager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_data_raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">averages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/helper_functions.html#soft_averager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.helper_functions.soft_averager" title="Link to this definition"></a></dt>
+<dd><p>A iterative soft averager to remove the noise from the data
+and smoothen out noisy data for low power resonator data
+to improve fitting at low photon numbers.</p>
+<p>It samples the raw data ,spaced evenly/unevenly and accumulates averaging it over the number of averages
+and then returns the averaged data</p>
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_advanced.resonator">
+<span id="qkit-analysis-circle-fit-circle-fit-advanced-resonator-module"></span><h2>qkit.analysis.circle_fit.circle_fit_advanced.resonator module<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_advanced.resonator" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.PowerResonator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.resonator.</span></span><span class="sig-name descname"><span class="pre">PowerResonator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#PowerResonator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.PowerResonator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Power Resonator class holds a resonator model information
+Ideally complex S21/S11 data at different power levels
+Attributes:
+1. fr: float -&gt; Resonance frequency
+1a. _fr: float -&gt;frequency Range
+2. Ql: float -&gt; Loaded/External Q
+3. Qc: float -&gt; Coupling Q
+4. Qi: float -&gt; Internal Q
+5. Sij: [complexIQ]/(amplitude,phase) -&gt; Sij data ; either for a single power or multiple power levels
+6. Pow: float -&gt; Power level
+7. Temp: float -&gt; Temperature
+8. photon: float -&gt; Number of photons/ corresponding and calculated from power level</p>
+<p>Methods :
+1. __init__ : Constructor</p>
+<ol class="arabic simple" start="2">
+<li><p>generate(nop=5000, start_f, stop_f,fr,fano_b) : Generate the resonator model from the given parameters</p></li>
+<li><p>generate_mw_model(nop=5000, start_f, stop_f,fr,fano_b) : Generate the resonator model from the given parameters using scipy.mw</p></li>
+<li><p>save(filename) : Save the model to a file using pandas</p></li>
+<li><p>plot() : Plot the model</p></li>
+<li><p>load(filename) : Load the model from a file using pandas</p></li>
+</ol>
+<p>Note: # powers &lt; the freqeuncy span of the resonator
+either 1D or 2D Sij data</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qkit.analysis.circle_fit.circle_fit_advanced.resonator.</span></span><span class="sig-name descname"><span class="pre">Resonator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5000000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Qi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ql</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Qc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.026</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Theretical Resonator class holds a resonator model information
+Ideally complex S21/S11 data</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>either store measured data and fit it, will update the fitparams</dt><dd><ol class="lowerroman simple">
+<li><p>calculates the model params</p></li>
+<li><p>Calculates SNR</p></li>
+<li><p>Photon number</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>or generate the model with some preset parameters</dt><dd><ol class="lowerroman simple">
+<li><p>set the desired parameters</p></li>
+<li><p>generate the model will update the Sij based on the parameters</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+<p>Attributes:
+1. fr: float -&gt; Resonance frequency
+1a. _fr: float -&gt;frequency Range
+2. Ql: float -&gt; Loaded/External Q
+3. Qc: float -&gt; Coupling Q
+4. Qi: float -&gt; Internal Q
+5. Sij: [complexIQ]/(amplitude,phase) -&gt; Sij data ; either for a single power or multiple power levels
+6. Pow: float -&gt; Power level
+7. Temp: float -&gt; Temperature
+8. photon: float -&gt; Number of photons/ corresponding and calculated from power level</p>
+<p>Methods :
+1. __init__ : Constructor</p>
+<ol class="arabic simple" start="2">
+<li><p>generate(nop=5000, start_f, stop_f,fr,fano_b) : Generate the resonator model from the given parameters</p></li>
+<li><p>generate_mw_model(nop=5000, start_f, stop_f,fr,fano_b) : Generate the resonator model from the given parameters using scipy.mw</p></li>
+<li><p>save(filename) : Save the model to a file using pandas</p></li>
+<li><p>plot() : Plot the model</p></li>
+<li><p>load(filename) : Load the model from a file using pandas</p></li>
+</ol>
+<p>Note: # powers &lt; the freqeuncy span of the resonator
+either 1D or 2D Sij data</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.BW">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BW</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.BW" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.Qc">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Qc</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.Qc" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.Qi">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Qi</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.Qi" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.Ql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ql</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.Ql" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.SNR">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SNR</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.SNR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.add_noise">
+<span class="sig-name descname"><span class="pre">add_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">SNR</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'both'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator.add_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.add_noise" title="Link to this definition"></a></dt>
+<dd><p>Add noise to the model,
+Scales the SNR / a
+or sigma = a x r / SNR</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.amp_pha2complex">
+<span class="sig-name descname"><span class="pre">amp_pha2complex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pha</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator.amp_pha2complex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.amp_pha2complex" title="Link to this definition"></a></dt>
+<dd><p>Convert amplitude and phase to complex</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.f">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">f</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.fitparams">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fitparams</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.fitparams" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.fr">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fr</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.fr" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.generate">
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">power</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4500000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5500000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fano_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.generate" title="Link to this definition"></a></dt>
+<dd><p>Generate the resonator model from the given parameters of the specific power level, using the fitparams.
+Update the fitparams before generate()
+and this updates the Sij and f based on the fitparams</p>
+<ul class="simple">
+<li><p>does not care about the power level</p></li>
+<li><p>depends on the SNR can add noise using add_noise(), but generates a very ideal model</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.generate_mw_model">
+<span class="sig-name descname"><span class="pre">generate_mw_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4500000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5500000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fano_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator.generate_mw_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.generate_mw_model" title="Link to this definition"></a></dt>
+<dd><p>Generate the resonator model from the given parameters using scipy.mw</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.get_SNR">
+<span class="sig-name descname"><span class="pre">get_SNR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator.get_SNR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.get_SNR" title="Link to this definition"></a></dt>
+<dd><p>Calculate the SNR of the model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.get_canonical">
+<span class="sig-name descname"><span class="pre">get_canonical</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator.get_canonical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.get_canonical" title="Link to this definition"></a></dt>
+<dd><p>Get the canonical form of the data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.load" title="Link to this definition"></a></dt>
+<dd><p>Load the model from a file using pandas</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.plot" title="Link to this definition"></a></dt>
+<dd><p>Plot the model</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.pow">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pow</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.pow" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.save" title="Link to this definition"></a></dt>
+<dd><p>Save the model to a file using pandas</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.sij">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sij</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.sij" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.temp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">temp</span></span><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.temp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/qkit/analysis/circle_fit/circle_fit_advanced/resonator.html#Resonator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qkit.analysis.circle_fit.circle_fit_advanced.resonator.Resonator.validate" title="Link to this definition"></a></dt>
+<dd><p>Validate the model, before every generate
+- validates the parameters changed to generate again; need to call before generate
+- not needed for the fit</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qkit.analysis.circle_fit.circle_fit_advanced">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qkit.analysis.circle_fit.circle_fit_advanced" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qkit.analysis.circle_fit.circle_fit_2019.html" class="btn btn-neutral float-left" title="qkit.analysis.circle_fit.circle_fit_2019 package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qkit.analysis.circle_fit.circle_fit_classic.html" class="btn btn-neutral float-right" title="qkit.analysis.circle_fit.circle_fit_classic package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

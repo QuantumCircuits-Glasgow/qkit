@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.drivers.Windfreaktech916 &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.drivers.Windfreaktech916</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.drivers.Windfreaktech916</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Windfreaktech SynthHD Microwave Source</span>
+<span class="c1"># Andre Schneider &lt;erdna.na@gmail.com&gt;, 2015</span>
+<span class="c1"># Lukas Gruenhaupt &lt;lukas.gruenhaupt@kit.edu&gt; 05/2018</span>
+<span class="c1"># Martin Spiecker &lt;martin.spiecker@kit.edu&gt; 2020</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software; you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation; either version 2 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit.core.instrument_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">visa</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">RectBivariateSpline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">distutils.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">LooseVersion</span>
+
+<span class="n">path_hardcode</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;C:\qkit\qkit\drivers\Windfreak_calibration_files&#39;</span>  <span class="c1"># TODO</span>
+
+
+<div class="viewcode-block" id="Windfreaktech916">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Windfreaktech916</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is the python QTLab driver for the Windfreaktech SynthHD microwave source</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s1">&#39;Windfreaktech&#39;</span><span class="p">,</span> <span class="n">serial</span><span class="o">=</span><span class="s1">&#39;290&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initializes the Windfreaktech_SynthHD, and communicates with the wrapper.</span>
+<span class="sd">        </span>
+<span class="sd">        Input:</span>
+<span class="sd">            name (string)    : name of the instrument</span>
+<span class="sd">            address (string) : address</span>
+<span class="sd">            serial (string)  : serial number of the Windfreak source. used to identify the correct calibration file</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : Initializing instrument&#39;</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;physical&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_address</span> <span class="o">=</span> <span class="n">address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span> <span class="o">=</span> <span class="n">visa</span><span class="o">.</span><span class="n">instrument</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_address</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span> <span class="o">=</span> <span class="n">serial</span>
+        
+        <span class="k">if</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="n">visa</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="s2">&quot;1.5.0&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">term_chars</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write_termination</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">read_termination</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_power</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_power_level</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        
+
+        <span class="c1"># Implement parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;frequency&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span> <span class="o">|</span> <span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET_AFTER_SET</span><span class="p">,</span>
+            <span class="n">channels</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">),</span> <span class="n">minval</span><span class="o">=</span><span class="mf">54e6</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">13.6e9</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Hz&#39;</span><span class="p">,</span> <span class="n">channel_prefix</span><span class="o">=</span><span class="s1">&#39;ch</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;power_level&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span> <span class="o">|</span> <span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GET_AFTER_SET</span><span class="p">,</span>
+            <span class="n">channels</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">),</span> <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">45000</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;arbu&#39;</span><span class="p">,</span> <span class="n">channel_prefix</span><span class="o">=</span><span class="s1">&#39;ch</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span>
+            <span class="n">channels</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">),</span> <span class="n">minval</span><span class="o">=-</span><span class="mi">70</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;dBm&#39;</span><span class="p">,</span> <span class="n">channel_prefix</span><span class="o">=</span><span class="s1">&#39;ch</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_parameter</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+            <span class="n">flags</span><span class="o">=</span><span class="n">Instrument</span><span class="o">.</span><span class="n">FLAG_GETSET</span><span class="p">,</span>
+            <span class="n">channels</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numchannels</span><span class="p">),</span> <span class="n">channel_prefix</span><span class="o">=</span><span class="s1">&#39;ch</span><span class="si">%d</span><span class="s1">_&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_function</span><span class="p">(</span><span class="s1">&#39;get_all&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_calibration</span><span class="p">()</span>
+        
+        <span class="c1"># sets the reference (clock) frequency ###</span>
+        <span class="c1">#self._visainstrument.write(&#39;C0x0&#39;)                 #added these two command lines to set the reference</span>
+        <span class="c1">#self._visainstrument.write(&#39;C1x0&#39;)		           #to external for both channels</span>
+        <span class="c1">#self.set_PLL_frequency(10e6)</span>
+        
+        <span class="c1"># switch off self-calibrated temperature compensation </span>
+        <span class="c1"># when tested in May 2018, this lead to jumps to the max power value some time after the power was set to a lower value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C0Z0&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C1Z0&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Unmute channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C0h1C1h1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C0h1C1h1&#39;</span><span class="p">)</span>
+
+        <span class="c1"># initialize parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+
+
+
+<span class="c1">##############################       </span>
+<span class="c1">### initialization related ###</span>
+<span class="c1">##############################</span>
+        
+<div class="viewcode-block" id="Windfreaktech916.get_all">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.get_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_ch1_frequency</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_ch2_frequency</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_ch1_power</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_ch2_power</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_ch1_power_level</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_ch2_power_level</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_ch1_status</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_ch2_status</span><span class="p">()</span></div>
+
+    
+<span class="c1">###########################################</span>
+<span class="c1">### Communication with device and setup ###</span>
+<span class="c1">###########################################</span>
+        
+<div class="viewcode-block" id="Windfreaktech916.load_calibration">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.load_calibration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        reloads power calibration from file Windfreak_SerialNo_Channel(A/B).cal in instruments\Windfreak_calibration_files folder.</span>
+<span class="sd">        Calibration file was measured in frequency interval 1 GHz - 13 GHz (frequency interval 10 MHz) and with power_level_parameter 10e3 to 45e3 (steps of 500)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">data_ChA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">path_hardcode</span> <span class="o">+</span> <span class="s2">&quot;\Windfreak_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span> <span class="o">+</span> <span class="s2">&quot;_ChannelA_calibration_with_freq_and_pow.npy&quot;</span><span class="p">,</span>
+                <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_ChB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                <span class="n">path_hardcode</span> <span class="o">+</span> <span class="s2">&quot;\Windfreak_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span> <span class="o">+</span> <span class="s2">&quot;_ChannelA_calibration_with_freq_and_pow.npy&quot;</span><span class="p">,</span>
+                <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">f_channelA</span> <span class="o">=</span> <span class="n">data_ChA</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;frequency_Hz&quot;</span><span class="p">)</span>
+            <span class="n">f_channelB</span> <span class="o">=</span> <span class="n">data_ChB</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;frequency_Hz&quot;</span><span class="p">)</span>
+
+            <span class="n">p_channelA</span> <span class="o">=</span> <span class="n">data_ChA</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;power_intrinsic_units&quot;</span><span class="p">)</span>
+            <span class="n">p_channelB</span> <span class="o">=</span> <span class="n">data_ChB</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;power_intrinsic_units&quot;</span><span class="p">)</span>
+
+            <span class="n">cal_matrix_A</span> <span class="o">=</span> <span class="n">data_ChA</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;calibration_matrix_dBm&quot;</span><span class="p">)</span>
+            <span class="n">cal_matrix_B</span> <span class="o">=</span> <span class="n">data_ChB</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;calibration_matrix_dBm&quot;</span><span class="p">)</span>
+
+            <span class="c1"># generate the interpolators to estimate the power_level parameter in set_power</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interp_amplitudeA</span> <span class="o">=</span> <span class="n">RectBivariateSpline</span><span class="p">(</span><span class="n">f_channelA</span><span class="p">,</span> <span class="n">p_channelA</span><span class="p">,</span> <span class="n">cal_matrix_A</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interp_amplitudeB</span> <span class="o">=</span> <span class="n">RectBivariateSpline</span><span class="p">(</span><span class="n">f_channelB</span><span class="p">,</span> <span class="n">p_channelB</span><span class="p">,</span> <span class="n">cal_matrix_B</span><span class="p">)</span>
+                
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Calibration file of Windfreak source not found&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Windfreaktech916.set_PLL_frequency">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.set_PLL_frequency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_PLL_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        set the reference frequency for the PLL in Hz</span>
+<span class="sd">        and set &#39;x&#39; to 0 (external reference clock)</span>
+<span class="sd">        if frequency == False: Set clock to internal reference</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">frequency</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;x1&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">27</span><span class="p">))</span>  <span class="c1"># unstable</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;*</span><span class="si">{}</span><span class="s2">x0&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">frequency</span><span class="o">/</span><span class="mf">1e6</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="Windfreaktech916.get_PLL_frequency">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.get_PLL_frequency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_PLL_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">return</span> <span class="mf">1e6</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;*?&quot;</span><span class="p">))</span></div>
+
+        
+<span class="c1">#######################</span>
+<span class="c1">### functionalities ###    </span>
+<span class="c1">#######################</span>
+    
+<div class="viewcode-block" id="Windfreaktech916.do_get_frequency">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.do_get_frequency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e6</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;C</span><span class="si">{}</span><span class="s1">f?&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span></div>
+
+        
+<div class="viewcode-block" id="Windfreaktech916.do_set_frequency">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.do_set_frequency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set frequency of device</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            freq (float) : Frequency in Hz</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C</span><span class="si">{}</span><span class="s1">f</span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">frequency</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">))</span>
+        <span class="c1"># After every frequency change the power level has to be resetted</span>
+        <span class="c1"># Since the output power is frequency dependent, the calibrated power is chosen</span>
+        <span class="c1"># self.do_set_power(self._power[channel - 1], channel)</span>
+        
+        <span class="c1"># sleep since source needs some time to adjust to new settings</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Windfreaktech916.do_set_frequency_uncalibrated">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.do_set_frequency_uncalibrated">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_frequency_uncalibrated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set frequency of device</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            freq (float) : Frequency in Hz</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C</span><span class="si">{}</span><span class="s1">f</span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">frequency</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C</span><span class="si">{}</span><span class="s1">a</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_power_level</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]))</span>
+
+        <span class="c1"># sleep since source needs some time to adjust to new settings</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Windfreaktech916.do_get_power_level">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.do_get_power_level">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_power_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_power_level</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;C</span><span class="si">{}</span><span class="s1">a?&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_power_level</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span></div>
+
+        
+<div class="viewcode-block" id="Windfreaktech916.do_set_power_level">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.do_set_power_level">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_power_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set uncalibrated power level of device</span>
+<span class="sd">        Usually, you should use set_power which accepts values in dBm</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            level (float) : (0=mimimum, 45000=maximum)</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_power_level</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C</span><span class="si">{}</span><span class="s1">a</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">level</span><span class="p">))</span>
+        
+        <span class="c1"># sleep since source needs some time to adjust to new settings</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span></div>
+
+    
+    <span class="c1"># TODO load files</span>
+<div class="viewcode-block" id="Windfreaktech916.do_get_power">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.do_get_power">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        this only returns the stored power value and does not communicate with the device!</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_power</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Power is not calibrated. You have to do this to get a proper value.&quot;</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_power</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span></div>
+
+        
+<div class="viewcode-block" id="Windfreaktech916.do_set_power">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.do_set_power">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set output power of device</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            power (float) : Power in dBm</span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_power</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">power</span>
+        
+        <span class="k">if</span> <span class="n">channel</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            
+            <span class="c1"># generate a helper function to find power level for desired power in dBm by finding roots of the function</span>
+            <span class="n">helper_fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interp_amplitudeA</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">power</span>
+            <span class="c1"># by finding the zero of the helper function, the power level value is determined</span>
+            <span class="n">pwr_lvl</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">optimize</span><span class="o">.</span><span class="n">newton</span><span class="p">(</span><span class="n">helper_fn</span><span class="p">,</span> <span class="mi">20000</span><span class="p">))</span>
+            
+            <span class="k">if</span> <span class="n">pwr_lvl</span> <span class="o">&gt;</span> <span class="mi">45000</span><span class="p">:</span>
+                
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The minimum and maximum output power of this microwave source depends on frequency. &#39;</span>
+                      <span class="s1">&#39;Your desired combination of frequency and output power is not possible. &#39;</span>
+                      <span class="s1">&#39;Power is set to max for this frequency: </span><span class="si">{}</span><span class="s1">.1f dBm&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interp_amplitudeA</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">45000</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_set_power_level</span><span class="p">(</span><span class="n">pwr_lvl</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
+                
+        <span class="k">if</span> <span class="n">channel</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            
+            <span class="c1"># generate a helper function to find power level for desired power in dBm by finding roots of the function</span>
+            <span class="n">helper_fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interp_amplitudeB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">power</span>
+            <span class="c1"># by finding the zero of the helper function, the power level value is determined</span>
+            <span class="n">pwr_lvl</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">optimize</span><span class="o">.</span><span class="n">newton</span><span class="p">(</span><span class="n">helper_fn</span><span class="p">,</span> <span class="mi">20000</span><span class="p">))</span>
+            
+            <span class="k">if</span> <span class="n">pwr_lvl</span> <span class="o">&gt;</span> <span class="mi">45000</span><span class="p">:</span>
+                
+                <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;The minimum and maximum output power of this microwave source depends on frequency. &#39;</span>
+                       <span class="s1">&#39;Your desired combination of frequency and output power is not possible. &#39;</span>
+                       <span class="s1">&#39;Power is set to max for this frequency: </span><span class="si">{}</span><span class="s1">.1f dBm&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interp_amplitudeB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">45000</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_set_power_level</span><span class="p">(</span><span class="n">pwr_lvl</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Windfreaktech916.do_get_status">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.do_get_status">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;C</span><span class="si">{}</span><span class="s1">r?&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))))</span></div>
+
+        
+<div class="viewcode-block" id="Windfreaktech916.do_set_status">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.do_set_status">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_set_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set status of output channel</span>
+<span class="sd">        Sets &#39;r&#39; (output-parameter)  as well as &#39;E&#39; (PLL Chip Enable) according to the manual</span>
+
+<span class="sd">        Input:</span>
+<span class="sd">            channel (int) : 0 for channel A, 1 for channel B</span>
+<span class="sd">            status        : True or False </span>
+
+<span class="sd">        Output:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39; : setting status to &quot;</span><span class="si">{}</span><span class="s1">s&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">status</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="n">status</span><span class="p">:</span>
+             
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C</span><span class="si">{}</span><span class="s1">r1E1&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C</span><span class="si">{}</span><span class="s1">r0E0&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Windfreaktech916.write">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.write">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>    </div>
+
+
+<div class="viewcode-block" id="Windfreaktech916.query">
+<a class="viewcode-back" href="../../../qkit.drivers.html#qkit.drivers.Windfreaktech916.Windfreaktech916.query">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visainstrument</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

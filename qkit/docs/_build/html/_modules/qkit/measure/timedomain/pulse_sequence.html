@@ -1,0 +1,805 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qkit.measure.timedomain.pulse_sequence &mdash; Qkit 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Qkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Package Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../qkit.html">qkit package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Qkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">qkit.measure.timedomain.pulse_sequence</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qkit.measure.timedomain.pulse_sequence</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module to provide a high-level possibility to arange pulses for an experiment.&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+
+<span class="n">plot_enable</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+    <span class="n">plot_enable</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="Shape">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.Shape">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Shape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A vectorized function describing a possible shape</span>
+<span class="sd">    defined on the standardized interval [0,1).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Shape</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pyfunc</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">pyfunc</span><span class="p">(</span><span class="n">x</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="ShapeLibClass">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.ShapeLibClass">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ShapeLibClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Object containing pre-defined pulse shapes.</span>
+<span class="sd">    Currently implemented: rect, gauss</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="n">Shape</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rect</span> <span class="o">=</span> <span class="n">Shape</span><span class="p">(</span><span class="s2">&quot;rect&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gauss</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Shape</span><span class="p">(</span><span class="s2">&quot;gauss&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.166</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)))</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">rect</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ramp</span> <span class="o">=</span> <span class="n">Shape</span><span class="p">(</span><span class="s2">&quot;ramp&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">rect</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sqrfct</span> <span class="o">=</span> <span class="n">Shape</span><span class="p">(</span><span class="s2">&quot;sqrfct&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">rect</span></div>
+
+
+
+<span class="c1"># Make ShapeLib a singleton:</span>
+<span class="n">ShapeLib</span> <span class="o">=</span> <span class="n">ShapeLibClass</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="PulseType">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PulseType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Type of Pulse object&quot;&quot;&quot;</span>
+
+    <span class="n">Pulse</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">Wait</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">Readout</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+
+<div class="viewcode-block" id="ParametrizedValue">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.ParametrizedValue">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParametrizedValue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    class for calculating the value of a lambda expression</span>
+<span class="sd">    value: Type lambda or float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Type</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The type of the parametrized values as given by the user.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Type</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_parametrized</span><span class="p">:</span>
+            <span class="n">useful_variables</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+                    <span class="n">useful_variables</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="o">**</span><span class="n">useful_variables</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+
+<div class="viewcode-block" id="ParametrizedValue.crop_string">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.ParametrizedValue.crop_string">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">crop_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="n">function</span><span class="p">[</span><span class="n">function</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">function</span><span class="p">[:</span> <span class="n">function</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot; )</span><span class="se">\\</span><span class="s2">n&#39;]&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s2">&quot;&lt;lambda&gt;&quot;</span><span class="p">:</span>
+            <span class="n">function_line</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsourcelines</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">function_line_start</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">function_line</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">function_line</span><span class="p">)[</span><span class="mi">6</span> <span class="p">:</span> <span class="n">function_line_start</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">function</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsourcelines</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">counter</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">function</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_string</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">counter</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;length&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s2">&quot;length&quot;</span> <span class="ow">in</span> <span class="n">function</span><span class="p">:</span>
+                        <span class="n">function_start</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;length&quot;</span><span class="p">)</span>
+                        <span class="n">function</span> <span class="o">=</span> <span class="n">function</span><span class="p">[</span><span class="n">function_start</span><span class="p">:]</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_string</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_string</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;amplitude&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s2">&quot;amplitude&quot;</span> <span class="ow">in</span> <span class="n">function</span><span class="p">:</span>
+                        <span class="n">function_start</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;amplitude&quot;</span><span class="p">)</span>
+                        <span class="n">function</span> <span class="o">=</span> <span class="n">function</span><span class="p">[</span><span class="n">function_start</span><span class="p">:]</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_string</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">cutting_point</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;lambda&quot;</span><span class="p">)</span>
+                        <span class="n">function</span> <span class="o">=</span> <span class="n">function</span><span class="p">[</span><span class="n">cutting_point</span> <span class="o">+</span> <span class="mi">6</span> <span class="p">:]</span>
+                        <span class="n">function_start</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;lambda&quot;</span><span class="p">)</span>
+                        <span class="n">function</span> <span class="o">=</span> <span class="n">function</span><span class="p">[</span><span class="n">function_start</span><span class="p">:]</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_string</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                        <span class="s2">&quot;unknown Parameter only length and amplitude are supportet&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="s2">&quot;too many lambda functions. Only length and amplitude can be lambda functions&quot;</span>
+                <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_parametrized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Pulse">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.Pulse">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Pulse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to describe a single pulse.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">length</span><span class="p">:</span> <span class="n">ParametrizedValue</span><span class="o">.</span><span class="n">Type</span><span class="p">,</span>
+        <span class="n">shape</span><span class="p">:</span> <span class="n">Shape</span> <span class="o">=</span> <span class="n">ShapeLib</span><span class="o">.</span><span class="n">rect</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">amplitude</span><span class="p">:</span> <span class="n">ParametrizedValue</span><span class="o">.</span><span class="n">Type</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">phase</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">iq_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">iq_dc_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">iq_angle</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">90.0</span><span class="p">,</span>
+        <span class="n">q_rel</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">ptype</span><span class="o">=</span><span class="n">PulseType</span><span class="o">.</span><span class="n">Pulse</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inits a pulse with:</span>
+<span class="sd">            length:       length of the pulse. This can also be a (lambda) function for variable pulse lengths.</span>
+<span class="sd">            shape:        pulse shape (i.e. rect, gauss, ...)</span>
+<span class="sd">            name:         name you want to give your pulse (i.e. pi-pulse, ...)</span>
+<span class="sd">            amplitude:    relative amplitude of your pulse. This can also be a (lambda) function for variable pulse amplitudes.</span>
+<span class="sd">            phase:        phase of the pulse in deg. (i.e. 90 for pulse around y-axis of the bloch sphere)</span>
+<span class="sd">            iq_frequency: IQ-frequency of your pulse for heterodyne mixing (if 0 homodyne mixing is employed)</span>
+<span class="sd">            iq_dc_offset: complex dc offset for calibrating the IQ-mixer (real part for dc offset of I, imaginary part is dc offset of Q)</span>
+<span class="sd">            iq_angle:     angle between I and Q in the complex plane (default is 90 deg)</span>
+<span class="sd">            q_rel:        relative amplitude of Q in respect to I. This is needed for mixer calibration. If q_rel &gt; 1 make sure you are still within the limits of your device.</span>
+<span class="sd">            type:         The type of the created pulse (from enum PulseType: can be Pulse, Wait or Readout)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span> <span class="o">=</span> <span class="n">ParametrizedValue</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;amplitude&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">ParametrizedValue</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;length&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="n">phase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iq_frequency</span> <span class="o">=</span> <span class="n">iq_frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iq_dc_offset</span> <span class="o">=</span> <span class="n">iq_dc_offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iq_angle</span> <span class="o">=</span> <span class="n">iq_angle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_rel</span> <span class="o">=</span> <span class="n">q_rel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">ptype</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">samplerate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">heterodyne</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">start_phase</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">variables</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the pulse envelope for a given frequency and, if length is a function, with given variables as kwargs</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">             samplerate: sample rate for calculating the envelope</span>
+<span class="sd">             heterodyne: Bool if True returns a complex envelope (defaults to False)</span>
+<span class="sd">             start_phase: the global phase at which the pulse should start (in rad, defaults to 0)</span>
+<span class="sd">            **variables: the variables for the length/amplitude function, if any</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            envelope of the pulse as numpy array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="o">**</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">amplitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="p">(</span><span class="o">**</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">timestep</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">samplerate</span>
+
+        <span class="k">if</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="n">timestep</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">length</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;The pulse &#39;</span><span class="si">{:}</span><span class="s2">&#39; is shorter than </span><span class="si">{:.2f}</span><span class="s2"> ns and thus is omitted.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">timestep</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="mf">1e9</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">timestep</span><span class="p">)</span>
+        <span class="n">time_fractions</span> <span class="o">=</span> <span class="n">time</span> <span class="o">/</span> <span class="n">length</span>
+
+        <span class="k">if</span> <span class="n">time_fractions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="c1"># This can happen due to float rounding error -&gt; cut it away</span>
+            <span class="c1"># (the shapes are only defined on [0,1) where 1 is not included)</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">time_fractions</span> <span class="o">=</span> <span class="n">time_fractions</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">envelope</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">time_fractions</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">heterodyne</span> <span class="ow">or</span> <span class="n">envelope</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">iq_frequency</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">envelope</span>
+        <span class="c1"># Empty envelope needs no IQ modulation and</span>
+        <span class="c1"># for homodyne mixing the envelope is real</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">envelope</span> <span class="o">=</span> <span class="n">envelope</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                <span class="mf">1.0</span><span class="n">j</span>
+                <span class="o">*</span> <span class="p">(</span>
+                    <span class="n">start_phase</span>
+                    <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span>
+                    <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">iq_frequency</span> <span class="o">*</span> <span class="n">time</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># account for mixer calibration i.e. dc offset and phase != 90deg between I and Q</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iq_angle</span> <span class="o">!=</span> <span class="mi">90</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_rel</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">envelope_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">envelope</span><span class="p">)</span>
+            <span class="n">envelope_q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_rel</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span>
+                <span class="n">envelope</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1.0</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="p">(</span><span class="mi">90</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">iq_angle</span><span class="p">))</span>
+            <span class="p">)</span>
+            <span class="n">envelope</span> <span class="o">=</span> <span class="n">envelope_i</span> <span class="o">+</span> <span class="mf">1.0</span><span class="n">j</span> <span class="o">*</span> <span class="n">envelope_q</span>
+        <span class="n">envelope</span><span class="p">[</span><span class="n">envelope</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iq_dc_offset</span>
+
+        <span class="k">return</span> <span class="n">envelope</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">variable_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A set with the names of all variables necessary to calculate the pulse length and amplitude.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_parametrized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;False if only fixed Values for length/amplitude&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">is_parametrized</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span><span class="o">.</span><span class="n">is_parametrized</span></div>
+
+
+
+<div class="viewcode-block" id="PulseSequence">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PulseSequence</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for aranging pulses for a time-domain experiment.</span>
+<span class="sd">    Sequence objects are callable, returning the sequence envelope for a given time step.</span>
+<span class="sd">    Add wait as variable times in the experiment.</span>
+<span class="sd">    Add readout to synchornize different channels in more sophisticated experiments.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        add:         adds a given pulse to the experiment</span>
+<span class="sd">        add_wait:    adds a wait time</span>
+<span class="sd">        add_readout: adds the readout to the experiment</span>
+<span class="sd">        plot:        plots schematic of the sequence</span>
+<span class="sd">        get_pulses:  returns list of currently added pulses and their properties.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">samplerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dc_corr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inits PulseSequence with sample and samplerate:</span>
+<span class="sd">            sample:     Sample object</span>
+<span class="sd">            samplerate: Samplerate of your device</span>
+<span class="sd">                        This should already be specified in your sample object as sample.clock</span>
+<span class="sd">            dc_corr:    DC Voltage bias of the AWG for idling times (Real p)complex dc offset for calibrating the IQ-mixer during idling times.</span>
+<span class="sd">                        The real part encodes the dc offset of I, the imaginary part is the dc offset of Q.</span>
+<span class="sd">                        This correction is added to the dc offset during the pulse (i.e. of the pulse object).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Pulse</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_pulse_is_parallel</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pulse</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span> <span class="o">=</span> <span class="n">sample</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc_corr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">dc_corr</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">samplerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">clock</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">samplerate</span> <span class="o">=</span> <span class="n">samplerate</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_color_palette</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;C0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;C1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;C2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;C3&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;C4&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;C5&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;C6&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;C8&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;C9&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;r&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;g&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;b&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;k&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;m&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pulse_cols</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">PulseType</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">PulseType</span><span class="o">.</span><span class="n">Readout</span><span class="p">:</span> <span class="s2">&quot;C7&quot;</span><span class="p">,</span>
+            <span class="n">PulseType</span><span class="o">.</span><span class="n">Wait</span><span class="p">:</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">IQ_mixing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">include_readout</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">samplerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">variables</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the envelope of the whole pulse sequence for the input time.</span>
+<span class="sd">        Also returns the index where the readout pulse starts.</span>
+<span class="sd">        If no readout tone is found it is assumed to be at the end of the sequence.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            IQ_mixing:   returns complex valued sequence if IQ_mixing is True (real part encodes I, imaginary part encodes Q)</span>
+<span class="sd">            include_readout:   If the readout pulse should be included in the resulting waveform</span>
+<span class="sd">            **variables:    function arguments for time dependent pulse lengths/wait times. Parameter names need to match time function parameters.</span>
+
+
+<span class="sd">        Returns:</span>
+<span class="sd">            waveform:      numpy array of the squence envelope, if IQ_mixing is True real part is I, imaginary part is Q</span>
+<span class="sd">            readout_index: index of the readout tone</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;Given function arguments do not match with required ones. &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;The following keyword arguments are required: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">samplerate</span> <span class="o">=</span> <span class="n">samplerate</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">samplerate</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">samplerate</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Sequence call requires samplerate.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># build the waveform of this sequence</span>
+        <span class="n">full_waveform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="n">timestep</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">samplerate</span>  <span class="c1"># minimum time step</span>
+        <span class="n">readout_index</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># index of the readout in the waveform of the whole sequence</span>
+        <span class="n">position_of_next_slice</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># index where the next time slice will start</span>
+        <span class="k">for</span> <span class="n">time_slice</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">:</span>
+            <span class="c1"># holds all waveforms that start at the same time (within the same slice)</span>
+            <span class="n">wfm_slice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+            <span class="c1"># tracks the length of the last waveform in the slice as the next slice will start after that</span>
+            <span class="n">last_wfm_length</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">pulse</span> <span class="ow">in</span> <span class="n">time_slice</span><span class="p">:</span>
+                <span class="c1"># create waveform array of the current pulse</span>
+                <span class="c1"># adjust global phase relative to the beginning of the sequence</span>
+                <span class="c1"># (startphase is only relevant when IQ_mixing is True)</span>
+                <span class="n">startphase</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">pulse</span><span class="o">.</span><span class="n">iq_frequency</span> <span class="o">*</span> <span class="n">position_of_next_slice</span> <span class="o">*</span> <span class="n">timestep</span>
+                <span class="p">)</span>  <span class="c1"># zero for homodyne mixing</span>
+                <span class="n">wfm</span> <span class="o">=</span> <span class="n">pulse</span><span class="p">(</span>
+                    <span class="n">samplerate</span><span class="p">,</span>
+                    <span class="n">start_phase</span><span class="o">=</span><span class="n">startphase</span><span class="p">,</span>
+                    <span class="n">heterodyne</span><span class="o">=</span><span class="n">IQ_mixing</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">variables</span>
+                <span class="p">)</span>
+
+                <span class="c1"># if (pulse_dict[&quot;pulse&quot;].type == PulseType.Readout) and (i == len(self._sequence) - 1):</span>
+                <span class="c1">#     # if readout is last, omit the wfm (apart from a single digit)</span>
+                <span class="c1">#     length = timestep</span>
+
+                <span class="c1"># Store index if this pulse is a readout pulse (will have the last one at the end)</span>
+                <span class="k">if</span> <span class="n">pulse</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">PulseType</span><span class="o">.</span><span class="n">Readout</span><span class="p">:</span>
+                    <span class="n">readout_index</span> <span class="o">=</span> <span class="n">position_of_next_slice</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">include_readout</span><span class="p">:</span>
+                        <span class="c1"># Readout pulses are not taken into account here</span>
+                        <span class="n">wfm</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="c1"># Store the size of the last waveform in a slice</span>
+                <span class="c1"># This waveform has skip=False and thus the next slice will start when this pulse is finished</span>
+                <span class="c1"># even if other pulses of the current slice are longer</span>
+                <span class="n">last_wfm_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wfm</span><span class="p">)</span>
+
+                <span class="c1"># Enlarge waveforms to be the same size</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">wfm_slice</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">wfm</span><span class="p">):</span>
+                    <span class="n">wfm_slice</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wfm</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">wfm</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wfm_slice</span><span class="p">))</span>
+                <span class="c1"># Add pulse to waveform of current time slice</span>
+                <span class="n">wfm_slice</span> <span class="o">+=</span> <span class="n">wfm</span>
+
+            <span class="c1"># Resize waveform to be capable of holding current wfm_slice</span>
+            <span class="n">new_waveform_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">full_waveform</span><span class="p">),</span> <span class="n">position_of_next_slice</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">wfm_slice</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">full_waveform</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">new_waveform_length</span><span class="p">)</span>
+            <span class="c1"># Add current time slice to global waveform</span>
+            <span class="n">full_waveform</span><span class="p">[</span>
+                <span class="n">position_of_next_slice</span> <span class="p">:</span> <span class="p">(</span><span class="n">position_of_next_slice</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">wfm_slice</span><span class="p">))</span>
+            <span class="p">]</span> <span class="o">+=</span> <span class="n">wfm_slice</span>
+
+            <span class="c1"># Update position for next slice (the last waveform has no skip and thus decides the time)</span>
+            <span class="n">position_of_next_slice</span> <span class="o">+=</span> <span class="n">last_wfm_length</span>
+
+        <span class="n">full_waveform</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc_corr</span>
+
+        <span class="c1"># make sure first and last point of the waveform go to 0</span>
+        <span class="n">full_waveform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">full_waveform</span><span class="p">)</span>
+        <span class="n">full_waveform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">full_waveform</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">iscomplex</span><span class="p">(</span><span class="n">full_waveform</span><span class="p">)):</span>
+            <span class="c1"># No complex information in there, so just return the real part</span>
+            <span class="n">full_waveform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">full_waveform</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">full_waveform</span><span class="p">,</span> <span class="n">readout_index</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># +1 due to leading 0</span>
+
+<div class="viewcode-block" id="PulseSequence.add">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.add">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pulse</span><span class="p">:</span> <span class="n">Pulse</span><span class="p">,</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Append a pulse to the sequence.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pulse: pulse object</span>
+<span class="sd">            skip:  if True the next pulse in the sequence will not wait until this pulse is finished (i.e. they happen at the same time)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if pulse name is valid and unique</span>
+        <span class="k">if</span> <span class="n">pulse</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pulse</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;The pulse name has to be a string and must not be None.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">elif</span> <span class="n">pulse</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span><span class="p">[</span><span class="n">pulse</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="ow">is</span> <span class="n">pulse</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;Another pulse with the same name (</span><span class="si">{name}</span><span class="s2">) is already present in the sequence!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">pulse</span><span class="o">.</span><span class="n">name</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="c1"># Add the pulse to the pulse dictionary if it is not yet present</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pulse</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span><span class="p">[</span><span class="n">pulse</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pulse</span>
+
+            <span class="c1"># Keep track of all variable names: Add them to a set of unique variable names</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pulse</span><span class="o">.</span><span class="n">variable_names</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_pulse_is_parallel</span><span class="p">:</span>
+            <span class="c1"># Add empty list for next pulse</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+        <span class="c1"># Add pulse to last sequence slice</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pulse</span><span class="p">)</span>
+
+        <span class="c1"># If skip is true the next pulse will be scheduled at the same time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next_pulse_is_parallel</span> <span class="o">=</span> <span class="n">skip</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="PulseSequence.add_wait">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.add_wait">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="n">ParametrizedValue</span><span class="o">.</span><span class="n">Type</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a wait time to the sequence.</span>
+<span class="sd">        Use a (lambda) function for variable wait times.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        self : PulseSequence</span>
+<span class="sd">            the PulseSequence</span>
+<span class="sd">        time : ParametrizedValue.Type</span>
+<span class="sd">            the waiting period as float or function</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            A special name can be passed for this wait block (by default, wait[#] will be used)</span>
+<span class="sd">        skip : bool, optional</span>
+<span class="sd">            if this wait should be parallel to the next item in the sequece, by default False</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PulseSequence</span>
+<span class="sd">            the PulsSequence with an added waiting period</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">compose_name</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;wait[</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Find a unused name for the next wait &quot;pulse&quot;</span>
+            <span class="n">wait_index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">compose_name</span><span class="p">(</span><span class="n">wait_index</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span><span class="p">:</span>
+                <span class="n">wait_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">compose_name</span><span class="p">(</span><span class="n">wait_index</span><span class="p">)</span>
+
+        <span class="n">wait_pulse</span> <span class="o">=</span> <span class="n">Pulse</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">ShapeLib</span><span class="o">.</span><span class="n">zero</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">ptype</span><span class="o">=</span><span class="n">PulseType</span><span class="o">.</span><span class="n">Wait</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">wait_pulse</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PulseSequence.add_readout">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.add_readout">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_readout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pulse</span><span class="p">:</span> <span class="n">Pulse</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a readout pulse to the sequence.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        skip : bool, optional</span>
+<span class="sd">            If True the next pulse will follow at the same time as the readout, by default False.</span>
+<span class="sd">        pulse : Pulse, optional</span>
+<span class="sd">            pulse: A user-defined readout pulse can be specified if necessary, by default rectangular shaped Pulse with lengtht as specified in sample.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PulseSequence</span>
+<span class="sd">            The PulseSequence with an added Readout</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">compose_name</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;readout[</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pulse</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Find a unused name for the next readout pulse</span>
+            <span class="n">readout_index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">compose_name</span><span class="p">(</span><span class="n">readout_index</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span><span class="p">:</span>
+                <span class="n">readout_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">compose_name</span><span class="p">(</span><span class="n">readout_index</span><span class="p">)</span>
+
+            <span class="c1"># Try to determine useful readout tone length</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">readout_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">rec_pulselength</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">readout_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="o">.</span><span class="n">readout_tone_length</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="n">readout_length</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="n">readout_pulse</span> <span class="o">=</span> <span class="n">Pulse</span><span class="p">(</span><span class="n">readout_length</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">ptype</span><span class="o">=</span><span class="n">PulseType</span><span class="o">.</span><span class="n">Readout</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If a special pulse is needed, user can add it</span>
+            <span class="n">readout_pulse</span> <span class="o">=</span> <span class="n">pulse</span>
+
+            <span class="k">if</span> <span class="n">readout_pulse</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">PulseType</span><span class="o">.</span><span class="n">Readout</span><span class="p">:</span>
+                <span class="n">readout_pulse</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">PulseType</span><span class="o">.</span><span class="n">Readout</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;The type of the added pulse has to be Readout and was changed accordingly.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">readout_pulse</span><span class="p">,</span> <span class="n">skip</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">variable_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A set with the names of all variables present in this sequence.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span>
+
+<div class="viewcode-block" id="PulseSequence.get_pulses">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.get_pulses">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_pulses</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of all pulses and their properties.</span>
+<span class="sd">        The properties of each pulse are stored in a dictionary with keys: name, shape, length, skip value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dict_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">time_slice</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pulse</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time_slice</span><span class="p">):</span>
+                <span class="c1"># This is more for legacy reasons</span>
+                <span class="n">dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">pulse</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                        <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="n">pulse</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                        <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="n">pulse</span><span class="o">.</span><span class="n">length</span><span class="p">,</span>
+                        <span class="s2">&quot;iq_frequency&quot;</span><span class="p">:</span> <span class="n">pulse</span><span class="o">.</span><span class="n">iq_frequency</span><span class="p">,</span>
+                        <span class="s2">&quot;phase&quot;</span><span class="p">:</span> <span class="n">pulse</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
+                        <span class="s2">&quot;skip&quot;</span><span class="p">:</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">time_slice</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">dict_list</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pulses</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pulse</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A dictionary containing pulse name as key and pulse as value&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulses</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Pulse</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A List of Lists containing pulses. If pulses are paralles they will be in the same sublist&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span>
+
+<div class="viewcode-block" id="PulseSequence.plot">
+<a class="viewcode-back" href="../../../../qkit.measure.timedomain.html#qkit.measure.timedomain.pulse_sequence.PulseSequence.plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot a schematic of the stored pulses.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">plot_enable</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;matplotlib not found.&quot;</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="n">amp</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">ampmax</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">remaining_colors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_palette</span><span class="p">[:]</span>
+        <span class="n">pulse_colors</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">time_slice</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">amp</span><span class="p">,</span> <span class="n">pulse</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">time_slice</span><span class="p">)):</span>
+                <span class="n">ampmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">ampmax</span><span class="p">,</span> <span class="n">amp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="c1"># Generate displayed text</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{name}</span><span class="se">\n</span><span class="si">{shape}</span><span class="se">\n</span><span class="si">{time}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">pulse</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="n">pulse</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">time</span><span class="o">=</span><span class="p">(</span><span class="n">pulse</span><span class="o">.</span><span class="n">length</span> <span class="k">if</span> <span class="n">pulse</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">PulseType</span><span class="o">.</span><span class="n">Readout</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">pulse</span><span class="o">.</span><span class="n">iq_frequency</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+                    <span class="n">text</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2"> f_iq = </span><span class="si">{:.0f}</span><span class="s2"> MHz&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pulse</span><span class="o">.</span><span class="n">iq_frequency</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">pulse</span><span class="o">.</span><span class="n">phase</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">text</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> phase = </span><span class="si">{:.0f}</span><span class="s2"> deg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pulse</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
+
+                <span class="c1"># Make sure pulse colors are unique</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">remaining_colors</span><span class="p">:</span>
+                    <span class="n">remaining_colors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_palette</span><span class="p">[:]</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All colors already in use...</span><span class="se">\n</span><span class="s2"> Resetting color palette.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pulse</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulse_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="c1"># Pulse type is special and has predefined color</span>
+                    <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pulse_cols</span><span class="p">[</span><span class="n">pulse</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">pulse</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">pulse_colors</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="c1"># Pulse was in sequence before, take same color again</span>
+                    <span class="n">col</span> <span class="o">=</span> <span class="n">pulse_colors</span><span class="p">[</span><span class="n">pulse</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">col</span> <span class="o">=</span> <span class="n">remaining_colors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">pulse_colors</span><span class="p">[</span><span class="n">pulse</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span>
+                    <span class="n">remaining_colors</span> <span class="o">=</span> <span class="n">remaining_colors</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+                <span class="n">ax</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span>
+                    <span class="p">[</span><span class="n">amp</span><span class="p">,</span> <span class="n">amp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">amp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">amp</span><span class="p">],</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
+                    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                    <span class="n">i</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
+                    <span class="n">amp</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
+                    <span class="n">text</span><span class="p">,</span>
+                    <span class="n">horizontalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                    <span class="n">verticalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="c1"># make sure plot looks nice and fits on the screen (max number of pulses before scaling down is 9)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">9.0</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">))</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_figheight</span><span class="p">(</span><span class="n">size</span> <span class="o">*</span> <span class="n">ampmax</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_figwidth</span><span class="p">(</span><span class="n">size</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;pulse number&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence</span><span class="p">)))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span>
+            <span class="o">-</span><span class="mf">0.05</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># hide y ticks</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="c1"># hide top and right spines</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s2">&quot;right&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Wridhdhisom / Quantum Circuits Group.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
